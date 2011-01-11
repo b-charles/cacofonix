@@ -1,0 +1,399 @@
+\documentclass{article}
+
+% USEPACKAGE
+\usepackage{color}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage{listings}
+\usepackage{xspace}
+
+% COMMANDS
+\newcommand\cacofonix{\textsc{Cacofonix}\xspace}
+\newcommand\matlab{\textsc{Matlab}\xspace}
+
+\newcommand\note{\lstinline!Note!\xspace}
+
+\newcommand\frerejaques{\emph{Fr\`ere Jacques}\xspace}
+
+\newcommand\noteFile{\texttt{Note.m}\xspace}
+\newcommand\cacofonixFile{\texttt{cacofonix.m}\xspace}
+\newcommand\noteInitFile{\texttt{NoteInit.m}\xspace}
+\newcommand\noteInitFrFile{\texttt{NoteInit\_fr.m}\xspace}
+
+\newcommand\exchange[2]{\texttt{#1}\footnote{\url{#2}}\xspace}
+
+% ME AND MYSELF
+\definecolor{mecolor}{rgb}{1,0.25,0.25}
+\definecolor{myselfcolor}{rgb}{0.25,0.25,1}
+\newenvironment{meenv}{ \par \noindent \makebox[6em][r]{ \textcolor{mecolor}{Me}: " --~}}{~"}
+\newenvironment{myselfenv}{ \par \noindent \makebox[6em][r]{ \textcolor{myselfcolor}{Myself}: " --~}}{~"}
+\newcommand{ \me }[1]{%
+\begin{meenv}%
+	#1%
+\end{meenv} }
+\newcommand{ \myself }[1]{%
+\begin{myselfenv}%
+	#1%
+\end{myselfenv} }
+
+% MATLAB CODE
+\definecolor{matlabcolor}{rgb}{0,0.5,0.5}
+\lstset{ basicstyle=\color{matlabcolor}, literate={~}{$\sim$}1 {>>}{$\gg$}1 }
+\title{\cacofonix user's guide}
+\author{by B}
+\date{}
+
+\usepackage{graphics}
+\begin{document}
+
+\maketitle
+
+\me{ Hi! }
+\myself{ Hello! }
+
+\paragraph{}
+
+\emph{I and my inner voices will try to explain the features of \cacofonix in the Shakespeare's language. I'm sorry for my mistakes and I will be grateful of any suggestion to improve this document.}
+
+\tableofcontents
+
+\section{Introduction}
+
+\cacofonix is a \matlab program, helping to write midi files.
+
+\me{ Who are the target customers? Who needs help the write midi files? Who thinks about \matlab to create a midi file? Who wakes up the morning and says "Hoho! Today, I will create a midi file. I think the easiest way is to use \matlab and an underground plug in."? }
+\myself{ Well, a lot of softwares, free or not, exist and are more attractive, intuitive, flexible and for better results. Nevertheless, \cacofonix was inspired from \exchange{Theme from Super Mario Brother Song}{http://www.mathworks.com/matlabcentral/fileexchange/8442}, a little project found on the \textsc{Matlab Central}, and the first midi files I produced was some themes from Zelda. So, I guess \cacofonix was created for geeks\dots }
+\me{ That's cool. One day, they'll rule the world. }
+
+\paragraph{}
+
+To start and to read this document, you need know some music theory and \matlab bases: at least, read a sheet and, \matlab side, know what is a script, a function, an array, an object\dots Advanced users know what to do with \lstinline!addpath!, but the easiest way to use \cacofonix is to set the \matlab current directory to the directory of codes (\noteFile and \cacofonixFile).
+
+\section{Tutorial}
+
+To see how \cacofonix works, we will try to transcode this sheet (\frerejaques, a famous French nursery melody):\\
+\begin{lilypond}
+	\relative c'' { \new Staff { \key g \major \time 2/4 g4 a b g b c d2 d8. e16 d8 c b4 g g d g2 } }
+\end{lilypond}
+
+\subsection{Dummy code}
+
+To create a playable note, you have to create two \note objects, one for the tonality, one for the duration, and associate them with the \lstinline!:! operator:
+\begin{lstlisting}
+mynote = Note('G'):Note(1);
+\end{lstlisting}
+This instruction creates a G quarter note (\lstinline!Note(4)! for a whole note). Per default, a note without tonality is a rest, and a note without duration is not played. A string can be inserted between the two notes, to specify the accent: \lstinline!Note('G'):'>':Note(1)!.
+
+To have a G note (or any other note\dots) of an another octave, you have to use the unary operators \lstinline!-! and \lstinline!+!. \\
+\begin{lilypond}
+	\relative c' { \new Staff { b1 c a' b c }
+	\addlyrics{ "-Note('B')  " "Note('C')  " "Note('A')  " "Note('B')  " "+Note('C')  " } }
+\end{lilypond}
+
+A complete sheet is just an array of \lstinline!Note! objects. So, this is a first (and very dummy) version of \frerejaques:
+\begin{lstlisting}
+sheet = [ ...
+Note('G'):Note(1) Note('A'):Note(1) ...
+Note('B'):Note(1) Note('G'):Note(1) ...
+Note('B'):Note(1) +Note('C'):Note(1) ...
++Note('D'):Note(2) ...
++Note('D'):Note(3/4) +Note('E'):Note(1/4) ...
++Note('D'):Note(1/2) +Note('C'):Note(1/2) ...
+Note('B'):Note(1) Note('G'):Note(1) ...
+Note('G'):Note(1) Note('D'):Note(1) ...
+Note('G'):Note(2) ];
+\end{lstlisting}
+
+The final step, to create the midi files, is to call the \lstinline!cacofonix! function, with setting the name of the file and the tempo:
+\begin{lstlisting}
+cacofonix( 'FrereJacques', 'Tempo', 100, sheet );
+\end{lstlisting}
+
+Theoretically, a file \texttt{FrereJacques.mid} has been created in the current directory and you can open it with your favorite player.
+
+\subsection{Predefinition of some \note objects}
+
+A way to simplify the writing of a sheet is to predefine some \note objects. Two scripts are proposed to initialize \matlab before the creation of sheets: \noteInitFile and \noteInitFrFile. This is an extract of \noteInitFile:
+\begin{lstlisting}
+R = Note( 'rest' );
+
+Cf = Note( 'Cf' ); C = Note( 'C' ); Cs = Note( 'Cs' );
+Df = Note( 'Df' ); D = Note( 'D' ); Ds = Note( 'Ds' );
+Ef = Note( 'Ef' ); E = Note( 'E' ); Es = Note( 'Es' );
+Ff = Note( 'Ff' ); F = Note( 'F' ); Fs = Note( 'Fs' );
+Gf = Note( 'Gf' ); G = Note( 'G' ); Gs = Note( 'Gs' );
+Af = Note( 'Af' ); A = Note( 'A' ); As = Note( 'As' );
+Bf = Note( 'Bf' ); B = Note( 'B' ); Bs = Note( 'Bs' );
+
+N = Note( 4 );
+N2 = Note( 2 );
+N4 = Note( 1 );
+N8 = Note( 0.5 );
+N16 = Note( 0.25 );
+N12 = Note( 1/3 );
+\end{lstlisting}
+
+In the real \noteInitFile, some other \note objects are instanced. All this objects will be useful, and explained later.
+
+So, \frerejaques becomes:
+\begin{lstlisting}
+NoteInit
+N8dotted = Note( 3/4 );
+
+sheet = [ ...
+G:N4 A:N4 ...
+B:N4 G:N4 ...
+B:N4 +C:N4 ...
++D:N2 ...
++D:N8dotted +E:N16 +D:N8 +C:N8 ...
+B:N4 G:N4 ...
+G:N4 D:N4 ...
+G:N2 ];
+\end{lstlisting}
+
+\me{Nice. Why each measure is on a line?}
+\myself{I think it's a good practice to separate each measure on a different line: bigger projects become more readable, specially with the bars and markers functionalities of \note.}
+
+\subsection{Bars}
+
+\cacofonix is able to check some common mistakes, like a measure with the wrong durations, but it need bars.
+
+A bar object is constructed with \lstinline!Note('bar')!. It's a very useful feature, so it's defined in \noteInitFile.
+
+With bars, our example becomes:
+\begin{lstlisting}
+NoteInit
+N8dotted = Note( 3/4 );
+
+sheet = [ ...
+	G:N4 A:N4 bar ...
+	B:N4 G:N4 bar ...
+	B:N4 +C:N4 bar ...
+	+D:N2 bar ...
+	+D:N8dotted +E:N16 +D:N8 +C:N8 bar ...
+	B:N4 G:N4 bar ...
+	G:N4 D:N4 bar ...
+	G:N2 bar ...
+	];
+\end{lstlisting}
+
+\me{Always adding \lstinline!bar! at each measure, it's a little boring, isn't it?}
+\myself{Yes. But something like \exchange{EditorMacro}{http://www.mathworks.com/matlabcentral/fileexchange/24615} can be helpful.}
+\me{ And how \cacofonix knows the expected duration?}
+\myself{Well, you have to know the first measure is never checked, to allow anacrusis. If the meter defined, the second and next are checked, else the duration of the second measure sets the expected duration of the others. Even if the first measure is an anacrusis, the other measures have to always have the same duration, or the meter has to be redefined.}
+
+\subsection{Dotted notes}
+
+In the last version of \frerejaques, a special \note object has been created to represent a dotted eighth note: \lstinline!N8dotted = Note(3/4);!, but the \lstinline!ctranspose! (\lstinline!'!) operator can be used to add the half duration of the note. For example: \\
+\begin{lilypond}
+	\relative c'' { \new Staff { \time 2/4 g4. g8 g8. g16 g8. g16 g4.. g16 } }
+\end{lilypond}
+
+\begin{lstlisting}
+NoteInit
+
+sheet = [ ...
+	G:N4' G:N8 bar ...
+	G:N8' G:N16 G:N8' G:N16 bar ...
+	G:N4'' G:N16 bar ...
+	];
+\end{lstlisting}
+
+\subsection{Ties and slurs}
+
+Ties and slurs are written with the same operator: \lstinline!not! (\lstinline!~!). Technically, the note preceding a tied note is played for all its duration, and the notes are merged if they have the same tonality. Sometimes, during a slur, two notes with the same tonality can be juxtaposed: \cacofonix will merge them, unless if the second note precise an attack with the \lstinline!'|'! character. If the operator is applied on an array of \note, all \note objects will be tied, excepted the first. This is some examples: \\
+\begin{lilypond}
+	\relative c'' { \new Staff { \time 4/4 g4( g) f( a) g( g) f( a) g\( ^( g) f a \) g\( g f a \) } }
+\end{lilypond}
+
+\begin{lstlisting}
+NoteInit
+sheet = [ ...
+	G:N4 ~G:N4 F:N4 ~A:N4 bar ...
+	~[ G:N4 G:N4 ] ~[ F:N4 A:N4 ] bar ...
+	G:N4 ~G:N4 ~F:N4 ~A:N4 bar ...
+	~[ G:N4 G:'|':N4 F:N4 A:N4 ] bar ...
+	];
+\end{lstlisting}
+
+\me{There are an another way to create a note with an exotic duration.}
+\begin{myselfenv}
+	Yes, but the good way is always use the \lstinline!'! and \lstinline!~! operators.
+\end{myselfenv}
+\begin{meenv}
+	And the convenient way is use an array for the duration with the operator \lstinline!:!, like that:\lstinline!G:[N4 N16]!.
+\end{meenv}
+
+\subsection{Chord}
+
+A chord is a note with several tonalities and one duration. There are two ways to create a chord: a good one, the operator \lstinline!plus! (\lstinline!+!), and a bad-but-sometimes-convenient one, using an array with the operator \lstinline!colon! (you know, \lstinline!:!). \\
+\begin{lilypond}
+	\relative c' { \new Staff { \time 2/4 <c e g c>2 <g' b d g> <c, e g c> <g' b d g>4( <g b d g>8)( <g b d g> ) } }
+\end{lilypond}
+
+\begin{lstlisting}
+NoteInit
+sheet = [ ...
+	C+E+G++C:N2 bar ...
+	G+B++D++G:N2 bar ...
+	[C E G +C]:N2 bar ...
+	[G B +D +G]:[N4 N8 N8] bar ...
+	];
+\end{lstlisting}
+
+\myself{Something to say?}
+\me{No.}
+\myself{Good.}
+
+\subsection{Polyphonic sections}
+
+A polyphonic section is a set of sheets with the same duration and played at the same time. To create a polyphonic sheet, the monophonic sheets have to be combined with the operator \lstinline!mrdivide! (\lstinline!/!). \\
+\begin{lilypond}
+\new GrandStaff <<
+\new Staff { \time 3/4 \relative c'' <<
+	{ c2 c4( c4) c2 } \\
+	{ c,4( e g) c,( e g) }
+	>> }
+\new Staff { \clef bass \relative c c2. c2. }
+	>>
+\end{lilypond}
+\begin{lstlisting}
+NoteInit
+sheet = [ +C:N2 +C:N4 bar ~+C:N4 +C:N2 bar ] / ...
+	[ ~[ C:N4 E:N4 G:N4 ] bar ~[ C:N4 E:N4 G:N4 ] bar ] / ...
+	[ -C:N2' bar -C:N2' bar ];
+\end{lstlisting}
+
+Bars have to be mentioned in every monophonic part.
+
+\subsection{Display}
+
+A good way to check errors is to display the sheet: the function \lstinline!display! has been overloaded to represent the sheet. This is the display of \frerejaques:
+\begin{lstlisting}
+>> NoteInit
+>> sheet = [ ...
+	G:N4 A:N4 bar ...
+	B:N4 G:N4 bar ...
+	B:N4 +C:N4 bar ...
+	+D:N2 bar ...
+	+D:N8' +E:N16 +D:N8 +C:N8 bar ...
+	B:N4 G:N4 bar ...
+	G:N4 D:N4 bar ...
+	G:N2 bar ...
+	];
+>> sheet
+$1///////////////////////////////////////////////$
+$|-----------G-----------|-----------A-----------$
+$2///////////////////////////////////////////////$
+$|-----------B-----------|-----------G-----------$
+$3///////////////////////////////////////////////$
+$|-----------B-----------|-----------C-----------$
+$4///////////////////////////////////////////////$
+$|-----------------------D-----------------------$
+$5///////////////////////////////////////////////$
+$|--------D--------|--E--|-----D-----|-----C-----$
+$6///////////////////////////////////////////////$
+$|-----------B-----------|-----------G-----------$
+$7///////////////////////////////////////////////$
+$|-----------G-----------|-----------D-----------$
+$8///////////////////////////////////////////////$
+$|-----------------------G-----------------------$
+\end{lstlisting}
+
+New lines are set according to bars, and a lot of stuff can be displayed: chords, polyphonic sheet, meters, markers, dynamics, tempo\dots Only note's octave is never displayed.
+
+To set the number of characters per quater note, you have to use the class function \lstinline!setNbCharByQuater! (for example: \lstinline!Note.setNbCharByQuater(48)! --- the default value is 24).
+
+\subsection{A little more about the \lstinline!cacofonix! function}
+
+As you know, the \lstinline!cacofonix! function writes the final file. It is possible to give several sheets, generaly one sheet by instrument. To do that, you have to precise the wanted instrument before the sheet. Suppose you have two sheets, \lstinline!sheet_violin! and \lstinline!sheet_trumpet!:
+\begin{lstlisting}
+cacofonix( 'myFile.mid', 'Tempo', 100, ...
+	'Violin', sheet_violin, ...
+	'Trumpet', sheet_trumpet )
+\end{lstlisting}
+
+To know the list of available instruments, type \lstinline!cacofonix -instruments!. You can't play more than 15 sheets (if you reach the limit, may be the polyphonic operator \lstinline!/! can be helpful).
+
+Some percussions are available too, type \lstinline!cacofonix -percussions! to know the list. However, percussion sheets can't have tonality: instead of using tonality notes (\lstinline!Note('G')!), you have to use the void note: \lstinline!V=Note('void')! (per default, a note without tonality is a rest). There are no restriction about the number of percussion sheet.
+
+\subsection{And now?}
+
+Well, we have a nice version of \frerejaques:
+\begin{lstlisting}
+NoteInit
+sheet = [ ...
+	G:N4 A:N4 bar ...
+	B:N4 G:N4 bar ...
+	B:N4 +C:N4 bar ...
+	+D:N2 bar ...
+	+D:N8' +E:N16 +D:N8 +C:N8 bar ...
+	B:N4 G:N4 bar ...
+	G:N4 D:N4 bar ...
+	G:N2 bar ...
+	];
+cacofonix( 'FrereJacques', 'Tempo', 100, sheet );
+\end{lstlisting}
+
+\me{Hurray!}
+
+We have seen in this tutorial only very basic features of \cacofonix, but it's probably enough for start.
+
+The script \texttt{ForElise.m} is a good demonstration of the possibilities of \cacofonix: you can see different attacks, markers, dynamics, tempo, sustain\dots The next section will explain more precisely all the features of \cacofonix.
+
+Thank you to have read this document, and for your interest about \cacofonix.
+
+\myself{ Enjoy! }
+
+\section{Reference guide}
+
+\subsection{A \note object}
+\subsubsection{Tonalities}
+\subsubsection{Duration}
+
+\subsection{Set duration \lstinline!:!}
+\subsubsection{Attacks}
+\subsubsection{Detached notes}
+
+\subsection{Dotted notes}
+
+\subsection{Ties and slur}
+
+\subsection{Meter}
+
+\subsection{Bars}
+
+\subsection{Octave}
+\subsubsection{Octave (operator)}
+\subsubsection{Octave (note)}
+
+\subsection{Dynamics}
+\subsubsection{Crescendo}
+
+\subsection{Tempo}
+\subsubsection{Fermata}
+\subsubsection{Accelerendo/Rall}
+
+\subsection{Polyphonic \lstinline!/!}
+
+\subsection{Sustain}
+
+\subsection{Chord \lstinline!+!}
+
+\subsection{Transpose \lstinline!\^!}
+
+\subsection{Repeat / Riff \lstinline!.*!}
+
+\subsection{Markers}
+\subsubsection{Extraction \lstinline!|!}
+
+\subsection{Display}
+
+\subsection{Void note}
+\subsubsection{Expand \lstinline!*!}
+\subsubsection{Index \lstinline!-!}
+
+\subsection{Function \lstinline!cacofonix!}
+\subsubsection{The Main sheet}
+
+\end{document}
