@@ -38,7 +38,7 @@
 
 % MATLAB CODE
 \definecolor{matlabcolor}{rgb}{0,0.5,0.5}
-\lstset{ basicstyle=\color{matlabcolor}, literate={~}{$\sim$}1 {>>}{$\gg$}1 }
+\lstset{ basicstyle=\color{matlabcolor}\ttfamily, literate={~}{$\sim$}1 {>>}{$\gg$}1, tabsize=4 }
 \title{\cacofonix user's guide}
 \author{by B}
 \date{}
@@ -53,7 +53,7 @@
 
 \paragraph{}
 
-\emph{I and my inner voices will try to explain the features of \cacofonix in the Shakespeare's language. I'm sorry for my mistakes and I will be grateful of any suggestion to improve this document.}
+\emph{I and my inner voices will try to explain the features of \cacofonix in the Shakespeare's language. I'm sorry for my grammatical mistakes and I will be grateful of any suggestion to improve this document.}
 
 \tableofcontents
 
@@ -62,12 +62,12 @@
 \cacofonix is a \matlab program, helping to write midi files.
 
 \me{ Who are the target customers? Who needs help the write midi files? Who thinks about \matlab to create a midi file? Who wakes up the morning and says "Hoho! Today, I will create a midi file. I think the easiest way is to use \matlab and an underground plug in."? }
-\myself{ Well, a lot of softwares, free or not, exist and are more attractive, intuitive, flexible and for better results. Nevertheless, \cacofonix was inspired from \exchange{Theme from Super Mario Brother Song}{http://www.mathworks.com/matlabcentral/fileexchange/8442}, a little project found on the \textsc{Matlab Central}, and the first midi files I produced was some themes from Zelda. So, I guess \cacofonix was created for geeks\dots }
+\myself{ Well, a lot of softwares for editing music and creating midi files exist, free or not, and are more attractive, intuitive, flexible and for better results. Nevertheless, \cacofonix was inspired from \exchange{Theme from Super Mario Brother Song}{http://www.mathworks.com/matlabcentral/fileexchange/8442}, a little project found on the \textsc{Matlab Central}, and the first midi files I produced was some themes from Zelda. So, I guess \cacofonix was created for \matlab geeks\dots }
 \me{ That's cool. One day, they'll rule the world. }
 
 \paragraph{}
 
-To start and to read this document, you need know some music theory and \matlab bases: at least, read a sheet and, \matlab side, know what is a script, a function, an array, an object\dots Advanced users know what to do with \lstinline!addpath!, but the easiest way to use \cacofonix is to set the \matlab current directory to the directory of codes (\noteFile and \cacofonixFile).
+To start and to read this document, you need know some music theory and \matlab bases: at least, read a music sheet and, \matlab side, know what is a script, a function, an array, an object\dots Advanced users know what to do with \lstinline!addpath!, but the easiest way to use \cacofonix is to set the \matlab current directory to the directory of codes (\noteFile and \cacofonixFile).
 
 \section{Tutorial}
 
@@ -86,22 +86,29 @@ This instruction creates a G quarter note (\lstinline!Note(4)! for a whole note)
 
 To have a G note (or any other note\dots) of an another octave, you have to use the unary operators \lstinline!-! and \lstinline!+!. \\
 \begin{lilypond}
-	\relative c' { \new Staff { b1 c a' b c }
-	\addlyrics{ "-Note('B')  " "Note('C')  " "Note('A')  " "Note('B')  " "+Note('C')  " } }
+	\relative c' { \new Staff { b1 c a' b c } }
 \end{lilypond}
+\begin{lstlisting}
+sheet = [ ...
+	-Note('B'):Note(4) ...
+	Note('C'):Note(4) ...
+	Note('A'):Note(4) ...
+	Note('B'):Note(4) ...
+	+Note('C'):Note(4) ];
+\end{lstlisting}
 
 A complete sheet is just an array of \lstinline!Note! objects. So, this is a first (and very dummy) version of \frerejaques:
 \begin{lstlisting}
 sheet = [ ...
-Note('G'):Note(1) Note('A'):Note(1) ...
-Note('B'):Note(1) Note('G'):Note(1) ...
-Note('B'):Note(1) +Note('C'):Note(1) ...
-+Note('D'):Note(2) ...
-+Note('D'):Note(3/4) +Note('E'):Note(1/4) ...
-+Note('D'):Note(1/2) +Note('C'):Note(1/2) ...
-Note('B'):Note(1) Note('G'):Note(1) ...
-Note('G'):Note(1) Note('D'):Note(1) ...
-Note('G'):Note(2) ];
+	Note('G'):Note(1) Note('A'):Note(1) ...
+	Note('B'):Note(1) Note('G'):Note(1) ...
+	Note('B'):Note(1) +Note('C'):Note(1) ...
+	+Note('D'):Note(2) ...
+	+Note('D'):Note(3/4) +Note('E'):Note(1/4) ...
+	+Note('D'):Note(1/2) +Note('C'):Note(1/2) ...
+	Note('B'):Note(1) Note('G'):Note(1) ...
+	Note('G'):Note(1) Note('D'):Note(1) ...
+	Note('G'):Note(2) ];
 \end{lstlisting}
 
 The final step, to create the midi files, is to call the \lstinline!cacofonix! function, with setting the name of the file and the tempo:
@@ -141,14 +148,14 @@ NoteInit
 N8dotted = Note( 3/4 );
 
 sheet = [ ...
-G:N4 A:N4 ...
-B:N4 G:N4 ...
-B:N4 +C:N4 ...
-+D:N2 ...
-+D:N8dotted +E:N16 +D:N8 +C:N8 ...
-B:N4 G:N4 ...
-G:N4 D:N4 ...
-G:N2 ];
+	G:N4 A:N4 ...
+	B:N4 G:N4 ...
+	B:N4 +C:N4 ...
+	+D:N2 ...
+	+D:N8dotted +E:N16 +D:N8 +C:N8 ...
+	B:N4 G:N4 ...
+	G:N4 D:N4 ...
+	G:N2 ];
 \end{lstlisting}
 
 \me{Nice. Why each measure is on a line?}
@@ -156,9 +163,9 @@ G:N2 ];
 
 \subsection{Bars}
 
-\cacofonix is able to check some common mistakes, like a measure with the wrong durations, but it need bars.
+\cacofonix is able to check some common mistakes, like a measure with the wrong duration, but it needs bars.
 
-A bar object is constructed with \lstinline!Note('bar')!. It's a very useful feature, so it's defined in \noteInitFile.
+A bar object is constructed with \lstinline!Note('bar')!. It's a very useful feature, so a \lstinline!bar! object is defined in \noteInitFile.
 
 With bars, our example becomes:
 \begin{lstlisting}
@@ -173,8 +180,7 @@ sheet = [ ...
 	+D:N8dotted +E:N16 +D:N8 +C:N8 bar ...
 	B:N4 G:N4 bar ...
 	G:N4 D:N4 bar ...
-	G:N2 bar ...
-	];
+	G:N2 bar ];
 \end{lstlisting}
 
 \me{Always adding \lstinline!bar! at each measure, it's a little boring, isn't it?}
@@ -195,13 +201,12 @@ NoteInit
 sheet = [ ...
 	G:N4' G:N8 bar ...
 	G:N8' G:N16 G:N8' G:N16 bar ...
-	G:N4'' G:N16 bar ...
-	];
+	G:N4'' G:N16 bar ];
 \end{lstlisting}
 
 \subsection{Ties and slurs}
 
-Ties and slurs are written with the same operator: \lstinline!not! (\lstinline!~!). Technically, the note preceding a tied note is played for all its duration, and the notes are merged if they have the same tonality. Sometimes, during a slur, two notes with the same tonality can be juxtaposed: \cacofonix will merge them, unless if the second note precise an attack with the \lstinline!'|'! character. If the operator is applied on an array of \note, all \note objects will be tied, excepted the first. This is some examples: \\
+Ties and slurs are written with the same operator: \lstinline!not! (\lstinline!~!). Technically, the note preceding a tied note is played for all its duration, and the notes are merged if they have the same tonality. Sometimes, during a slur, two notes with the same tonality can be juxtaposed: \cacofonix will merge them, unless if the second note precise an attack with the \lstinline!'|'! character. If the operator \lstinline!not! is applied on an array of \note, all \note objects will be tied, excepted the first. This is some examples: \\
 \begin{lilypond}
 	\relative c'' { \new Staff { \time 4/4 g4( g) f( a) g( g) f( a) g\( ^( g) f a \) g\( g f a \) } }
 \end{lilypond}
@@ -212,8 +217,7 @@ sheet = [ ...
 	G:N4 ~G:N4 F:N4 ~A:N4 bar ...
 	~[ G:N4 G:N4 ] ~[ F:N4 A:N4 ] bar ...
 	G:N4 ~G:N4 ~F:N4 ~A:N4 bar ...
-	~[ G:N4 G:'|':N4 F:N4 A:N4 ] bar ...
-	];
+	~[ G:N4 G:'|':N4 F:N4 A:N4 ] bar ];
 \end{lstlisting}
 
 \me{There are an another way to create a note with an exotic duration.}
@@ -221,7 +225,7 @@ sheet = [ ...
 	Yes, but the good way is always use the \lstinline!'! and \lstinline!~! operators.
 \end{myselfenv}
 \begin{meenv}
-	And the convenient way is use an array for the duration with the operator \lstinline!:!, like that:\lstinline!G:[N4 N16]!.
+	And the convenient way is use an array for the duration with the operator \lstinline!:!, like that: \lstinline!G:[N4 N16]!.
 \end{meenv}
 
 \subsection{Chord}
@@ -237,8 +241,7 @@ sheet = [ ...
 	C+E+G++C:N2 bar ...
 	G+B++D++G:N2 bar ...
 	[C E G +C]:N2 bar ...
-	[G B +D +G]:[N4 N8 N8] bar ...
-	];
+	[G B +D +G]:[N4 N8 N8] bar ];
 \end{lstlisting}
 
 \myself{Something to say?}
@@ -250,12 +253,12 @@ sheet = [ ...
 A polyphonic section is a set of sheets with the same duration and played at the same time. To create a polyphonic sheet, the monophonic sheets have to be combined with the operator \lstinline!mrdivide! (\lstinline!/!). \\
 \begin{lilypond}
 \new GrandStaff <<
-\new Staff { \time 3/4 \relative c'' <<
-	{ c2 c4( c4) c2 } \\
-	{ c,4( e g) c,( e g) }
-	>> }
-\new Staff { \clef bass \relative c c2. c2. }
-	>>
+	\new Staff { \time 3/4 \relative c'' <<
+		{ c2 c4( c4) c2 } \\
+		{ c,4( e g) c,( e g) }
+		>> }
+	\new Staff { \clef bass \relative c c2. c2. }
+>>
 \end{lilypond}
 \begin{lstlisting}
 NoteInit
@@ -279,8 +282,7 @@ A good way to check errors is to display the sheet: the function \lstinline!disp
 	+D:N8' +E:N16 +D:N8 +C:N8 bar ...
 	B:N4 G:N4 bar ...
 	G:N4 D:N4 bar ...
-	G:N2 bar ...
-	];
+	G:N2 bar ];
 >> sheet
 $1///////////////////////////////////////////////$
 $|-----------G-----------|-----------A-----------$
@@ -330,8 +332,7 @@ sheet = [ ...
 	+D:N8' +E:N16 +D:N8 +C:N8 bar ...
 	B:N4 G:N4 bar ...
 	G:N4 D:N4 bar ...
-	G:N2 bar ...
-	];
+	G:N2 bar ];
 cacofonix( 'FrereJacques', 'Tempo', 100, sheet );
 \end{lstlisting}
 
@@ -348,10 +349,42 @@ Thank you to have read this document, and for your interest about \cacofonix.
 \section{Reference guide}
 
 \subsection{A \note object}
+
+For \cacofonix, all sheets consist of an array of \lstinline!Note! objects: every functionality is associated to an \lstinline!Note! object or a method of \lstinline!Note! class. Of course, two kind of \lstinline!Note! object are fundamental: tonalities and duration.
+
 \subsubsection{Tonalities}
+
+To create a tonality \lstinline!Note! object, you simply have to call the constructor with a string containing the name of the expected note. The basic names are \lstinline!'rest'! for a rest, \lstinline!'void'! for a void note, \lstinline!'do'!, \lstinline!'re'!, \lstinline!'mi'!, \lstinline!'fa'!, \lstinline!'sol'!, \lstinline!'la'!, \lstinline!'si'! and \lstinline!'a'!, \lstinline!'b'!, \lstinline!'c'!, \lstinline!'d'!, \lstinline!'e'!, \lstinline!'f'! and \lstinline!'g'!. You can add one or two \lstinline!'b'! (\emph{b\'emol}, flat) or \lstinline!'d'! (\emph{di\`ese}, sharp) after \lstinline!'do'!, \lstinline!'re'!, \lstinline!'mi'!\dots and you can add one or two \lstinline!'f'! or \lstinline!'s'! after \lstinline!'a'!, \lstinline!'b'!, \lstinline!'c'!\dots The constructor is case insensitive.
+
+In \noteInitFile and \noteInitFrFile files, only notes with none or one accident are instanced, but something like \lstinline!Eff = Note( 'Eff' );! is completely valid.
+
 \subsubsection{Duration}
 
+To create a duration \lstinline!Note! object, you have to call the constructor with a double, which will be the duration of the note, in number of beats: \lstinline!Note(4)! for a whole note, \lstinline!Note(1)! for a quarter note.
+
+\noteInitFile and \noteInitFrFile defined some useful duration: the whole note to the sixteenth note and the triplet quarter note.
+
+\subsection{Chord \lstinline!+!}
+
+In the tutorial, the binary \lstinline!+! operator is used to create chords, but this operator is more general. It merge two notes (or two array of notes) in one object: tonalities are recorded as a chord and durations are summed.
+
+The script can become messy very quickly if this operator is not correctly used. Yes, with that, you can create a complete note with tonalities and duration (\lstinline!C+N2+E+N8+G! works perfectly) but it's generally a bad idea.
+
 \subsection{Set duration \lstinline!:!}
+
+The \lstinline!:! operator associates a tonality note (or an array of tonality notes) with a duration note (or an array of duration notes).
+
+Like \lstinline!+!, this operator is very flexible, but it's not a good a idea to abuse of this. For a minimum of readability, it's a good practice to write \lstinline!tonality:duration!, but, in facts, the order is not important: the two arrays, tonality and duration, are merge with the \lstinline!plus! operator.
+
+\begin{table}
+\begin{tabular}{ccl}
+\lstinline!'>'! & accent & raise the dynamics of the note \\
+\lstinline!'.'! & staccato & the note is played only during the half of its duration \\
+\lstinline!'^'! & marcato & like an accent and a staccato \\
+\lstinline!'-'! & tenuto & like an accent and the delay between the previous note and this one is risen \\
+\end{tabular}
+\end{table}
+
 \subsubsection{Attacks}
 \subsubsection{Detached notes}
 
@@ -378,8 +411,6 @@ Thank you to have read this document, and for your interest about \cacofonix.
 
 \subsection{Sustain}
 
-\subsection{Chord \lstinline!+!}
-
 \subsection{Transpose \lstinline!\^!}
 
 \subsection{Repeat / Riff \lstinline!.*!}
@@ -389,7 +420,17 @@ Thank you to have read this document, and for your interest about \cacofonix.
 
 \subsection{Display}
 
-\subsection{Void note}
+Someting about the display.
+
+\subsection{The void note}
+
+\begin{lilypond}
+\new GrandStaff <<
+\new Staff { \clef treble \key es \major \time 2/4 \relative c'' { r8 g\ff[ g g] es2\fermata r8 f[ f f] d2( d2\fermata) } }
+\new Staff { \clef bass \key es \major \partcombine { \relative c' { r8 g[ g g] es2\fermata r8 f[ f f] d2( d2\fermata) } } { \relative c { r8 g[ g g] es2 r8 f[ f f] d2( d2) } } }
+>>
+\end{lilypond}
+
 \subsubsection{Expand \lstinline!*!}
 \subsubsection{Index \lstinline!-!}
 
