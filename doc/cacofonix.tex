@@ -53,7 +53,7 @@
 
 \paragraph{}
 
-\emph{I and my inner voices will try to explain the features of \cacofonix in the Shakespeare's language. I'm sorry for my grammatical mistakes and I will be grateful of any suggestion to improve this document.}
+\emph{Welcome. I and my inner voices will try to explain the features of \cacofonix. I realize my English is far to be perfect and I will be grateful of any suggestion to improve this document.}
 
 \tableofcontents
 
@@ -82,7 +82,7 @@ To create a playable note, you have to create two \note objects, one for the ton
 \begin{lstlisting}
 mynote = Note('G'):Note(1);
 \end{lstlisting}
-This instruction creates a G quarter note (\lstinline!Note(4)! for a whole note). Per default, a note without tonality is a rest, and a note without duration is not played. A string can be inserted between the two notes, to specify the accent: \lstinline!Note('G'):'>':Note(1)!.
+This instruction creates a G quarter note (\lstinline!Note(4)! for a whole note). Per default, a note without tonality is a rest, and a note without duration is not played.
 
 To have a G note (or any other note\dots) of an another octave, you have to use the unary operators \lstinline!-! and \lstinline!+!. \\
 \begin{lilypond}
@@ -186,7 +186,7 @@ sheet = [ ...
 \me{Always adding \lstinline!bar! at each measure, it's a little boring, isn't it?}
 \myself{Yes. But something like \exchange{EditorMacro}{http://www.mathworks.com/matlabcentral/fileexchange/24615} can be helpful.}
 \me{ And how \cacofonix knows the expected duration?}
-\myself{Well, you have to know the first measure is never checked, to allow anacrusis. If the meter defined, the second and next are checked, else the duration of the second measure sets the expected duration of the others. Even if the first measure is an anacrusis, the other measures have to always have the same duration, or the meter has to be redefined.}
+\myself{Well, you have to know the first measure is never checked, to allow anacrusis. If the meter is defined, the second and next are checked, else the duration of the second measure sets the expected duration of the others. Even if the first measure is an anacrusis, the other measures have to always have the same duration, or the meter has to be redefined.}
 
 \subsection{Dotted notes}
 
@@ -206,19 +206,7 @@ sheet = [ ...
 
 \subsection{Ties and slurs}
 
-Ties and slurs are written with the same operator: \lstinline!not! (\lstinline!~!). Technically, the note preceding a tied note is played for all its duration, and the notes are merged if they have the same tonality. Sometimes, during a slur, two notes with the same tonality can be juxtaposed: \cacofonix will merge them, unless if the second note precise an attack with the \lstinline!'|'! character. If the operator \lstinline!not! is applied on an array of \note, all \note objects will be tied, excepted the first. This is some examples: \\
-\begin{lilypond}
-	\relative c'' { \new Staff { \time 4/4 g4( g) f( a) g( g) f( a) g\( ^( g) f a \) g\( g f a \) } }
-\end{lilypond}
-
-\begin{lstlisting}
-NoteInit
-sheet = [ ...
-	G:N4 ~G:N4 F:N4 ~A:N4 bar ...
-	~[ G:N4 G:N4 ] ~[ F:N4 A:N4 ] bar ...
-	G:N4 ~G:N4 ~F:N4 ~A:N4 bar ...
-	~[ G:N4 G:'|':N4 F:N4 A:N4 ] bar ];
-\end{lstlisting}
+Ties and slurs are written with the same operator: \lstinline!not! (\lstinline!~!). The operator can be used on one note to merge it with the previous: \lstinline!G:N4 ~G:N8! (we can write \lstinline!G:N4'! too). The operator can also be used on an array of notes to play legato.
 
 \me{There are an another way to create a note with an exotic duration.}
 \begin{myselfenv}
@@ -268,6 +256,29 @@ sheet = [ +C:N2 +C:N4 bar ~+C:N4 +C:N2 bar ] / ...
 \end{lstlisting}
 
 Bars have to be mentioned in every monophonic part.
+
+\me{ There are no polyphonic section in \frerejaques. }
+\begin{myselfenv}
+Yes, but it's nice in a canon:
+
+\begin{lstlisting}
+>> NoteInit
+>> sheet = [ ...
+	G:N4 A:N4 bar ...
+	B:N4 G:N4 bar ...
+	B:N4 +C:N4 bar ...
+	+D:N2 bar ...
+	+D:N8' +E:N16 +D:N8 +C:N8 bar ...
+	B:N4 G:N4 bar ...
+	G:N4 D:N4 bar ...
+	G:N2 bar ];
+>> delay = [ N2 bar N2 bar ];
+>> cacofonix( 'FrereJacques', 'Tempo', 100, ...
+	[ sheet delay ] / [ delay sheet ] );
+\end{lstlisting}
+
+\end{myselfenv}
+\me{ Yeah, man! }
 
 \subsection{Display}
 
@@ -336,7 +347,7 @@ sheet = [ ...
 cacofonix( 'FrereJacques', 'Tempo', 100, sheet );
 \end{lstlisting}
 
-\me{Hurray!}
+\me{ Hurray! }
 
 We have seen in this tutorial only very basic features of \cacofonix, but it's probably enough for start.
 
@@ -366,38 +377,104 @@ To create a duration \lstinline!Note! object, you have to call the constructor w
 
 \subsection{Chord \lstinline!+!}
 
-In the tutorial, the binary \lstinline!+! operator is used to create chords, but this operator is more general. It merge two notes (or two array of notes) in one object: tonalities are recorded as a chord and durations are summed.
+In the tutorial, the binary \lstinline!plus! operator (\lstinline!+!) is used to create chords, but this operator is more general. It merge two notes (or two array of notes) in one object: tonalities are recorded as a chord and durations are summed.
 
-The script can become messy very quickly if this operator is not correctly used. Yes, with that, you can create a complete note with tonalities and duration (\lstinline!C+N2+E+N8+G! works perfectly) but it's generally a bad idea.
+\myself{ The script can become messy very quickly if this operator is not correctly used.}
+\me{ Yes, there is a lot of possibilities: \lstinline!C+N2+E+N8+G!, or \lstinline![C N2]+[E N8]+G!, or \lstinline!C+[N2 E+[N8 G]]!\dots It's awesome. }
+\myself{ Every time you don't use that operator correctly and neatly, God kill a kitten, and you will burn in hell. }
+
+The final note is tied if in the two arrays, at least on note is tied. The final note is detached if in the two arrays, at least on note is detached. A note can be tied AND detached, see the section \ref{sec:TiesAndSlurs} for more informations.
 
 \subsection{Set duration \lstinline!:!}
 
-The \lstinline!:! operator associates a tonality note (or an array of tonality notes) with a duration note (or an array of duration notes).
+Officially, the \lstinline!colon! operator (\lstinline!:!) associates a tonality note (or an array of tonality notes) with a duration note (or an array of duration notes): \lstinline!mynote = tonality:duration!.
 
-Like \lstinline!+!, this operator is very flexible, but it's not a good a idea to abuse of this. For a minimum of readability, it's a good practice to write \lstinline!tonality:duration!, but, in facts, the order is not important: the two arrays, tonality and duration, are merge with the \lstinline!plus! operator.
+In fact, the \lstinline!:! operator is like the \lstinline!+! operator: it merges two array of notes in the same way. The difference is the optional argument, a string which indicates the accent and if the note is detached. The string is composed with the characters of the table \ref{table:charsOfColon}: only one accent can be specify (\lstinline!'>'!, \lstinline!'.'!, \lstinline!'^'! or \lstinline!'-'!). The character \lstinline!'|'!, for a detached note, can be added after or before (for more information about detached notes, see the section \ref{sec:TiesAndSlurs}).
 
 \begin{table}
-\begin{tabular}{ccl}
+	\center
+\begin{tabular}{ccp{7cm}}
 \lstinline!'>'! & accent & raise the dynamics of the note \\
 \lstinline!'.'! & staccato & the note is played only during the half of its duration \\
 \lstinline!'^'! & marcato & like an accent and a staccato \\
 \lstinline!'-'! & tenuto & like an accent and the delay between the previous note and this one is risen \\
+\lstinline!'|'! & detached & the note is detached, even if it is tied
 \end{tabular}
+\caption{Characters composing the optional string of the \lstinline!:! operator}
+\label{table:charsOfColon}
 \end{table}
 
-\subsubsection{Attacks}
-\subsubsection{Detached notes}
+Some examples: \\
+\begin{lilypond}
+	\new Staff { \time 4/4 \relative c'' { c4\accent b\staccato a\marcato g\tenuto c,4\( ^( c8) g'8 g2\accent \) } }
+\end{lilypond}
 
-\subsection{Dotted notes}
+\begin{lstlisting}
+NoteInit
+sheet = [ ...
+	+C:'>':N4 B:'.':N4 A:'^':N4 G:'-':N4 bar ...
+	~[ C:N4 C:N8 G:N8 G:'|>':N2 bar ];
+\end{lstlisting}
 
-\subsection{Ties and slur}
+\subsection{Dotted notes \lstinline!'!}
+
+The operator \lstinline!ctranspose! (\lstinline!'!) raises the duration of the note, as a dot: one \lstinline!'! increases the duration of the note by half of its original value, $n$ \lstinline!'! serve to lengthen the note by $1 - \frac{1}{2^n}$ of its original duration. For example: \\
+\begin{lilypond}
+	\relative c'' { \new Staff { \time 2/4 g4. g8 g8. g16 g8. g16 g4.. g16 } }
+\end{lilypond}
+
+\begin{lstlisting}
+NoteInit
+
+sheet = [ ...
+	G:N4' G:N8 bar ...
+	G:N8' G:N16 G:N8' G:N16 bar ...
+	G:N4'' G:N16 bar ];
+\end{lstlisting}
+
+\subsection{Ties and slurs}
+\label{sec:TiesAndSlurs}
+
+The operator \lstinline!not! (\lstinline!~!) is used to defined ties and slurs. Technically, the note preceding a tied note is played for all its duration, and the notes are merged if they have the same tonality. Sometimes, during a slur, two notes with the same tonality can be juxtaposed: \cacofonix will merge them, unless if the second note precise an attack with the \lstinline!'|'! character (the note is \emph{detached}).
+
+If the operator \lstinline!not! is applied on an array of \note, all \note objects in the array will be tied. In this case, the array can contain not playable \note objects (like bars, meters, crescendo\dots): the operator will ignore them. This is some examples: \\
+\begin{lilypond}
+	\relative c'' { \new Staff { \time 4/4 g4( g) f( a) g( g) f( a) g\( ^( g) f a \) g\( g f a g1 \) } }
+\end{lilypond}
+
+\begin{lstlisting}
+NoteInit
+sheet = [ ...
+	G:N4 ~G:N4 F:N4 ~A:N4 bar ...
+	~[ G:N4 G:N4 ] ~[ F:N4 A:N4 ] bar ...
+	G:N4 ~G:N4 ~F:N4 ~A:N4 bar ...
+	~[ G:N4 G:'|':N4 F:N4 A:N4 bar ...
+	G:N1 ] bar ];
+\end{lstlisting}
 
 \subsection{Meter}
+
+To defined a meter, you have to instantiate a special \note object by calling the constructor \lstinline!Note! with an array of two double \lstinline!meter = Note([upper lower])!. Without surprise, the double \lstinline!upper! indicates how many beats there are in a measure and the double \lstinline!lower! indicates the note value which represents one beat.
+
+When several sheets are given to \cacofonix, the first sheet defined the meters. Next sheets don't have to redefined meters, but if they do, the meters can't be different from the first sheet. With the same spirit, in the polyphonic sections, if the meters have to be defined, the first monophonic section contains meters objects and the others don't have to, but if they do, meters have to be always identical.
+
+The first measure duration is never checked, to allow anacrusis. If no meter is given, the second measure is the reference and all measure have to have the same duration.
+
+Some examples: \\
+\begin{lilypond}
+\new GrandStaff <<
+\new Staff { \clef treble \relative c'' { \time 2/4 \partial 8 c,8 g'2 \time 4/4 c4 d e f \time 6/8 e8\( f e\) e\( d e\) } }
+\new Staff { \clef bass \relative c' { \time 2/4 \partial 8 r8 g2 \time 4/4 c,4 d e f \time 6/8 e8\( f e\) e\( d e\) } }
+>>
+\end{lilypond}
+
+\begin{lstlisting}
+\end{lstlisting}
 
 \subsection{Bars}
 
 \subsection{Octave}
-\subsubsection{Octave (operator)}
+\subsubsection{Octave (operators \lstinline!+! and \lstinline!-!)}
 \subsubsection{Octave (note)}
 
 \subsection{Dynamics}
