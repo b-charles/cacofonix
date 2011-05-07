@@ -185,8 +185,6 @@ sheet = [ ...
 
 \me{Always adding \lstinline!bar! at each measure, it's a little boring, isn't it?}
 \myself{Yes. But something like \exchange{EditorMacro}{http://www.mathworks.com/matlabcentral/fileexchange/24615} can be helpful.}
-\me{ And how \cacofonix knows the expected duration?}
-\myself{Well, you have to know the first measure is never checked, to allow anacrusis. If the meter is defined, the second and next are checked, else the duration of the second measure sets the expected duration of the others. Even if the first measure is an anacrusis, the other measures have to always have the same duration, or the meter has to be redefined.}
 
 \subsection{Dotted notes}
 
@@ -364,6 +362,7 @@ Thank you to have read this document, and for your interest about \cacofonix.
 For \cacofonix, all sheets consist of an array of \lstinline!Note! objects: every functionality is associated to an \lstinline!Note! object or a method of \lstinline!Note! class. Of course, two kind of \lstinline!Note! object are fundamental: tonalities and duration.
 
 \subsubsection{Tonalities}
+\label{sec:Tonalities}
 
 To create a tonality \lstinline!Note! object, you simply have to call the constructor with a string containing the name of the expected note. The basic names are \lstinline!'rest'! for a rest, \lstinline!'void'! for a void note, \lstinline!'do'!, \lstinline!'re'!, \lstinline!'mi'!, \lstinline!'fa'!, \lstinline!'sol'!, \lstinline!'la'!, \lstinline!'si'! and \lstinline!'a'!, \lstinline!'b'!, \lstinline!'c'!, \lstinline!'d'!, \lstinline!'e'!, \lstinline!'f'! and \lstinline!'g'!. You can add one or two \lstinline!'b'! (\emph{b\'emol}, flat) or \lstinline!'d'! (\emph{di\`ese}, sharp) after \lstinline!'do'!, \lstinline!'re'!, \lstinline!'mi'!\dots and you can add one or two \lstinline!'f'! or \lstinline!'s'! after \lstinline!'a'!, \lstinline!'b'!, \lstinline!'c'!\dots The constructor is case insensitive.
 
@@ -373,7 +372,7 @@ In \noteInitFile and \noteInitFrFile files, only notes with none or one accident
 
 To create a duration \lstinline!Note! object, you have to call the constructor with a double, which will be the duration of the note, in number of beats: \lstinline!Note(4)! for a whole note, \lstinline!Note(1)! for a quarter note.
 
-\noteInitFile and \noteInitFrFile defined some useful duration: the whole note to the sixteenth note and the triplet quarter note.
+\noteInitFile and \noteInitFrFile define some useful duration: the whole note to the sixteenth note and the triplet quarter note.
 
 \subsection{Chord \lstinline!+!}
 
@@ -381,7 +380,7 @@ In the tutorial, the binary \lstinline!plus! operator (\lstinline!+!) is used to
 
 \myself{ The script can become messy very quickly if this operator is not correctly used.}
 \me{ Yes, there is a lot of possibilities: \lstinline!C+N2+E+N8+G!, or \lstinline![C N2]+[E N8]+G!, or \lstinline!C+[N2 E+[N8 G]]!\dots It's awesome. }
-\myself{ Every time you don't use that operator correctly and neatly, God kill a kitten, and you will burn in hell. }
+\myself{ Every time you don't use that operator correctly and neatly, you make Jesus cry, God kill a kitten, and you will burn in hell to expiate your felony. }
 
 The final note is tied if in the two arrays, at least on note is tied. The final note is detached if in the two arrays, at least on note is detached. A note can be tied AND detached, see the section \ref{sec:TiesAndSlurs} for more informations.
 
@@ -452,13 +451,18 @@ sheet = [ ...
 	G:N1 ] bar ];
 \end{lstlisting}
 
-\subsection{Meter}
+\subsection{Meters and bars}
 
 To defined a meter, you have to instantiate a special \note object by calling the constructor \lstinline!Note! with an array of two double \lstinline!meter = Note([upper lower])!. Without surprise, the double \lstinline!upper! indicates how many beats there are in a measure and the double \lstinline!lower! indicates the note value which represents one beat.
 
-When several sheets are given to \cacofonix, the first sheet defined the meters. Next sheets don't have to redefined meters, but if they do, the meters can't be different from the first sheet. With the same spirit, in the polyphonic sections, if the meters have to be defined, the first monophonic section contains meters objects and the others don't have to, but if they do, meters have to be always identical.
+\lstinline!Note('bar')! creates an object representing a bar, and you use it every time you have to separate two measures. You can adding bar in tied arrays, in repeated sections (right or left, see \ref{sec:RepeatRiff}), or in expandable sections (only left, see \ref{sec:Expand}).
 
-The first measure duration is never checked, to allow anacrusis. If no meter is given, the second measure is the reference and all measure have to have the same duration.
+When several sheets are given to \cacofonix, the first sheet defined the meters. Next sheets have to precise bars, but not meters. If they do, the meters can't be different from the first sheet. With the same spirit, in the polyphonic sections, bars have to be added everywhere and, if the meters have to be defined, the first monophonic section contains meters objects and the others don't have to, but if they do, meters have to be always identical.
+
+\me{ For project with several sheets, it's maybe a good idea if the first sheet is only composed with meters and tempo, do you think? }
+\myself{ Shh! It's explained at the section \ref{sec:MainSheet}. Let him talk. }
+
+The first measure duration is never checked, to allow anacrusis. If no meter is given, the second measure is the reference and all measure have to have the same duration. Even if the first measure is an anacrusis, the other measures have to always have the same duration, or the meter has to be redefined.
 
 Some examples: \\
 \begin{lilypond}
@@ -469,13 +473,80 @@ Some examples: \\
 \end{lilypond}
 
 \begin{lstlisting}
+NoteInit
+sheet = [ ...
+	Note( [2 4] ) ...
+	C:N8 bar ...
+	G:N2 bar ...
+	Note( [4 4] ) ...
+	+C:N4 +D:N4 +E:N4 +F:N4 bar ...
+	Note( [6 8] ) ...
+	~[ +E:N8 +F:N8 +E:N8 ] ~[ +E:N8 +D:N8 +E:N8 ] bar ...
+	] / [ ...
+	R:N8 bar ...
+	-G:N2 bar ...
+	-C:N4 -D:N4 -E:N4 -F:N4 bar ...
+	Note( [6 8] ) ...
+	~[ -E:N8 -F:N8 -E:N8 ] ~[ -E:N8 -D:N8 -E:N8 ] bar ...
+	];
 \end{lstlisting}
 
-\subsection{Bars}
+\me{ You don't have to use meters and bars. }
+\myself{ Here we go\dots }
+\me{ It's true: any midi files \cacofonix can produce, you can make the same results with or without. }
+\myself{ OK, yes, you're right. Do you remember why bars have been created? }
+\me{ Hum, no. }
+\begin{myselfenv}
+You liar: you are me, and I remember that perfectly! You have spend about an half hour on stupid errors: during the writing of a little sheet, you have thinking about something else, and you have get the wrong duration on several notes. Do you remember how it was boring to find where is the mistake on the sheet, then in the code, re-launch \cacofonix and replay the midi files until the next error? Well, with bars, you can still get the wrong tonality of course, but get the wrong duration makes crash \cacofonix, and the error message gives you what is the problematic measure. Look at that:
+\begin{lstlisting}
+>> NoteInit
+>> cacofonix('dumass', [ Note([4 4]) C:N4 bar E:N4 bar G:N bar ])
+??? Error using ==> cacofonix
+The measure 2 of the sheet 1 is incorrect.
+\end{lstlisting}
+\end{myselfenv}
+\me{ Humpf. }
 
 \subsection{Octave}
+
+There are two ways to add or subtract an octave from a note: the unary operators \lstinline!+! and \lstinline!-! and a special note.
+
 \subsubsection{Octave (operators \lstinline!+! and \lstinline!-!)}
+
+The simplest way to modify the octave of a note is the unary operators \lstinline!+! and \lstinline!-!. Some examples: \\
+\begin{lilypond}
+\relative c' { \new Staff { \time 4/4 g2 c e g a b c c' <e,,, g c c''>1 } }
+\end{lilypond}
+
+\begin{lstlisting}
+NoteInit
+sheet = [ ...
+	-G:N2 C:N2 bar ...
+	E:N2 G:N2 bar ...
+	A:N2 B:N2 bar ...
+	+C:N2 ++C:N2 bar ...
+	-E+-G+C+++C:N1 bar ];
+\end{lstlisting}
+
 \subsubsection{Octave (note)}
+
+Sometimes, a sheet or a section of a sheet is naturally high or low pitched. So, instead of add \lstinline!+! or \lstinline!-! behind each note, you can add a special note which means the default octave. To create a note which raise of $n$ octaves, you have call the constructor \lstinline!Note! with a string \lstinline!'+n'! (\emph{e.g.}, \lstinline!Note('+2')! to raise of two octaves). Use a string \lstinline!'-n'! to lower of $n$ octaves. To restore the default octave, you can use \lstinline!Note('+0')! or \lstinline!Note('-0')!. \\
+\begin{lilypond}
+\relative c' { \new Staff { \time 4/4 g4 a d f, g a d f, g'' f a g g, f a g } }
+\end{lilypond}
+
+\begin{lstlisting}
+NoteInit
+sheet = [ ...
+	          -G:N4 -A:N4  D:N4 -F:N4 bar ...
+	Note('-1') G:N4  A:N4 +D:N4  F:N4 bar ...
+	Note('+1') G:N4 F:N4 A:N4 G:N4 bar ...
+	Note('+0') G:N4 F:N4 A:N4 G:N4 bar ];
+\end{lstlisting}
+
+\myself{ I guess you would talk about the other way to create this kind of \lstinline!Note!? }
+\me{ Yeah. Instead of using a \lstinline!'+n'! form, you can create a string repeating \lstinline!'+'! $n$ times, like that: \lstinline!Note('+++')! instead of \lstinline!Note('+3')!. Of course, it's also working with \lstinline!'-'!. It's nice when you want raise or lower only one octave, because you can write only \lstinline!Note('+')! and not \lstinline!Note('+1')!. }
+\myself{ Yes, you're right. But it didn't work when $n$ means $0$: to restore the default octave, you have absolutely use \lstinline!Note('+0')! or \lstinline!Note('-0')!. }
 
 \subsection{Dynamics}
 \subsubsection{Crescendo}
@@ -491,6 +562,7 @@ Some examples: \\
 \subsection{Transpose \lstinline!\^!}
 
 \subsection{Repeat / Riff \lstinline!.*!}
+\label{sec:RepeatRiff}
 
 \subsection{Markers}
 \subsubsection{Extraction \lstinline!|!}
@@ -509,9 +581,12 @@ Someting about the display.
 \end{lilypond}
 
 \subsubsection{Expand \lstinline!*!}
+\label{sec:Expand}
+
 \subsubsection{Index \lstinline!-!}
 
 \subsection{Function \lstinline!cacofonix!}
 \subsubsection{The Main sheet}
+\label{sec:MainSheet}
 
 \end{document}
