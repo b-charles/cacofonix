@@ -154,7 +154,7 @@ end
 		end
 	end
 
-%% path to final file
+%% Path to final file
 
 [ filepath, filename, fileext ] = fileparts( filepath );
 if isempty( fileext )
@@ -162,7 +162,7 @@ if isempty( fileext )
 end
 filepath = fullfile( filepath, [ filename, fileext ] );
 
-%% tempo
+%% Tempo
 
 defaultTempo = getOption( 'Tempo', defaultTempo );
 
@@ -170,7 +170,7 @@ defaultTempo = getOption( 'Tempo', defaultTempo );
 
 velocityValues = getOption( 'Velocity', [ 16 33 49 64 80 96 112 126 ] );
 if length( velocityValues ) ~= 8
-	error( 'CACOFONIX:VELOCITY', ...
+	throwError( 'CACOFONIX:VELOCITY', ...
 		'The velocity vector must have 8 elements.' );
 end
 
@@ -180,6 +180,7 @@ args = varargin;
 nbArgs = length( args );
 
 sheets = struct( ...
+	'number', {}, ...
 	'name', {}, ...
 	'notes', {}, ...
 	'channel', {}, ...
@@ -197,14 +198,18 @@ lastInstrument = INSTRUMENTS(1).patch;
 	function chan = getAFreeChannel()
 		chan = find( freeChannels, 1, 'first' ) - 1;
 		if isempty( chan )
-			error( 'CACOFONIX:NoMoreChannels', ...
+			throwError( 'CACOFONIX:NoMoreChannels', ...
 				'The limit of channels is reached.' );
 		end
 		freeChannels( chan+1 ) = false;
 	end
 
 numArg = 1;
+numSheet = 0;
+
 while numArg <= nbArgs
+	
+	numSheet = numSheet + 1;
 	
 	if ischar( args{ numArg } )
 		% 'Intrument'|'Percussion', notes
@@ -213,13 +218,13 @@ while numArg <= nbArgs
 		idxPercussion = find( strcmpi( args{ numArg }, { PERCUSSIONS.name } ), 1 );
 		
 		if isempty( idxInstrument ) && isempty( idxPercussion )
-			error( 'CACOFONIX:UnexpectedArgument', ...
+			throwError( 'CACOFONIX:UnexpectedArgument', ...
 				'Unexpected argument: %s', args{ numArg } );
 		end
 		
 		numArg = numArg + 1;
 		if numArg > nbArgs || ~isa( args{numArg}, 'Note' )
-			error( 'CACOFONIX:NoNoteObjets', ...
+			throwError( 'CACOFONIX:NoNoteObjets', ...
 				'Note objects expected after %s', args{ numArg-1 } );
 		end
 		
@@ -229,6 +234,7 @@ while numArg <= nbArgs
 			lastInstrument = INSTRUMENTS(idxInstrument).patch;
 
 			sheets = [ sheets struct( ...
+				'number', numSheet, ...
 				'name', INSTRUMENTS(idxInstrument).name, ...
 				'notes', args{numArg}, ...
 				'channel', getAFreeChannel(), ...
@@ -249,6 +255,7 @@ while numArg <= nbArgs
 			percu = [ percu{:} ];
 			
 			sheets = [ sheets struct( ...
+				'number', numSheet, ...
 				'name', PERCUSSIONS(idxPercussion).name, ...
 				'notes', percu * args{numArg}, ...
 				'channel', 9, ...
@@ -271,6 +278,7 @@ while numArg <= nbArgs
 		
 		if numArg == 1 && firstSheetGeneral
 			sheets = [ sheets struct( ...
+				'number', numSheet, ...
 				'name', 'Main', ...
 				'notes', notes, ...
 				'channel', 0, ...
@@ -279,6 +287,7 @@ while numArg <= nbArgs
 				'bin', [] ) ]; %#ok<AGROW>
 		else
 			sheets = [ sheets struct( ...
+				'number', numSheet, ...
 				'name', '', ...
 				'notes', notes, ...
 				'channel', getAFreeChannel(), ...
@@ -288,15 +297,17 @@ while numArg <= nbArgs
 		end
 		
 	else
-		error( 'CACOFONIX:UnexpectedArgument', 'Unexpected argument' );
+		throwError( 'CACOFONIX:UnexpectedArgument', 'Unexpected argument' );
 	end
 	
 	numArg = numArg + 1;
 	
 end
 
+% add a default Main sheet
 if ~firstSheetGeneral
 	sheets = [ struct( ...
+		'number', 0, ...
 		'name', 'Main', ...
 		'notes', [], ...
 		'channel', 0, ...
@@ -309,7 +320,7 @@ nbSheets = length( sheets );
 
 %% ### CONVERT NOTE TO EVENTS
 
-%% ERROR MESSAGES
+%% ERROR
 
 	function str = getCurrentMeasureInfo()
 		if ~isempty( sinceLastMarker )
@@ -326,12 +337,20 @@ nbSheets = length( sheets );
 	end
 
 	function str = getCurrentSheetInfo()
+		sheetNumber = sheets( numCurrentSheet ).number;
 		sheetName = sheets( numCurrentSheet ).name;
 		if isempty( sheetName )
-			str = sprintf( 'sheet %d', numCurrentSheet );
+			str = sprintf( 'sheet %d', sheetNumber );
 		else
-			str = sprintf( 'sheet %d (%s)', numCurrentSheet, sheetName );
+			str = sprintf( 'sheet %d (%s)', sheetNumber, sheetName );
 		end
+	end
+
+	function throwError( identifier, message, varargin )
+		error( struct( ...
+			'identifier', identifier, ...
+			'message', sprintf( message, varargin{:} ), ...
+			'stack', struct( 'file', mfilename, 'name', 'cacofonix', 'line', 0 ) ) );
 	end
 
 %% NOTES
@@ -617,7 +636,7 @@ sinceLastMarker = [];
 			idx = find( roundDuration([markers.time]-currentTime)>=0 & strcmp(note.marker,{markers.name}), 1, 'first' );
 			
 			if isempty( idx )
-				error( 'CACOFONIX:MarkerNotFound', ...
+				throwError( 'CACOFONIX:MarkerNotFound', ...
 					'No marker %s after the %s found (%s).', ...
 					note.marker, getCurrentMeasureInfo(), getCurrentSheetInfo() );
 			else
@@ -636,7 +655,7 @@ sinceLastMarker = [];
 						'time', roundDuration( currentTime ), ...
 						'meterState', getMeterState() ) ];
 				else
-					error( 'CACOFONIX:MarkerMisplaced', ...
+					throwError( 'CACOFONIX:MarkerMisplaced', ...
 						'The marker %s does not match an existing marker (%s, %s).', ...
 						note.marker, getCurrentMeasureInfo(), getCurrentSheetInfo() );
 				end
@@ -691,7 +710,7 @@ currentMeter = [];
 				measureDuration(1) = nbBeat;
 				
 			elseif roundDuration( nbBeat - measureDuration(1) ) ~= 0
-				error( 'CACOFONIX:MEASURE', ...
+				throwError( 'CACOFONIX:MEASURE', ...
 					'The first measure of the %s is incorrect.', getCurrentSheetInfo() );
 			end
 			
@@ -712,7 +731,7 @@ currentMeter = [];
 			% check measure length
 			nbBeat = roundDuration( currentTime - lastTimeBar );
 			if roundDuration( nbBeat - currentNbBeat ) ~= 0
-				error( 'CACOFONIX:MEASURE', ...
+				throwError( 'CACOFONIX:MEASURE', ...
 					'The %s of the %s is incorrect.', ...
 					getCurrentMeasureInfo(), getCurrentSheetInfo() );
 			end
@@ -725,7 +744,7 @@ currentMeter = [];
 			
 			% check measure length
 			if roundDuration( currentTime - timesBars(numCurrentMeasure) ) ~= 0
-				error( 'CACOFONIX:MEASURE', ...
+				throwError( 'CACOFONIX:MEASURE', ...
 					'The %s of the %s is incorrect.', ...
 					getCurrentMeasureInfo(), getCurrentSheetInfo() );
 			end
@@ -1186,7 +1205,7 @@ MTrk = [ 77 84 114 107 ];
 fid = fopen( filepath, 'w', 'b' );
 
 if fid == -1
-	error( 'CACOFONIX:UnableToOpenFile', ...
+	throwError( 'CACOFONIX:UnableToOpenFile', ...
 		'Unable to open the file %s', filepath );
 end
 
