@@ -1246,15 +1246,4 @@ classdef Note
 					
 	end
 	
-	%% euclidQuotient
-	
-	methods( Static )
-		
-			function [q, r] = euclidQuotient( x, y )
-				q = floor( x / y );
-				r = mod( x, y );
-			end
-			
-	end
-	
 end
