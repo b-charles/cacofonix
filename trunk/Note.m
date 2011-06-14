@@ -972,7 +972,7 @@ classdef Note
 			
 			persistent dynamicsNames
 			if isempty( dynamicsNames )
-				dynamicsNames = { 'ppp', 'pp', 'p', 'mp', 'mf', 'f', 'ff', 'fff' };
+				dynamicsNames = { '0', 'ppp', 'pp', 'p', 'mp', 'mf', 'f', 'ff', 'fff' };
 			end
 			
 			persistent degDisp altDisp degree2HalfTons
@@ -1141,7 +1141,7 @@ classdef Note
 					
 					dynString = append( dynString, 1, currentChar, repmat( '<', 1, dur ), false );
 					
-					str = dynamicsNames{ note.dynamics + 5 };
+					str = dynamicsNames{ note.dynamics + 6 };
 					dynString = append( dynString, 1, currentChar+dur-length(str), str, true );
 					
 				elseif note.defMeter
