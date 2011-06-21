@@ -276,7 +276,6 @@ Yes, but it's nice in a canon:
 \end{lstlisting}
 
 \end{myselfenv}
-\me{ Yeah, man! }
 
 \subsection{Display}
 
@@ -359,7 +358,7 @@ Thank you to have read this document, and for your interest about \cacofonix.
 
 \subsection{A \note object}
 
-For \cacofonix, all sheets consist of an array of \lstinline!Note! objects: every functionality is associated to an \lstinline!Note! object or a method of \lstinline!Note! class. Of course, two kind of \lstinline!Note! object are fundamental: tonalities and duration.
+For \cacofonix, all sheets consist of an array of \lstinline!Note! objects. Of course, two kind of \lstinline!Note! object are fundamental: tonalities and duration.
 
 \subsubsection{Tonalities}
 \label{sec:Tonalities}
@@ -380,7 +379,7 @@ In the tutorial, the binary \lstinline!plus! operator (\lstinline!+!) is used to
 
 \myself{ The script can become messy very quickly if this operator is not correctly used.}
 \me{ Yes, there is a lot of possibilities: \lstinline!C+N2+E+N8+G!, or \lstinline![C N2]+[E N8]+G!, or \lstinline!C+[N2 E+[N8 G]]!\dots It's awesome. }
-\myself{ Every time you don't use that operator correctly and neatly, you make Jesus cry, God kill a kitten, and you will burn in hell to expiate your felony. }
+\myself{ Every time you don't use that operator correctly and neatly, you make Jesus cry, God kills a kitten, and you will burn in hell to expiate your felony. }
 
 The final note is tied if in the two arrays, at least on note is tied. The final note is detached if in the two arrays, at least on note is detached. A note can be tied AND detached, see the section \ref{sec:TiesAndSlurs} for more informations.
 
@@ -511,7 +510,7 @@ The measure 2 of the sheet 1 is incorrect.
 
 There are two ways to add or subtract an octave from a note: the unary operators \lstinline!+! and \lstinline!-! and a special note.
 
-\subsubsection{Octave (operators \lstinline!+! and \lstinline!-!)}
+\subsubsection{Octave (\lstinline!+! and \lstinline!-! operators)}
 
 The simplest way to modify the octave of a note is the unary operators \lstinline!+! and \lstinline!-!. Some examples: \\
 \begin{lilypond}
@@ -546,14 +545,32 @@ sheet = [ ...
 
 \myself{ I guess you would talk about the other way to create this kind of \lstinline!Note!? }
 \me{ Yeah. Instead of using a \lstinline!'+n'! form, you can create a string repeating \lstinline!'+'! $n$ times, like that: \lstinline!Note('+++')! instead of \lstinline!Note('+3')!. Of course, it's also working with \lstinline!'-'!. It's nice when you want raise or lower only one octave, because you can write only \lstinline!Note('+')! and not \lstinline!Note('+1')!. }
-\myself{ Yes, you're right. But it didn't work when $n$ means $0$: to restore the default octave, you have absolutely use \lstinline!Note('+0')! or \lstinline!Note('-0')!. }
+\myself{ Yes, you're right. But it didn't work when $n$ means $0$: to restore the default octave, you have absolutely to use \lstinline!Note('+0')! or \lstinline!Note('-0')!. }
 
 \subsection{Dynamics}
+
+\begin{table}
+	\centering
+	\begin{tabular}{rll}
+		\lstinline!'fff'! & forteissimo possibile & loudest possible \\
+		\lstinline!'ff'! & fortissimo & very loud \\
+		\lstinline!'f'! & forte & loud \\
+		\lstinline!'mf'! & mezzo-forte & moderatly loud (default) \\
+		\lstinline!'mp'! & mezzo-piano & moderatly soft \\
+		\lstinline!'p'! & piano & soft \\
+		\lstinline!'pp'! & pianissimo & very soft \\
+		\lstinline!'ppp'! & pianissimo possibile & softest possible \\
+		\lstinline!'0'! & & silence \\
+	\end{tabular}
+	\caption{Strings for dynamics}
+	\label{tab:dynamics}
+\end{table}
+
 \subsubsection{Crescendo}
 
 \subsection{Tempo}
 \subsubsection{Fermata}
-\subsubsection{Accelerendo/Rall}
+\subsubsection{Accelerando/Rallentando}
 
 \subsection{Polyphonic \lstinline!/!}
 
