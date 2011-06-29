@@ -22,6 +22,8 @@
 
 \newcommand\exchange[2]{\texttt{#1}\footnote{\url{#2}}\xspace}
 
+\newcommand\sfz{s$f$z\xspace}
+
 % ME AND MYSELF
 \definecolor{mecolor}{rgb}{1,0.25,0.25}
 \definecolor{myselfcolor}{rgb}{0.25,0.25,1}
@@ -82,19 +84,19 @@ To create a playable note, you have to create two \note objects, one for the ton
 \begin{lstlisting}
 mynote = Note('G'):Note(1);
 \end{lstlisting}
-This instruction creates a G quarter note (\lstinline!Note(4)! for a whole note). Per default, a note without tonality is a rest, and a note without duration is not played.
+This instruction creates a G quarter note (\lstinline!Note(4)! for a whole note). Per default, a note without tonality is a rest (but it's a good idea to use \lstinline!Note('rest')!), and, well, a note without duration is not played.
 
 To have a G note (or any other note\dots) of an another octave, you have to use the unary operators \lstinline!-! and \lstinline!+!. \\
 \begin{lilypond}
-	\relative c' { \new Staff { b1 c a' b c } }
+	\relative c' { \new Staff { b1 c a' c c'} }
 \end{lilypond}
 \begin{lstlisting}
 sheet = [ ...
 	-Note('B'):Note(4) ...
 	Note('C'):Note(4) ...
 	Note('A'):Note(4) ...
-	Note('B'):Note(4) ...
-	+Note('C'):Note(4) ];
+	+Note('C'):Note(4) ...
+	++Note('C'):Note(4) ];
 \end{lstlisting}
 
 A complete sheet is just an array of \lstinline!Note! objects. So, this is a first (and very dummy) version of \frerejaques:
@@ -120,7 +122,7 @@ Theoretically, a file \texttt{FrereJacques.mid} has been created in the current 
 
 \subsection{Predefinition of some \note objects}
 
-A way to simplify the writing of a sheet is to predefine some \note objects. Two scripts are proposed to initialize \matlab before the creation of sheets: \noteInitFile and \noteInitFrFile. This is an extract of \noteInitFile:
+A way to simplify the writing of a sheet is to predefine some \note objects. Two scripts are proposed to initialize \matlab before the creation of sheets: \noteInitFile and \noteInitFrFile. Of course, with a little practrice, you should be able to create your own initialization file. This is an extract of \noteInitFile:
 \begin{lstlisting}
 R = Note( 'rest' );
 
@@ -158,7 +160,7 @@ sheet = [ ...
 	G:N2 ];
 \end{lstlisting}
 
-\me{Nice. Why each measure is on a line?}
+\me{Nice. Why each measure is on a line? A whim again?}
 \myself{I think it's a good practice to separate each measure on a different line: bigger projects become more readable, specially with the bars and markers functionalities of \note.}
 
 \subsection{Bars}
@@ -184,7 +186,7 @@ sheet = [ ...
 \end{lstlisting}
 
 \me{Always adding \lstinline!bar! at each measure, it's a little boring, isn't it?}
-\myself{Yes. But something like \exchange{EditorMacro}{http://www.mathworks.com/matlabcentral/fileexchange/24615} can be helpful.}
+\myself{Yes. But something like \exchange{EditorMacro}{http://www.mathworks.com/matlabcentral/fileexchange/24615} (and probably the new \exchange{\matlab editor API}{http://blogs.mathworks.com/desktop/2011/05/16/matlab-editor-api-examples/}) can be helpful.}
 
 \subsection{Dotted notes}
 
@@ -204,7 +206,7 @@ sheet = [ ...
 
 \subsection{Ties and slurs}
 
-Ties and slurs are written with the same operator: \lstinline!not! (\lstinline!~!). The operator can be used on one note to merge it with the previous: \lstinline!G:N4 ~G:N8! (we can write \lstinline!G:N4'! too). The operator can also be used on an array of notes to play legato.
+Ties and slurs are written with the same operator: \lstinline!not! (\lstinline!~!). The operator can be used on one note to merge it with the previous: \lstinline!G:N2 ~G:N8!. The operator can also be used on an array of notes to play legato: \lstinline!~[ C:N4 E:N4 G:N4 +C:N4]!.
 
 \me{There are an another way to create a note with an exotic duration.}
 \begin{myselfenv}
@@ -276,6 +278,7 @@ Yes, but it's nice in a canon:
 \end{lstlisting}
 
 \end{myselfenv}
+\me{ 100\% rock'n'roll. }
 
 \subsection{Display}
 
@@ -566,7 +569,32 @@ sheet = [ ...
 	\label{tab:dynamics}
 \end{table}
 
+Dynamics are really important: they add all the expressiveness.
+\me{ \dots as far as midi files can be played with expressiveness. }
+
+To start a section of a sheet with a precise dynamic, you just have to add a special note: \lstinline!Note('dynamics',dyn)!, where \lstinline!dyn! is a string found in the table \ref{tab:dynamics}.
+
+Before examples, two precisions: when a note is \dots
+\me{ Don't! We are here precisely to give precisions! }
+\myself{ Yes, every man to his own trade. }
+\me{ Forced to get angry. Incredible. So, what are we talking about? }
+\myself{ Well, when a note is played, \cacofonix look at the current dynamic and apply this dynamic for all the duration of the note, so you can't play fun dynamics like \sfz }
+\me{ \dots yet. }
+\myself{ The second point is about polyphony: every monophonic part can have a different current dynamic. It's very useful: in a sheet for piano, the right hand and the left hand can play differently. }
+\me{ But don't forget to specify changes everywhere! }
+
+\begin{lilypond}
+\new GrandStaff <<
+\new Staff { \clef treble \relative c'' { \time 2/4 \partial 8 c,8 g'2 \time 4/4 c4 d e f \time 6/8 e8\( f e\) e\( d e\) } }
+\new Staff { \clef bass \relative c' { \time 2/4 \partial 8 r8 g2 \time 4/4 c,4 d e f \time 6/8 e8\( f e\) e\( d e\) } }
+>>
+\end{lilypond}
+
 \subsubsection{Crescendo}
+
+\subsubsection{The velocity}
+
+\subsubsection{Channel dynamics}
 
 \subsection{Tempo}
 \subsubsection{Fermata}
