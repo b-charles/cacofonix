@@ -1,7 +1,12 @@
+
+%
+% Für Elise
+%
+% Compositor: Ludwig van Beethoven
+%
+
 %#ok<*BDSCA>
 clc
-
-clear classes
 
 NoteInit_fr
 

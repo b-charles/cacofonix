@@ -1,5 +1,14 @@
+
+%
+% My Freeze Ray
+%
+% Compositors: Joss Whedon, Jed Whedon, Zack Whedon, Maurissa Tancharoen
+% From: Dr. Horrible's Sing-Along Blog
+%
+
 %#ok<*BDSCA>
 clc
+
 NoteInit_fr
 
 DD = Note( 1/8 );

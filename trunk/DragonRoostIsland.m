@@ -1,3 +1,11 @@
+
+%
+% Dragon Roost Island
+%
+% Compositors: Kenta Nagata, Hajime Wakai, Toru Minegishi, Koji Kondo
+% From: The Legend of Zelda: The Wind Waker
+%
+
 %#ok<*BDSCA>
 clc
 

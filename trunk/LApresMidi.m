@@ -1,4 +1,13 @@
+
+%
+% Comptine d'un Autre Eté: L'Après Midi
+%
+% Compositor: Yann Tiersen
+% From: Le Fabuleux Destin d'Amélie Poulain
+%
+
 %#ok<*BDSCA>
+clc
 
 NoteInit_fr
 

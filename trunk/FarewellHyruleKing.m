@@ -1,3 +1,11 @@
+
+%
+% Farewell Hyrule King
+%
+% Compositors: Kenta Nagata, Hajime Wakai, Toru Minegishi, Koji Kondo
+% From: The Legend of Zelda: The Wind Waker
+%
+
 %#ok<*BDSCA>
 clc
 
@@ -167,6 +175,3 @@ finalDecresc = Note( 'Decresc', R*3, '0' );
 cacofonix( 'FarewellHyruleKing.mid', 'Velocity', linspace( 50, 126, 8 ), ...
 	'Piano', [ MDIntro MDA MDB MDC DynMF MDD MDE finalDecresc MDD|MARK_END ] / ...
 	[ MGIntro MGA MGB MGC DynF MGD MGE finalDecresc MGD|MARK_END ] );
-
-% [ MGIntro MGA MGB MGC MGD MGE ] / ...
-% 	[ MDIntro MDA MDB MDC MDD MDE ]

@@ -1,5 +1,11 @@
+
+%
+% William Tell Overture
+%
+% Compositor: Gioachino Rossini
+%
+
 clc
-% clear all
 
 Note.setNbCharByQuater( 48 );
 

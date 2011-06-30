@@ -1,7 +1,12 @@
-%% Notes definition
+
+%
+% Overworld
+%
+% Compositor: Koji Kondo
+% From: The Legend of Zelda
+%
 
 clc
-clear classes
 
 NoteInit
 

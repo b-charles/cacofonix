@@ -1,3 +1,11 @@
+
+%
+% Song Of Storms
+%
+% Compositor: Koji Kondo
+% From: The Legend of Zelda: Ocarina of Time
+%
+
 %#ok<*BDSCA>
 clc
 
@@ -79,7 +87,6 @@ ORGAN_MG = [ ...
 %% TAMBOURINE
 
 RIFF = [ S:N V:'>':N V:'>':N bar S:C V:C V:'>':C V:C V:'>':C S:C bar ];
-% RIFF = [ S:N -faB:'>':N -faB:'>':N bar S:C -faB:C -faB:'>':C -faB:C -faB:'>':C S:C bar ];
 
 TAMBOURINE_INTRO = [ MARKER_INTRO RIFF ];
 TAMBOURINE = [ MARKER_A RIFF*3 MARKER_B RIFF MARKER_END RIFF*3 MARKER_C RIFF*4 ];

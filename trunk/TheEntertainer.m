@@ -1,4 +1,12 @@
+
+%
+% The Entertainer
+%
+% Compositor: Scott Joplin
+%
+
 %#ok<*BDSCA>
+clc
 
 NoteInit_fr
 
@@ -331,10 +339,7 @@ do++do:C -sol+sol:C -do+do:C S:C bar ...
 
 %cacofonix( 'TheEntertainer', 'Velocity', linspace( 50, 100, 8 ), PIANOMD / PIANOMG );
 
-% faster ending
+% faster end
 cacofonix( 'TheEntertainer', 'Velocity', linspace( 50, 100, 8 ), ...
 [ PIANOMD|MARK_D2 Note('accel', B*16, 130 ) MARK_D|PIANOMD ] / [ PIANOMG|MARK_D2 MARK_D|PIANOMG ] );
 
-beep
-pause(0.5)
-beep

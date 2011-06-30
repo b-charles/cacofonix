@@ -1,4 +1,13 @@
+
+%
+% The Piano Duet
+%
+% Compositor: Danny Elfman
+% From: Corpse Bride
+%
+
 %#ok<*BDSCA>
+clc
 
 NoteInit_fr
 
