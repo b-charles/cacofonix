@@ -6,6 +6,7 @@
 \usepackage{hyperref}
 \usepackage{listings}
 \usepackage{xspace}
+\usepackage{dingbat}
 
 % COMMANDS
 \newcommand\cacofonix{\textsc{Cacofonix}\xspace}
@@ -22,7 +23,7 @@
 
 \newcommand\exchange[2]{\texttt{#1}\footnote{\url{#2}}\xspace}
 
-\newcommand\sfz{s$f$z\xspace}
+\newcommand\sfz{s$\!f\!$z\xspace}
 
 % ME AND MYSELF
 \definecolor{mecolor}{rgb}{1,0.25,0.25}
@@ -206,7 +207,7 @@ sheet = [ ...
 
 \subsection{Ties and slurs}
 
-Ties and slurs are written with the same operator: \lstinline!not! (\lstinline!~!). The operator can be used on one note to merge it with the previous: \lstinline!G:N2 ~G:N8!. The operator can also be used on an array of notes to play legato: \lstinline!~[ C:N4 E:N4 G:N4 +C:N4]!.
+Ties and slurs are written with the same operator: \lstinline!not! (\lstinline!~!). The operator can be used on one note to merge it with the previous: \lstinline![G:N2 ~G:N8]!. The operator can also be used on an array of notes to play legato: \lstinline!~[C:N4 E:N4 G:N4 +C:N4]!.
 
 \me{There are an another way to create a note with an exotic duration.}
 \begin{myselfenv}
@@ -242,20 +243,20 @@ A polyphonic section is a set of sheets with the same duration and played at the
 \begin{lilypond}
 \new GrandStaff <<
 	\new Staff { \time 3/4 \relative c'' <<
-		{ c2 c4( c4) c2 } \\
-		{ c,4( e g) c,( e g) }
+		{ c2. <c, e g c>2. } \\
+		{ c4( e g) s2. }
 		>> }
-	\new Staff { \clef bass \relative c c2. c2. }
+	\new Staff { \clef bass \relative c { c2.( c) } }
 >>
 \end{lilypond}
 \begin{lstlisting}
 NoteInit
-sheet = [ +C:N2 +C:N4 bar ~+C:N4 +C:N2 bar ] / ...
-	[ ~[ C:N4 E:N4 G:N4 ] bar ~[ C:N4 E:N4 G:N4 ] bar ] / ...
-	[ -C:N2' bar -C:N2' bar ];
+sheet = [ ( +C:N2' ) / ~[ C:N4 E:N4 G:N4 ] bar ...
+	[ C E G +C ]:N2' bar ] / ...
+	[ -C:N2' bar ~-C:N2' bar ];
 \end{lstlisting}
 
-Bars have to be mentioned in every monophonic part.
+Bars have to be mentioned in all monophonic parts.
 
 \me{ There are no polyphonic section in \frerejaques. }
 \begin{myselfenv}
@@ -361,7 +362,7 @@ Thank you to have read this document, and for your interest about \cacofonix.
 
 \subsection{A \note object}
 
-For \cacofonix, all sheets consist of an array of \lstinline!Note! objects. Of course, two kind of \lstinline!Note! object are fundamental: tonalities and duration.
+For \cacofonix, all sheets consist of an array of \lstinline!Note! objects. Of course, two kinds of \lstinline!Note! object are fundamental: tonalities and duration.
 
 \subsubsection{Tonalities}
 \label{sec:Tonalities}
@@ -414,7 +415,7 @@ Some examples: \\
 NoteInit
 sheet = [ ...
 	+C:'>':N4 B:'.':N4 A:'^':N4 G:'-':N4 bar ...
-	~[ C:N4 C:N8 G:N8 G:'|>':N2 bar ];
+	~[ C:N4 C:N8 G:N8 G:'|>':N2 ] bar ];
 \end{lstlisting}
 
 \subsection{Dotted notes \lstinline!'!}
@@ -496,10 +497,8 @@ sheet = [ ...
 \me{ You don't have to use meters and bars. }
 \myself{ Here we go\dots }
 \me{ It's true: any midi files \cacofonix can produce, you can make the same results with or without. }
-\myself{ OK, yes, you're right. Do you remember why bars have been created? }
-\me{ Hum, no. }
 \begin{myselfenv}
-You liar: you are me, and I remember that perfectly! You have spend about an half hour on stupid errors: during the writing of a little sheet, you have thinking about something else, and you have get the wrong duration on several notes. Do you remember how it was boring to find where is the mistake on the sheet, then in the code, re-launch \cacofonix and replay the midi files until the next error? Well, with bars, you can still get the wrong tonality of course, but get the wrong duration makes crash \cacofonix, and the error message gives you what is the problematic measure. Look at that:
+	OK, yes, you're right. Adding bars is boring: you spend time for something which don't appear in the final midi file. But, sometimes, you have thinking about something else, and you have get the wrong duration on several notes. Then, you spend \emph{a lot} of time to find where is the mistake on the sheet, correct the code, re-launch \cacofonix and replay the midi files until the next error. Well, with bars, you can still get the wrong tonality of course, but get the wrong duration makes nicely crash \cacofonix, and the error message gives you what is the problematic measure. Look at that:
 \begin{lstlisting}
 >> NoteInit
 >> cacofonix('dumass', [ Note([4 4]) C:N4 bar E:N4 bar G:N bar ])
@@ -552,14 +551,19 @@ sheet = [ ...
 
 \subsection{Dynamics}
 
+Dynamics are really important: they add all the expressiveness.
+\me{ \dots as far as midi files can be played with expressiveness. }
+
+\subsubsection{Simple dynamics}
+
 \begin{table}
 	\centering
 	\begin{tabular}{rll}
 		\lstinline!'fff'! & forteissimo possibile & loudest possible \\
 		\lstinline!'ff'! & fortissimo & very loud \\
 		\lstinline!'f'! & forte & loud \\
-		\lstinline!'mf'! & mezzo-forte & moderatly loud (default) \\
-		\lstinline!'mp'! & mezzo-piano & moderatly soft \\
+		\lstinline!'mf'! & mezzo-forte & moderately loud (default) \\
+		\lstinline!'mp'! & mezzo-piano & moderately soft \\
 		\lstinline!'p'! & piano & soft \\
 		\lstinline!'pp'! & pianissimo & very soft \\
 		\lstinline!'ppp'! & pianissimo possibile & softest possible \\
@@ -569,32 +573,32 @@ sheet = [ ...
 	\label{tab:dynamics}
 \end{table}
 
-Dynamics are really important: they add all the expressiveness.
-\me{ \dots as far as midi files can be played with expressiveness. }
+To start a section with a precise dynamic, you just have to add a special note: \lstinline!Note('dynamics',dyn)!, where \lstinline!dyn! is a string found in the table \ref{tab:dynamics}. You can also create a dynamic note with a delay: \lstinline!Note('dynamics',dyn,delay)!. The delay is a double or a duration \lstinline!Note! and the new dynamic will be effective only after this duration.
 
-To start a section of a sheet with a precise dynamic, you just have to add a special note: \lstinline!Note('dynamics',dyn)!, where \lstinline!dyn! is a string found in the table \ref{tab:dynamics}.
-
-Before examples, two precisions: when a note is \dots
-\me{ Don't! We are here precisely to give precisions! }
-\myself{ Yes, every man to his own trade. }
-\me{ Forced to get angry. Incredible. So, what are we talking about? }
-\myself{ Well, when a note is played, \cacofonix look at the current dynamic and apply this dynamic for all the duration of the note, so you can't play fun dynamics like \sfz }
-\me{ \dots yet. }
+\myself{ Two precisions: this kind of dynamics specify only how notes are attacked. Even with the delay parameter, you can't modify the dynamic of a note which has begun to be played. So, you can't play fun dynamics like \sfz \dots }
+\me{ \dots yet. The trick is at the section \ref{sec:channelDynamics}. }
 \myself{ The second point is about polyphony: every monophonic part can have a different current dynamic. It's very useful: in a sheet for piano, the right hand and the left hand can play differently. }
 \me{ But don't forget to specify changes everywhere! }
 
-\begin{lilypond}
-\new GrandStaff <<
-\new Staff { \clef treble \relative c'' { \time 2/4 \partial 8 c,8 g'2 \time 4/4 c4 d e f \time 6/8 e8\( f e\) e\( d e\) } }
-\new Staff { \clef bass \relative c' { \time 2/4 \partial 8 r8 g2 \time 4/4 c,4 d e f \time 6/8 e8\( f e\) e\( d e\) } }
->>
-\end{lilypond}
-
 \subsubsection{Crescendo}
+
+To play a crescendo, you have to add a note created by \lstinline!Note( keyword, duration, dynamics )! or \lstinline!Note( keyword, duration, dynamics, delay )!:
+\begin{itemize}
+	\item \lstinline!keyword! can be \lstinline!'crescendo'!, \lstinline!'cresc'!, \lstinline!'decrescendo'! or \lstinline!'decresc'!.
+		\me{ Fun story: you can use indifferently these key words! \lstinline!'crescendo'! and \lstinline!'cresc'! can be used to create a decrescendo, and \lstinline!'decrescendo'! and \lstinline!'decresc'! can be used for crescendo. }
+	\item \lstinline!duration! can be a double or a duration \lstinline!Note! which indicates the duration of the crescendo (or the decrescendo).
+	\item \lstinline!dynamics! is a string from the table \ref{tab:dynamics}: it gives the final dynamic.
+	\item \lstinline!delay! is an optional double or a duration \lstinline!Note!. Like for the dynamic \lstinline!Note!, the crescendo starts only after this duration (and ends at \lstinline!delay+duration!).
+\end{itemize}
+
+Like simple dynamics, \cacofonix look at the current dynamic at the start of the note, and apply this dynamic for the attack of the note. So you can't play crescendo or decrescendo on one note.
 
 \subsubsection{The velocity}
 
+
+
 \subsubsection{Channel dynamics}
+\label{sec:channelDynamics}
 
 \subsection{Tempo}
 \subsubsection{Fermata}
@@ -618,12 +622,32 @@ Someting about the display.
 
 \subsection{The void note}
 
+\me{ Before start, a little mood music. }
+
+\vspace{ 0.25in }
+
 \begin{lilypond}
-\new GrandStaff <<
-\new Staff { \clef treble \key es \major \time 2/4 \relative c'' { r8 g\ff[ g g] es2\fermata r8 f[ f f] d2( d2\fermata) } }
-\new Staff { \clef bass \key es \major \partcombine { \relative c' { r8 g[ g g] es2\fermata r8 f[ f f] d2( d2\fermata) } } { \relative c { r8 g[ g g] es2 r8 f[ f f] d2( d2) } } }
->>
+\paper { line-width = 126\mm }
+\layout { indent = 2.0\cm }
+\header{
+	title = "Symphony No. 5"
+	composer = "Beethoven"
+}
+\score { <<
+\new Staff { 
+	\set Staff.instrumentName = \markup \center-column { Violin, \line { Clarinet } }
+	\clef treble \key es \major \time 2/4 \relative c'' { r8 g\ff[ g g] es2\fermata r8 f[ f f] d2( d2\fermata) }
+}
+\new Staff {
+	\set Staff.instrumentName = \markup \center-column { Viol, \line { Cello, } \line { \concat{ Bass } } }
+	\clef bass \key es \major \partcombine { \relative c' { r8 g[ g g] es2\fermata r8 f[ f f] d2( d2\fermata) } } { \relative c { r8 g[ g g] es2 r8 f[ f f] d2( d2) } }
+}
+>> }
 \end{lilypond}
+
+\vspace{ 0.25in }
+
+\myself{ And, as recommended by \emph{The Hitchhiker's Guide to the Galaxy}, \textsc{don't panic}. \rightthumbsup }
 
 \subsubsection{Expand \lstinline!*!}
 \label{sec:Expand}
