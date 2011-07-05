@@ -7,6 +7,7 @@
 \usepackage{listings}
 \usepackage{xspace}
 \usepackage{dingbat}
+\usepackage{graphics}
 
 % COMMANDS
 \newcommand\cacofonix{\textsc{Cacofonix}\xspace}
@@ -41,18 +42,18 @@
 
 % MATLAB CODE
 \definecolor{matlabcolor}{rgb}{0,0.5,0.5}
-\lstset{ basicstyle=\color{matlabcolor}\ttfamily, literate={~}{$\sim$}1 {>>}{$\gg$}1, tabsize=4 }
+\lstset{ basicstyle=\color{matlabcolor}\ttfamily, literate={~}{$\sim$}1 {>>}{$\gg$}1, tabsize=4, numbers=left, numberstyle=\tiny\color{black}, stepnumber=3, numbersep=5pt, numberfirstline=false, firstnumber=1 }
+
 \title{\cacofonix user's guide}
 \author{by B}
 \date{}
 
-\usepackage{graphics}
 \begin{document}
 
 \maketitle
 
-\me{ Hi! }
-\myself{ Hello! }
+\me{Hi!}
+\myself{Hello!}
 
 \paragraph{}
 
@@ -64,9 +65,9 @@
 
 \cacofonix is a \matlab program, helping to write midi files.
 
-\me{ Who are the target customers? Who needs help the write midi files? Who thinks about \matlab to create a midi file? Who wakes up the morning and says "Hoho! Today, I will create a midi file. I think the easiest way is to use \matlab and an underground plug in."? }
-\myself{ Well, a lot of softwares for editing music and creating midi files exist, free or not, and are more attractive, intuitive, flexible and for better results. Nevertheless, \cacofonix was inspired from \exchange{Theme from Super Mario Brother Song}{http://www.mathworks.com/matlabcentral/fileexchange/8442}, a little project found on the \textsc{Matlab Central}, and the first midi files I produced was some themes from Zelda. So, I guess \cacofonix was created for \matlab geeks\dots }
-\me{ That's cool. One day, they'll rule the world. }
+\me{Who are the target customers? Who needs help the write midi files? Who thinks about \matlab to create a midi file? Who wakes up the morning and says "Hoho! Today, I will create a midi file. I think the easiest way is to use \matlab and an underground plug in."?}
+\myself{Well, a lot of softwares for editing music and creating midi files exist, free or not, and are more attractive, intuitive, flexible and for better results. Nevertheless, \cacofonix was inspired from \exchange{Theme from Super Mario Brother Song}{http://www.mathworks.com/matlabcentral/fileexchange/8442}, a little project found on the \textsc{Matlab Central}, and the first midi files I produced was some themes from Zelda. So, I guess \cacofonix was created for \matlab geeks\dots}
+\me{That's cool. One day, they'll rule the world.}
 
 \paragraph{}
 
@@ -210,11 +211,11 @@ sheet = [ ...
 Ties and slurs are written with the same operator: \lstinline!not! (\lstinline!~!). The operator can be used on one note to merge it with the previous: \lstinline![G:N2 ~G:N8]!. The operator can also be used on an array of notes to play legato: \lstinline!~[C:N4 E:N4 G:N4 +C:N4]!.
 
 \me{There are an another way to create a note with an exotic duration.}
-\begin{myselfenv}
-	Yes, but the good way is always use the \lstinline!'! and \lstinline!~! operators.
+\begin{myselfenv}%
+	Yes, but the good way is always use the \lstinline!'! and \lstinline!~! operators.%
 \end{myselfenv}
-\begin{meenv}
-	And the convenient way is use an array for the duration with the operator \lstinline!:!, like that: \lstinline!G:[N4 N16]!.
+\begin{meenv}%
+	And the convenient way is use an array for the duration with the operator \lstinline!:!, like that: \lstinline!G:[N4 N16]!.%
 \end{meenv}
 
 \subsection{Chord}
@@ -258,8 +259,8 @@ sheet = [ ( +C:N2' ) / ~[ C:N4 E:N4 G:N4 ] bar ...
 
 Bars have to be mentioned in all monophonic parts.
 
-\me{ There are no polyphonic section in \frerejaques. }
-\begin{myselfenv}
+\me{There are no polyphonic section in \frerejaques.}
+\begin{myselfenv}%
 Yes, but it's nice in a canon:
 
 \begin{lstlisting}
@@ -276,10 +277,9 @@ Yes, but it's nice in a canon:
 >> delay = [ N2 bar N2 bar ];
 >> cacofonix( 'FrereJacques', 'Tempo', 100, ...
 	[ sheet delay ] / [ delay sheet ] );
-\end{lstlisting}
-
+\end{lstlisting}%
 \end{myselfenv}
-\me{ 100\% rock'n'roll. }
+\me{100\% rock'n'roll.}
 
 \subsection{Display}
 
@@ -348,7 +348,7 @@ sheet = [ ...
 cacofonix( 'FrereJacques', 'Tempo', 100, sheet );
 \end{lstlisting}
 
-\me{ Hurray! }
+\me{Hurray!}
 
 We have seen in this tutorial only very basic features of \cacofonix, but it's probably enough for start.
 
@@ -356,38 +356,136 @@ The script \texttt{ForElise.m} is a good demonstration of the possibilities of \
 
 Thank you to have read this document, and for your interest about \cacofonix.
 
-\myself{ Enjoy! }
+\myself{Enjoy!}
 
 \section{Reference guide}
 
-\subsection{A \note object}
+\subsection{Overview}
 
-For \cacofonix, all sheets consist of an array of \lstinline!Note! objects. Of course, two kinds of \lstinline!Note! object are fundamental: tonalities and duration.
+In this reference guide, we will see every possibilities to transcribe any sheet the most quickly and faithfully as far as it can be.
 
-\subsubsection{Tonalities}
+\paragraph{}
+
+All features of \cacofonix can be classified in three sets: either it's a special use of the \lstinline!Note! constructor (see table \ref{tab:NoteAPI}), or it's a member function or an operator of the \lstinline!Note! class (see table \ref{tab:NoteFunctions}) or it's about the \lstinline!cacofonix! function (see table \ref{tab:CacofonixAPI}).
+
+There is another classification of the features of \cacofonix: the scope. There are four possible scopes: note, monophonic, channel or global.
+\begin{itemize}
+	\item A feature with a note scope will modify only one note (or sometimes, an array of notes), and the next notes are not influenced.
+	\item A feature with a monophonic scope modify all the next notes. If the feature is placed in a monophonic section, which is a part of a polyphonic section, the other monophonic parts (which are played in parallel) are not modified, influenced or perturbed, in any way. If, after the modification, a new polyphonic section starts, the feature will be apply in every new monophonic parts. Last tricky point: after the polyphonic section, the last modification of the last written monophonic part will be active. See this example (see section \ref{sec:PlainDynamics} for explications about dynamics):
+\begin{lstlisting}
+NoteInit
+sheet = [ C:N bar ...      % default dynamic: mf
+	DynF D:N bar ...       % new dynamic: f
+	[ ...                  % start a monophonic section
+		E:N bar ...        % current dynamic: f
+		DynMP F:N bar ...  % new dynamic: mp
+		G:N bar ... 
+		A:N bar ...
+	] ...                  % end of the monophonic section
+	/ ...                  % polyphonic operator
+	[ ...                  % new monophonic section
+		+E:N bar ...       % current dynamic: f
+		+F:N bar ...       % current dynamic: f (not modified)
+		DynPP +G:N bar ... % new dynamic: pp
+		+A:N bar ...
+	] ...                  % end of the polyphonic section
+	+C:N bar ...           % current dynamic: pp
+	];
+\end{lstlisting}
+	\item A feature with a channel scope modify at the same time all played monophonic sections of the sheet.
+	\item Finally, a feature with a global scope modify all sheets given to the \lstinline!cacofonix! function.
+\end{itemize}
+
+\begin{table}[p]
+	\centering
+	\begin{tabular}{llcl}
+		Contructor syntax & Description & Scope & Section \\
+		\hline
+		\lstinline!Note( tonality )! & tonality & N & \ref{sec:Tonalities} \\
+		\lstinline!Note( duration )! & duration & N & \ref{sec:Duration} \\
+		\lstinline!Note( 'bar' )! & bars & M & \ref{sec:MetersAndBars} \\
+		\lstinline!Note( [upper lower] )! & meters & G & \ref{sec:MetersAndBars} \\
+		\lstinline!Note( '+X'|'-X' )! & octave & M & \ref{sec:OctaveNote} \\
+		\lstinline!Note( 'dynamics', dyn, [ d ] )! & dynamics & M & \ref{sec:Dynamics} \\
+		\lstinline!Note( 'dynamics*', dyn, [ d ] )! & channel dynamics & C & \ref{sec:ChannelDynamics} \\
+		\lstinline!Note( 'cresc', dur, dyn, [ d ] )! & crescendo & M & \ref{sec:Crescendo} \\
+		\lstinline!Note( 'cresc*', dur, dyn, [ d ] )! & channel crescendo & C & \ref{sec:ChannelDynamics} \\
+		\lstinline!Note( 'tempo', tempo )! & tempo & G & \ref{sec:Tempo} \\
+		\lstinline!Note( 'accel', dur, tempo )! & accelerando & G & \ref{sec:AccelerandoRallentando} \\
+		\lstinline!Note( 'fermata', dur, play )! & fermata & G & \ref{sec:Fermata} \\
+		\lstinline!Note( 'sustain', 'on'|'off' )! & sustain & C & \ref{sec:Sustain} \\
+		\lstinline!Note( 'marker', mark )! & marker & G & \ref{sec:Markers} \\
+		\lstinline!Note( 'marker*', mark )! & go to & M & \ref{sec:Goto} \\
+		\lstinline!Note( 'void' )! & void note & N & \ref{sec:VoidNote} \\
+	\end{tabular}
+	\caption[\lstinline!Note! constructor API]{\lstinline!Note! constructor API. Scope column: N means note, M means monophonic, C means channel and G means global.}
+	\label{tab:NoteAPI}
+\end{table}
+
+\begin{table}[p]
+	\centering
+	\begin{tabular}{lllcl}
+		Member function & Operator & Description & Scope & Section \\
+		\hline
+		\lstinline!plus! & \lstinline!+! & chord & N & \ref{sec:Chord} \\
+		\lstinline!colon! & \lstinline!:! & set duration & N & \ref{sec:SetDuration} \\
+		\lstinline!ctranspose! & \lstinline!'! & dot & N & \ref{sec:DottedNotes} \\
+		\lstinline!not! & \lstinline!~! & tie & N & \ref{sec:TiesAndSlurs} \\
+		\lstinline!uplus!, \lstinline!uminus! & \lstinline!+!, \lstinline!-! & octave & N & \ref{sec:OctaveOperators} \\
+		\lstinline!mrdivide! & \lstinline!/! & polyphonic section & N & \ref{sec:Polyphonic} \\
+		\lstinline!mpower! & \lstinline!^! & transposition & N & \ref{sec:Transpose} \\
+		\lstinline!mtimes! & \lstinline!.*! & riff & N & \ref{sec:RepeatRiff} \\
+		\lstinline!or! & \lstinline!|! & extraction & C & \ref{sec:Extraction} \\
+		\lstinline!display!& & display & C & \ref{sec:Display} \\
+		\lstinline!times! & \lstinline!*! & expand & N & \ref{sec:Extraction} \\
+		\lstinline!minus! & \lstinline!-! & index & N & \ref{sec:Index} \\
+	\end{tabular}
+	\caption[\lstinline!Note! member functions]{\lstinline!Note! member functions. Scope column: N means note, M means monophonic, C means channel and G means global.}
+	\label{tab:NoteFunctions}
+\end{table}
+
+\begin{table}[p]
+	\centering
+	\begin{tabular}{llcl}
+		\lstinline!cacofonix! function syntax & Description & Scope & Section \\
+		\hline
+		\lstinline!cacofonix( file, ... )! & output file & & \ref{sec:CacofonixFunction} \\
+		\lstinline!cacofonix( ..., instrument, sheet, ... )! & add a sheet & C & \ref{sec:CacofonixFunction} \\
+		\lstinline!cacofonix( ..., mainSheet, ... )! & main sheet & G & \ref{sec:MainSheet} \\
+		\lstinline!cacofonix( ..., 'Tempo', tempo, ... )! & default tempo & G & \ref{sec:Tempo} \\
+		\lstinline!cacofonix( ..., 'Velocity', velocity, ... )! & velocity & G & \ref{sec:Velocity} \\
+	\end{tabular}
+	\caption[\lstinline!cacofonix! function API]{\lstinline!cacofonix! function API. Scope column: N means note, M means monophonic, C means channel and G means global.}
+	\label{tab:CacofonixAPI}
+\end{table}
+
+\subsection{Tonalities}
 \label{sec:Tonalities}
 
-To create a tonality \lstinline!Note! object, you simply have to call the constructor with a string containing the name of the expected note. The basic names are \lstinline!'rest'! for a rest, \lstinline!'void'! for a void note, \lstinline!'do'!, \lstinline!'re'!, \lstinline!'mi'!, \lstinline!'fa'!, \lstinline!'sol'!, \lstinline!'la'!, \lstinline!'si'! and \lstinline!'a'!, \lstinline!'b'!, \lstinline!'c'!, \lstinline!'d'!, \lstinline!'e'!, \lstinline!'f'! and \lstinline!'g'!. You can add one or two \lstinline!'b'! (\emph{b\'emol}, flat) or \lstinline!'d'! (\emph{di\`ese}, sharp) after \lstinline!'do'!, \lstinline!'re'!, \lstinline!'mi'!\dots and you can add one or two \lstinline!'f'! or \lstinline!'s'! after \lstinline!'a'!, \lstinline!'b'!, \lstinline!'c'!\dots The constructor is case insensitive.
+To create a tonality \lstinline!Note! object, you simply have to call the constructor with a string containing the name of the expected note. The basic names are \lstinline!'rest'! for a rest, \lstinline!'void'! for a void note (see section \ref{sec:VoidNote}), \lstinline!'do'!, \lstinline!'re'!, \lstinline!'mi'!, \lstinline!'fa'!, \lstinline!'sol'!, \lstinline!'la'!, \lstinline!'si'! and \lstinline!'a'!, \lstinline!'b'!, \lstinline!'c'!, \lstinline!'d'!, \lstinline!'e'!, \lstinline!'f'! and \lstinline!'g'!. You can add one or two \lstinline!'b'! (\emph{b\'emol}, flat) or \lstinline!'d'! (\emph{di\`ese}, sharp) after \lstinline!'do'!, \lstinline!'re'!, \lstinline!'mi'!\dots and you can add one or two \lstinline!'f'! or \lstinline!'s'! after \lstinline!'a'!, \lstinline!'b'!, \lstinline!'c'!\dots The constructor is case insensitive.
 
 In \noteInitFile and \noteInitFrFile files, only notes with none or one accident are instanced, but something like \lstinline!Eff = Note( 'Eff' );! is completely valid.
 
-\subsubsection{Duration}
+\subsection{Duration}
+\label{sec:Duration}
 
 To create a duration \lstinline!Note! object, you have to call the constructor with a double, which will be the duration of the note, in number of beats: \lstinline!Note(4)! for a whole note, \lstinline!Note(1)! for a quarter note.
 
 \noteInitFile and \noteInitFrFile define some useful duration: the whole note to the sixteenth note and the triplet quarter note.
 
 \subsection{Chord \lstinline!+!}
+\label{sec:Chord}
 
 In the tutorial, the binary \lstinline!plus! operator (\lstinline!+!) is used to create chords, but this operator is more general. It merge two notes (or two array of notes) in one object: tonalities are recorded as a chord and durations are summed.
 
-\myself{ The script can become messy very quickly if this operator is not correctly used.}
-\me{ Yes, there is a lot of possibilities: \lstinline!C+N2+E+N8+G!, or \lstinline![C N2]+[E N8]+G!, or \lstinline!C+[N2 E+[N8 G]]!\dots It's awesome. }
-\myself{ Every time you don't use that operator correctly and neatly, you make Jesus cry, God kills a kitten, and you will burn in hell to expiate your felony. }
+\myself{The script can become messy very quickly if this operator is not correctly used.}
+\me{Yes, there is a lot of possibilities: \lstinline!C+N2+E+N8+G!, or \lstinline![C N2]+[E N8]+G!, or \lstinline!C+[N2 E+[N8 G]]!\dots It's awesome.}
+\myself{Every time you don't use that operator correctly and neatly, you make Jesus cry, God kills a kitten, and you will burn in hell to expiate your felony.}
 
 The final note is tied if in the two arrays, at least on note is tied. The final note is detached if in the two arrays, at least on note is detached. A note can be tied AND detached, see the section \ref{sec:TiesAndSlurs} for more informations.
 
 \subsection{Set duration \lstinline!:!}
+\label{sec:SetDuration}
 
 Officially, the \lstinline!colon! operator (\lstinline!:!) associates a tonality note (or an array of tonality notes) with a duration note (or an array of duration notes): \lstinline!mynote = tonality:duration!.
 
@@ -419,6 +517,7 @@ sheet = [ ...
 \end{lstlisting}
 
 \subsection{Dotted notes \lstinline!'!}
+\label{sec:DottedNotes}
 
 The operator \lstinline!ctranspose! (\lstinline!'!) raises the duration of the note, as a dot: one \lstinline!'! increases the duration of the note by half of its original value, $n$ \lstinline!'! serve to lengthen the note by $1 - \frac{1}{2^n}$ of its original duration. For example: \\
 \begin{lilypond}
@@ -451,19 +550,20 @@ sheet = [ ...
 	~[ G:N4 G:N4 ] ~[ F:N4 A:N4 ] bar ...
 	G:N4 ~G:N4 ~F:N4 ~A:N4 bar ...
 	~[ G:N4 G:'|':N4 F:N4 A:N4 bar ...
-	G:N1 ] bar ];
+	G:N ] bar ];
 \end{lstlisting}
 
 \subsection{Meters and bars}
+\label{sec:MetersAndBars}
 
 To defined a meter, you have to instantiate a special \note object by calling the constructor \lstinline!Note! with an array of two double \lstinline!meter = Note([upper lower])!. Without surprise, the double \lstinline!upper! indicates how many beats there are in a measure and the double \lstinline!lower! indicates the note value which represents one beat.
 
 \lstinline!Note('bar')! creates an object representing a bar, and you use it every time you have to separate two measures. You can adding bar in tied arrays, in repeated sections (right or left, see \ref{sec:RepeatRiff}), or in expandable sections (only left, see \ref{sec:Expand}).
 
-When several sheets are given to \cacofonix, the first sheet defined the meters. Next sheets have to precise bars, but not meters. If they do, the meters can't be different from the first sheet. With the same spirit, in the polyphonic sections, bars have to be added everywhere and, if the meters have to be defined, the first monophonic section contains meters objects and the others don't have to, but if they do, meters have to be always identical.
+When several sheets are given to \cacofonix, the first sheet defined the meters. Next sheets have to precise bars, but not meters (meters are in the global scope, although bars are only in the monophonic scope). If another sheet specify meters, the meters can't be different from the first sheet. With the same spirit, in the polyphonic sections, bars have to be added everywhere and, if the meters have to be defined, the first monophonic section contains meters objects and the others don't have to, but if they do, meters have to be always identical.
 
-\me{ For project with several sheets, it's maybe a good idea if the first sheet is only composed with meters and tempo, do you think? }
-\myself{ Shh! It's explained at the section \ref{sec:MainSheet}. Let him talk. }
+\me{For project with several sheets, it's maybe a good idea if the first sheet is only composed with meters and tempo, do you think?}
+\myself{Shh! It's explained at the section \ref{sec:MainSheet}. Let him talk.}
 
 The first measure duration is never checked, to allow anacrusis. If no meter is given, the second measure is the reference and all measure have to have the same duration. Even if the first measure is an anacrusis, the other measures have to always have the same duration, or the meter has to be redefined.
 
@@ -494,25 +594,27 @@ sheet = [ ...
 	];
 \end{lstlisting}
 
-\me{ You don't have to use meters and bars. }
-\myself{ Here we go\dots }
-\me{ It's true: any midi files \cacofonix can produce, you can make the same results with or without. }
-\begin{myselfenv}
+\me{You don't have to use meters and bars.}
+\myself{Here we go\dots}
+\me{It's true: any midi files \cacofonix can produce, you can make the same results with or without.}
+\begin{myselfenv}%
 	OK, yes, you're right. Adding bars is boring: you spend time for something which don't appear in the final midi file. But, sometimes, you have thinking about something else, and you have get the wrong duration on several notes. Then, you spend \emph{a lot} of time to find where is the mistake on the sheet, correct the code, re-launch \cacofonix and replay the midi files until the next error. Well, with bars, you can still get the wrong tonality of course, but get the wrong duration makes nicely crash \cacofonix, and the error message gives you what is the problematic measure. Look at that:
 \begin{lstlisting}
 >> NoteInit
 >> cacofonix('dumass', [ Note([4 4]) C:N4 bar E:N4 bar G:N bar ])
 ??? Error using ==> cacofonix
 The measure 2 of the sheet 1 is incorrect.
-\end{lstlisting}
+\end{lstlisting}%
 \end{myselfenv}
-\me{ Humpf. }
+\me{Humpf.}
 
 \subsection{Octave}
+\label{sec:Octave}
 
 There are two ways to add or subtract an octave from a note: the unary operators \lstinline!+! and \lstinline!-! and a special note.
 
 \subsubsection{Octave (\lstinline!+! and \lstinline!-! operators)}
+\label{sec:OctaveOperators}
 
 The simplest way to modify the octave of a note is the unary operators \lstinline!+! and \lstinline!-!. Some examples: \\
 \begin{lilypond}
@@ -526,12 +628,13 @@ sheet = [ ...
 	E:N2 G:N2 bar ...
 	A:N2 B:N2 bar ...
 	+C:N2 ++C:N2 bar ...
-	-E+-G+C+++C:N1 bar ];
+	-E+-G+C+++C:N bar ];
 \end{lstlisting}
 
 \subsubsection{Octave (note)}
+\label{sec:OctaveNote}
 
-Sometimes, a sheet or a section of a sheet is naturally high or low pitched. So, instead of add \lstinline!+! or \lstinline!-! behind each note, you can add a special note which means the default octave. To create a note which raise of $n$ octaves, you have call the constructor \lstinline!Note! with a string \lstinline!'+n'! (\emph{e.g.}, \lstinline!Note('+2')! to raise of two octaves). Use a string \lstinline!'-n'! to lower of $n$ octaves. To restore the default octave, you can use \lstinline!Note('+0')! or \lstinline!Note('-0')!. \\
+Sometimes, a sheet or a section of a sheet is naturally high or low pitched. So, instead of add \lstinline!+! or \lstinline!-! behind each note, you can add a special note which means the default octave. To create a note which raises of $n$ octaves, you have call the constructor \lstinline!Note! with a string \lstinline!'+n'! (\emph{e.g.}, \lstinline!Note('+2')! to raise of two octaves). Use a string \lstinline!'-n'! to lower of $n$ octaves. To restore the default octave, you can use \lstinline!Note('+0')! or \lstinline!Note('-0')!. \\
 \begin{lilypond}
 \relative c' { \new Staff { \time 4/4 g4 a d f, g a d f, g'' f a g g, f a g } }
 \end{lilypond}
@@ -545,16 +648,18 @@ sheet = [ ...
 	Note('+0') G:N4 F:N4 A:N4 G:N4 bar ];
 \end{lstlisting}
 
-\myself{ I guess you would talk about the other way to create this kind of \lstinline!Note!? }
-\me{ Yeah. Instead of using a \lstinline!'+n'! form, you can create a string repeating \lstinline!'+'! $n$ times, like that: \lstinline!Note('+++')! instead of \lstinline!Note('+3')!. Of course, it's also working with \lstinline!'-'!. It's nice when you want raise or lower only one octave, because you can write only \lstinline!Note('+')! and not \lstinline!Note('+1')!. }
-\myself{ Yes, you're right. But it didn't work when $n$ means $0$: to restore the default octave, you have absolutely to use \lstinline!Note('+0')! or \lstinline!Note('-0')!. }
+\myself{I guess you would talk about the other way to create this kind of \lstinline!Note!?}
+\me{Yeah. Instead of using a \lstinline!'+n'! form, you can create a string repeating \lstinline!'+'! $n$ times, like that: \lstinline!Note('+++')! instead of \lstinline!Note('+3')!. Of course, it's also working with \lstinline!'-'!. It's nice when you want raise or lower only one octave, because you can write only \lstinline!Note('+')! and not \lstinline!Note('+1')!.}
+\myself{Yes, you're right. But it didn't work when $n$ means $0$: to restore the default octave, you have absolutely to use \lstinline!Note('+0')! or \lstinline!Note('-0')!.}
 
 \subsection{Dynamics}
+\label{sec:Dynamics}
 
 Dynamics are really important: they add all the expressiveness.
-\me{ \dots as far as midi files can be played with expressiveness. }
+\me{\dots as far as midi files can be played with expressiveness.}
 
-\subsubsection{Simple dynamics}
+\subsubsection{Plain dynamics}
+\label{sec:PlainDynamics}
 
 \begin{table}
 	\centering
@@ -575,17 +680,20 @@ Dynamics are really important: they add all the expressiveness.
 
 To start a section with a precise dynamic, you just have to add a special note: \lstinline!Note('dynamics',dyn)!, where \lstinline!dyn! is a string found in the table \ref{tab:dynamics}. You can also create a dynamic note with a delay: \lstinline!Note('dynamics',dyn,delay)!. The delay is a double or a duration \lstinline!Note! and the new dynamic will be effective only after this duration.
 
-\myself{ Two precisions: this kind of dynamics specify only how notes are attacked. Even with the delay parameter, you can't modify the dynamic of a note which has begun to be played. So, you can't play fun dynamics like \sfz \dots }
-\me{ \dots yet. The trick is at the section \ref{sec:channelDynamics}. }
-\myself{ The second point is about polyphony: every monophonic part can have a different current dynamic. It's very useful: in a sheet for piano, the right hand and the left hand can play differently. }
-\me{ But don't forget to specify changes everywhere! }
+\myself{Two precisions: this kind of dynamics specify only how notes are attacked. Even with the delay parameter, you can't modify the dynamic of a note which has begun to be played. So, you can't play fun dynamics like \sfz.}
+\me{\dots yet. The trick is at the section \ref{sec:ChannelDynamics}.}
+\myself{The second point is about polyphony: every monophonic part can have a different current dynamic. It's very useful: in a sheet for piano, the right hand and the left hand can play differently.}
+\me{But don't forget to specify changes everywhere!}
+
+Plain dynamics, from \lstinline!'fff'! to \lstinline!'ppp'! are defined in \lstinline!NoteInit! and \lstinline!NoteInit_fr! scripts, in the variables \lstinline!DynFFF! to \lstinline!DynPPP!.
 
 \subsubsection{Crescendo}
+\label{sec:Crescendo}
 
 To play a crescendo, you have to add a note created by \lstinline!Note( keyword, duration, dynamics )! or \lstinline!Note( keyword, duration, dynamics, delay )!:
 \begin{itemize}
 	\item \lstinline!keyword! can be \lstinline!'crescendo'!, \lstinline!'cresc'!, \lstinline!'decrescendo'! or \lstinline!'decresc'!.
-		\me{ Fun story: you can use indifferently these key words! \lstinline!'crescendo'! and \lstinline!'cresc'! can be used to create a decrescendo, and \lstinline!'decrescendo'! and \lstinline!'decresc'! can be used for a crescendo. }
+		\me{Fun story: you can use indifferently these key words! \lstinline!'crescendo'! and \lstinline!'cresc'! can be used to create a decrescendo, and \lstinline!'decrescendo'! and \lstinline!'decresc'! can be used for a crescendo.}
 	\item \lstinline!duration! can be a double or a duration \lstinline!Note! which indicates the duration of the crescendo (or the decrescendo).
 	\item \lstinline!dynamics! is a string from the table \ref{tab:dynamics}: it gives the final dynamic.
 	\item \lstinline!delay! is an optional double or a duration \lstinline!Note!. Like for the dynamic \lstinline!Note!, the crescendo starts only after this duration (and ends at \lstinline!delay+duration!).
@@ -594,17 +702,24 @@ To play a crescendo, you have to add a note created by \lstinline!Note( keyword,
 Like simple dynamics, \cacofonix look at the current dynamic at the start of the note, and apply this dynamic for the attack of the note. So you can't play crescendo or decrescendo on one note.
 
 \subsubsection{The velocity}
+\label{sec:Velocity}
 
-To each dynamic correspond a velocity: it's a value between $0$ and $127$ which specify the attack of the note, in the midi file. You can redefine the mapping: when you calling the \cacofonix function, add two more parameters:
+To each dynamic corresponds a velocity: it's a value between $0$ and $127$ which specify the attack of the note, in the midi file. You can redefine the mapping: when you're calling the \cacofonix function, add two more parameters:
 \begin{lstlisting}
 cacofonix( filename, ..., 'Velocity', velocities, ... )
 \end{lstlisting}
 where \lstinline!velocities! is an array of $8$ values which gives the velocity values of dynamics \lstinline!'ppp'! to \lstinline!'fff'!. You can't set the velocity of the dynamic \lstinline!'0'!, which is always $0$. Per default, the values are \lstinline![ 16 33 49 64 80 96 112 126 ]!.
 
 \subsubsection{Channel dynamics}
-\label{sec:channelDynamics}
+\label{sec:ChannelDynamics}
 
-When you create a \lstinline!Note! object with \lstinline!'dynamics'!, \lstinline!'crescendo'!, \lstinline!'cresc'!, \lstinline!'decrescendo'! or \lstinline!'decresc'!, you specify only the attacks of next notes. But there is an other way to modify the dynamics: when you add \lstinline!*! at the end of these keywords (\emph{e.g.} \lstinline!'cresc*'!), you modify the volume of the instrument (or the \emph{channel}). It's pretty convenient for modify the dynamic of notes after the attack, but never forget that, in polyphonic sections, all monophonic sections will be influenced, and it's only modify the volume, whereas a \emph{standard} (without \lstinline!*!) dynamic is more realistic and can modify the volume and the timbre of the instrument. \\
+When you create a \lstinline!Note! object with \lstinline!'dynamics'!, \lstinline!'crescendo'!, \lstinline!'cresc'!, \lstinline!'decrescendo'! or \lstinline!'decresc'!, you specify only the attacks of next notes. But there is an other way to modify the dynamics: when you add \lstinline!*! at the end of these keywords (\emph{e.g.} \lstinline!'cresc*'!), you modify the volume of the instrument (or the volume of the \emph{channel}). It's pretty convenient for modify the dynamic of notes after the attack, but never forget that, in polyphonic sections, all monophonic sections will be influenced, and it's only modify the volume, whereas a plain dynamic (without \lstinline!*!) is more realistic and can modify the volume and the timbre of the instrument.
+
+Standard dynamics and channel dynamics are independent: even if the current plain dynamic is set, the current channel dynamic is not modify. Also, you can boost a plain dynamic with a channel dynamic, but the experience shown that mix the two kinds of dynamics is quickly messy and it's often a bad idea.
+
+\subsubsection{Example}
+
+This is an example of the using dynamics: \\
 \begin{lilypond}
 	\relative c'' { \new Staff { \time 4/4 c2\ff g a\> b c2\mp b2 g1\< a1\sfz } }
 \end{lilypond}
@@ -613,44 +728,73 @@ When you create a \lstinline!Note! object with \lstinline!'dynamics'!, \lstinlin
 NoteInit
 sheet = [ ...
 	Note( 'dynamics', 'ff' ) +C:N2 G:N2 bar ...
-	Note( 'decresc', N1, 'mp' ) A:N2 B:N2 bar ...
+	Note( 'decresc', N, 'mp' ) A:N2 B:N2 bar ...
 	+C:N2 B:N2 bar ...
-	Note( 'cresc*', N1, 'mf' ) G:N1 bar ...
+	Note( 'dynamics', 'mf' ) ...
+	Note( 'dynamics*', 'mp' ) ...
+	Note( 'cresc*', N, 'mf' ) G:N bar ...
 	Note( 'dynamics*', 'ff' ) ...
-	Note( 'dynamics*', 'mf', N8 ) G:N1 bar ];
+	Note( 'dynamics*', 'mf', N8 ) G:N bar ];
 \end{lstlisting}
 
-Standard dynamics and channel dynamics are independent: you can boost a standard dynamic with a channel dynamic, but the experience shown that mix the two ways is often a bad idea.
+Look at the switch plain/channel dynamic: the plain dynamic is reset (line 6) and the channel dynamics takes the old value of the plain (line 7).
 
 \subsection{Tempo}
+\label{sec:Tempo}
+
+Two ways to set the tempo:
+\begin{itemize}
+	\item the tempo is constant: in this case, you can just add two input parameters at the calling of the \cacofonix function:
+\begin{lstlisting}
+cacofonix( filename, ..., 'Tempo', tempo, ... )
+\end{lstlisting}
+	\item the tempo is not constant: to set a new tempo, add in the sheet a note created with \lstinline!Note('tempo',tempo)!.
+\end{itemize}
+
+All sheets share the same tempo in the same time, so you should set the tempo only in one sheet. 
 
 \subsubsection{Accelerando/Rallentando}
+\label{sec:AccelerandoRallentando}
+
 \subsubsection{Fermata}
+\label{sec:Fermata}
 
 \subsection{Polyphonic \lstinline!/!}
+\label{sec:Polyphonic}
 
 \subsection{Sustain}
+\label{sec:Sustain}
 
 \subsection{Transpose \lstinline!\^!}
+\label{sec:Transpose}
 
 \subsection{Repeat / Riff \lstinline!.*!}
 \label{sec:RepeatRiff}
 
 \subsection{Markers}
+\label{sec:Markers}
+
+\subsubsection{Go to a marker}
+\label{sec:Goto}
+
 \subsubsection{Extraction \lstinline!|!}
+\label{sec:Extraction}
 
 \subsection{Display}
+\label{sec:Display}
 
 Someting about the display.
 
 \subsection{The void note}
+\label{sec:VoidNote}
 
-\me{ Before start, a little mood music. }
+\me{Before start, a little mood music.}
 
 \vspace{ 0.25in }
 
+\begin{center}
 \begin{lilypond}
-\paper { line-width = 126\mm }
+\paper { line-width = 106\mm }
 \layout { indent = 2.0\cm }
 \header{
 	title = "Symphony No. 5"
@@ -667,18 +811,24 @@ Someting about the display.
 }
 >> }
 \end{lilypond}
+\end{center}
 
 \vspace{ 0.25in }
 
-\myself{ And, as recommended by \emph{The Hitchhiker's Guide to the Galaxy}, \textsc{don't panic}. \rightthumbsup }
+\myself{And, as recommended by \emph{The Hitchhiker's Guide to the Galaxy}, \textsc{don't panic}. \rightthumbsup}
 
 \subsubsection{Expand \lstinline!*!}
 \label{sec:Expand}
 
 \subsubsection{Index \lstinline!-!}
+\label{sec:Index}
 
 \subsection{Function \lstinline!cacofonix!}
+\label{sec:CacofonixFunction}
+
 \subsubsection{The Main sheet}
 \label{sec:MainSheet}
+
+\subsubsection{Percussions}
 
 \end{document}
