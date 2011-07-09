@@ -35,8 +35,8 @@ classdef Note
 			[6;9]  [6;10] [6;11] [6;12] [6;13] [6;9]  [6;10] [6;11] [6;12] [6;13] } );
 		
 		DYNAMICS = struct( ...
-			'pat', { '0', 'mf', 'mp', 'fff', 'ppp', 'ff', 'pp', 'f', 'p' }, ...
-			'value', { -5 0 -1 3 -4 2 -3 1 -2 } );
+			'pat', {   '0', 'inf', 'mf', 'mp', 'fff', 'ppp', 'ff', 'pp', 'f', 'p' }, ...
+			'value', { -5      4     0    -1      3     -4     2    -3    1   -2 } );
 		
 		ACCENTS = struct( ...
 			'pat', { '.', '^', '>', '-' }, ...
@@ -978,7 +978,7 @@ classdef Note
 			
 			persistent dynamicsNames
 			if isempty( dynamicsNames )
-				dynamicsNames = { '0', 'ppp', 'pp', 'p', 'mp', 'mf', 'f', 'ff', 'fff' };
+				dynamicsNames = { '0', 'ppp', 'pp', 'p', 'mp', 'mf', 'f', 'ff', 'fff', 'inf' };
 			end
 			
 			persistent degDisp altDisp degree2HalfTons

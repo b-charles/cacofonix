@@ -413,7 +413,7 @@ nbNotes = 0;
 			st = n.startPlay;
 			if length( st ) == 1, st = repmat( st, 1, length( ton ) ); end
 			et = n.stopPlay;
-			velo = max( min( interp1( -5:3, [ 0 velocityValues ], n.dynamics, 'linear', 'extrap' ), 127 ), 0 );
+			velo = dyn2value( n.dynamics );
 			
 			arrayfun( @(ton, st) addEvent( NOTE_ON, st, ton, velo ), ton, st );
 			arrayfun( @(ton) addEvent( NOTE_OFF, et, ton, velo ), ton );
@@ -515,6 +515,10 @@ channelDynamic = [0 0]'; % [ -time- ; -dynamics- ]
 		channelDynamic = [0 0]';
 	end
 
+	function values = dyn2value( dyn )
+		values = max( min( interp1( -5:4, [ 0 velocityValues 127 ], dyn, 'linear', 'extrap' ), 127 ), 0 );
+	end
+
 	function dyn = getCurrDyn( dyns, t )
 		if nargin==1
 			t = currentTime;
@@ -544,11 +548,6 @@ channelDynamic = [0 0]'; % [ -time- ; -dynamics- ]
 
 	function setDynamics( note )
 		
-		function dyns = clearDyn( dyns, ts, te )
-			t = dyns(1,:);
-			dyns( :, ts < t & t < te ) = [];
-		end
-		
 		channel = note.channelDynamics;
 		
 		ts = currentTime + note.delay;
@@ -557,36 +556,40 @@ channelDynamic = [0 0]'; % [ -time- ; -dynamics- ]
 		
 		if channel
 			ds = getCurrDyn( channelDynamic, ts );
-			channelDynamic = clearDyn( channelDynamic, ts, te );
+			channelDynamic( :, ts < channelDynamic(1,:) ) = [];
 			channelDynamic = [ channelDynamic [ ts ds ]' [ te de ]' ];
 		else
 			ds = getCurrDyn( currentDynamic, ts );
-			currentDynamic = clearDyn( currentDynamic, ts, te );
+			currentDynamic( :, ts < currentDynamic(1,:) ) = [];
 			currentDynamic = [ currentDynamic [ ts ds ]' [ te de ]' ];
 		end
 		
 	end
 
-	function evts = getChannelDynamics()
+	function addChannelDynamicsEvents()
 		endDyn = [ currentTime getCurrDyn( channelDynamic, currentTime ) ]';
 		channelDynamic( :, channelDynamic(1,:) >= currentTime ) = [];
 		channelDynamic = [ channelDynamic endDyn ];
 		
 		nbseg = size( channelDynamic, 2 )-1;
-		evts = cell(1, nbseg);
+		times = cell(1, nbseg);
 		
 		for i = 1:nbseg
 			if channelDynamic(2,i) ~= channelDynamic(2,i+1)
-				t = channelDynamic(1,i):crescendoSampling:channelDynamic(1,i+1);
+				times{i} = channelDynamic(1,i):crescendoSampling:channelDynamic(1,i+1);
 			else
-				t = channelDynamic(1,i);
+				times{i} = channelDynamic(1,i);
 			end
-			evts{i} = struct( ...
-				'time', num2cell( t ), ...
-				'value', arrayfun( @(t)getCurrDyn( channelDynamic, t ), t, 'UniformOutput', false ) );
 		end
 		
-		evts = [ evts{:} ];
+		times = unique( [ times{:} ] );
+		dyn = arrayfun( @(t)getCurrDyn( channelDynamic, t ), times );
+		
+		values = dyn2value( dyn );
+		
+		for i = 1:length( times )
+			addEvent( VOLUME, times(i), values(i) );
+		end
 		
 	end
 
@@ -1091,11 +1094,7 @@ for numCurrentSheet = 1:nbSheets
 	end
 	
 	% converts channel dynamics to events
-	channelDynEvt = getChannelDynamics();
-	for ii=1:length( channelDynEvt )
-		value = max( min( interp1( -5:3, [ 0 velocityValues ], channelDynEvt(ii).value, 'linear', 'extrap' ), 127 ), 0 );
-		addEvent( VOLUME, channelDynEvt(ii).time, value );
-	end
+	addChannelDynamicsEvents();
 	
 	% converts notes to events
 	convertsNotes2Events()
@@ -1136,6 +1135,27 @@ addEvent( END_TRACK, maxDuration );
 ev = [ sheets(1).events getEvents() ];
 [ toto, index ] = sort( [ ev.time ] );
 sheets(1).events = ev( index );
+
+% adjust channel volume
+
+maxValue = 127;
+allEvents = [ sheets.events ];
+volumeIdx = strcmp( VOLUME, { allEvents.name } );
+if any( volumeIdx )
+	maxValue = max( [ allEvents( volumeIdx ).arg1 ] );
+end
+
+for ii = 1:length( sheets )
+	
+	ev = sheets(ii).events;
+	volumeIdx = strcmp( VOLUME, { ev.name } );
+	if any( volumeIdx )
+		values = num2cell( [ ev( volumeIdx ).arg1 ] - maxValue + 127 );
+		[ sheets(ii).events( volumeIdx ).arg1 ] = deal( values{:} );
+	end
+	
+end
+
 
 %% ### CONVERTS EVENTS TO HEXA-CODE
 
