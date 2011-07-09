@@ -58,6 +58,7 @@ classdef Note
 		initialDuration = [];
 		isDotted = 0;
 		isTied = false;
+		isArpeggiated = false;
 		accent = 0;
 		isDetached = NaN;
 		
@@ -549,8 +550,11 @@ classdef Note
 				end
 			end
 			
-			if ~isempty( mod ) && ismember( '|', mod );
+			if ~isempty( mod ) && ismember( '|', mod )
 				note.isDetached = true;
+			end
+			if ~isempty( mod ) && ismember( '$', mod )
+				note.isArpeggiated = true;
 			end
 			
 		end
@@ -596,6 +600,8 @@ classdef Note
 			note.accent = max( [ notes.accent ] ); % why not?
 			
 			note.isDetached = any( [ notes.isDetached ] );
+			
+			note.isArpeggiated = any( [ notes.isArpeggiated ] );
 			
 			note.isVoid = any( [ notes.isVoid ] );
 			note.voidInfo = myUnique( [ notes.voidInfo ] );

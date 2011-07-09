@@ -12,6 +12,8 @@ roundDuration = @(dur) round( dur / precisionDuration ) * precisionDuration;
 detachSeparatorFix = 0.1;
 detachSeparatorLim = 0.05;
 
+deltaArpeggio = 0.2;
+
 crescendoSampling = 0.25;
 
 tempoSample = 10;
@@ -409,11 +411,12 @@ nbNotes = 0;
 			n = notes( numNote );
 			ton = n.tonality;
 			st = n.startPlay;
+			if length( st ) == 1, st = repmat( st, 1, length( ton ) ); end
 			et = n.stopPlay;
 			velo = max( min( interp1( -5:3, [ 0 velocityValues ], n.dynamics, 'linear', 'extrap' ), 127 ), 0 );
 			
-			arrayfun( @(ty) addEvent( NOTE_ON, st, ty, velo ), ton );
-			arrayfun( @(ty) addEvent( NOTE_OFF, et, ty, velo ), ton );
+			arrayfun( @(ton, st) addEvent( NOTE_ON, st, ton, velo ), ton, st );
+			arrayfun( @(ton) addEvent( NOTE_OFF, et, ton, velo ), ton );
 		end
 		
 	end
@@ -827,6 +830,14 @@ tempoEvt = repmat( struct( ...
 
 %% NOTES UTILITIES (addNote, notesReader)
 
+	function durationPlay = getDurationPlay( duration )
+		if duration * detachSeparatorLim > detachSeparatorFix
+			durationPlay = duration - detachSeparatorFix;
+		else
+			durationPlay = duration * (1-detachSeparatorLim);
+		end
+	end
+
 	function createNote( note )
 		
 		tonality = note.tonality;
@@ -838,6 +849,7 @@ tempoEvt = repmat( struct( ...
 			duration = note.duration;
 			dynamics = getCurrentDynamics( note );
 			isTied = note.isTied;
+			isArpeggiated = note.isArpeggiated;
 			
 			isAdded = false;
 			
@@ -857,12 +869,7 @@ tempoEvt = repmat( struct( ...
 						notes( index ).stop = currentTime + duration;
 						duration = notes( index ).stop - notes( index ).start;
 						
-						if duration * detachSeparatorLim > detachSeparatorFix
-							durationPlay = duration - detachSeparatorFix;
-						else
-							durationPlay = duration * (1-detachSeparatorLim);
-						end
-						notes( index ).stopPlay = notes( index ).start + durationPlay;
+						notes( index ).stopPlay = notes( index ).start + getDurationPlay( duration );
 						
 						isAdded = true;
 					end
@@ -877,29 +884,25 @@ tempoEvt = repmat( struct( ...
 			end
 			
 			if ~isAdded
+				
+				start = currentTime;
+				startPlay = currentTime;
+				stop = start + duration;
+				stopPlay = startPlay + duration;
+				
 				if accent == 0
-					if duration * detachSeparatorLim > detachSeparatorFix
-						durationPlay = duration - detachSeparatorFix;
-					else
-						durationPlay = duration * (1-detachSeparatorLim);
-					end
-					addNote( tonality, dynamics, duration, durationPlay )
+					stopPlay = startPlay + getDurationPlay( duration );
 					
 				elseif accent == 1 % '.' staccato
-					durationPlay = duration / 2;
-					addNote( tonality, dynamics, duration, durationPlay )
+					stopPlay = startPlay + duration / 2;
 					
 				elseif accent == 2 % '^' marcato
-					durationPlay = duration / 2;
-					addNote( tonality, dynamics+1, duration, durationPlay )
+					stopPlay = startPlay + duration / 2;
+					dynamics = dynamics + 1;
 					
 				elseif accent == 3 % '>' accent
-					if duration * detachSeparatorLim > detachSeparatorFix
-						durationPlay = duration - detachSeparatorFix;
-					else
-						durationPlay = duration * (1-detachSeparatorLim);
-					end
-					addNote( tonality, dynamics+1, duration, durationPlay )
+					stopPlay = startPlay + getDurationPlay( duration );
+					dynamics = dynamics + 1;
 					
 				elseif accent == 4 % '-' tenuto
 					if duration * 2*detachSeparatorLim > 2*detachSeparatorFix
@@ -907,9 +910,27 @@ tempoEvt = repmat( struct( ...
 					else
 						sep = duration * detachSeparatorLim;
 					end
-					addNote( tonality, dynamics+1, currentTime, currentTime+duration, currentTime+sep, currentTime+duration-sep )
+					startPlay = currentTime + sep;
+					stopPlay = currentTime + duration - sep;
+					dynamics = dynamics + 1;
 					
 				end
+				
+				if isArpeggiated
+					
+					nbTon = length( tonality );
+					delta = deltaArpeggio;
+					
+					if nbTon*delta > stopPlay - startPlay
+						delta = ( stopPlay - startPlay ) / nbTon;
+					end
+					
+					startPlay = delta*(0:nbTon-1)/(nbTon-1) + startPlay;
+					
+				end
+				
+				addNote( tonality, dynamics, start, stop, startPlay, stopPlay )
+				
 			end
 			
 		end
