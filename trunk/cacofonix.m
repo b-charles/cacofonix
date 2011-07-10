@@ -516,7 +516,7 @@ channelDynamic = [0 0]'; % [ -time- ; -dynamics- ]
 	end
 
 	function values = dyn2value( dyn )
-		values = max( min( interp1( -5:4, [ 0 velocityValues 127 ], dyn, 'linear', 'extrap' ), 127 ), 0 );
+		values = max( min( round( interp1( -5:4, [ 0 velocityValues 127 ], dyn, 'linear', 'extrap' ) ), 127 ), 0 );
 	end
 
 	function dyn = getCurrDyn( dyns, t )
@@ -586,6 +586,11 @@ channelDynamic = [0 0]'; % [ -time- ; -dynamics- ]
 		dyn = arrayfun( @(t)getCurrDyn( channelDynamic, t ), times );
 		
 		values = dyn2value( dyn );
+		
+		% delete doubloon
+		isEqValues = [ false diff( values )==0 ];
+		times = times( ~isEqValues );
+		values = values( ~isEqValues );
 		
 		for i = 1:length( times )
 			addEvent( VOLUME, times(i), values(i) );
