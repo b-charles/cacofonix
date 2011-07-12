@@ -22,6 +22,11 @@
 \newcommand\noteInitFile{\texttt{NoteInit.m}\xspace}
 \newcommand\noteInitFrFile{\texttt{NoteInit\_fr.m}\xspace}
 
+\newcommand\wikipedia{\textsc{Wikipedia}\xspace}
+\newcommand\wiktionary{\textsc{Wiktionary}\xspace}
+\newcommand\google{\textsc{Google}\xspace}
+
+\newcommand\footurl[1]{\footnote{\url{#1}}\xspace}
 \newcommand\exchange[2]{\texttt{#1}\footnote{\url{#2}}\xspace}
 
 \newcommand\sfz{s$\!f\!$z\xspace}
@@ -371,7 +376,7 @@ All features of \cacofonix can be classified in three sets: either it's a specia
 There is another classification of the features of \cacofonix: the scope. There are four possible scopes: note, monophonic, channel or global.
 \begin{itemize}
 	\item A feature with a note scope will modify only one note (or sometimes, an array of notes), and the next notes are not influenced.
-	\item A feature with a monophonic scope modify all the next notes. If the feature is placed in a monophonic section, which is a part of a polyphonic section, the other monophonic parts (which are played in parallel) are not modified, influenced or perturbed, in any way. If, after the modification, a new polyphonic section starts, the feature will be apply in every new monophonic parts. Last tricky point: after the polyphonic section, the last modification of the last written monophonic part will be active. See this example (see section \ref{sec:PlainDynamics} for explications about dynamics):
+	\item A feature with a monophonic scope modify the next notes of the monophonic part. If the feature is placed in a monophonic section, which is a part of a polyphonic section, the other monophonic parts (which are played in parallel) are not modified, influenced or perturbed, in any way. If, after the modification, a new polyphonic section starts, the feature will be apply in every new monophonic parts. Last point: after the polyphonic section, the last modification of the last written monophonic part will be active. See this example (see section \ref{sec:PlainDynamics} for explications about dynamics):
 \begin{lstlisting}
 NoteInit
 sheet = [ C:N bar ...      % default dynamic: mf
@@ -395,6 +400,11 @@ sheet = [ C:N bar ...      % default dynamic: mf
 	\item A feature with a channel scope modify at the same time all played monophonic sections of the sheet.
 	\item Finally, a feature with a global scope modify all sheets given to the \lstinline!cacofonix! function.
 \end{itemize}
+
+\me{I not sure to understand\dots}
+\myself{A feature with a note scope modify a note. When it's a monophonic scope, that modify the monophic section. A channel scope modify the channel, which means the sheet, and a global feature modify all sheets. It's almost logical.}
+\me{Yes, but the monophonic scope seems tricky.}
+\myself{Don't be stressed out. There are more difficult to understand latter.}
 
 \begin{table}[p]
 	\centering
@@ -482,23 +492,31 @@ In the tutorial, the binary \lstinline!plus! operator (\lstinline!+!) is used to
 \me{Yes, there is a lot of possibilities: \lstinline!C+N2+E+N8+G!, or \lstinline![C N2]+[E N8]+G!, or \lstinline!C+[N2 E+[N8 G]]!\dots It's awesome.}
 \myself{Every time you don't use that operator correctly and neatly, you make Jesus cry, God kills a kitten, and you will burn in hell to expiate your felony.}
 
-The final note is tied if in the two arrays, at least on note is tied. The final note is detached if in the two arrays, at least on note is detached. A note can be tied AND detached, see the section \ref{sec:TiesAndSlurs} for more informations.
+The final note is tied, detached or arpeggiated if in the two arrays, at least on note is tied, detached or arpeggiated. See the section \ref{sec:TiesAndSlurs} for more informations about ties and detached notes and the section \ref{sec:SetDuration} for arpeggios.
+
+\me{Arpeggios? Arpeggi?}
+\myself{\wikipedia gives both\footurl{http://en.wikipedia.org/wiki/Arpeggio}, \wiktionary gives only arpeggios\footurl{http://en.wiktionary.org/wiki/arpeggio}. \google finds 3 820 000 results for argeggios and only 634 000 for arpeggi. The \textsc{Oxford Dictionaries} and The \textsc{Cambridge Dictionaries Online} suggest only arpeggios\footurl{http://oxforddictionaries.com/definition/arpeggio}\footurl{http://dictionary.cambridge.org/dictionary/british/arpeggio}. Arpeggios win.}
 
 \subsection{Set duration \lstinline!:!}
 \label{sec:SetDuration}
 
 Officially, the \lstinline!colon! operator (\lstinline!:!) associates a tonality note (or an array of tonality notes) with a duration note (or an array of duration notes): \lstinline!mynote = tonality:duration!.
 
-In fact, the \lstinline!:! operator is like the \lstinline!+! operator: it merges two array of notes in the same way. The difference is the optional argument, a string which indicates the accent and if the note is detached. The string is composed with the characters of the table \ref{table:charsOfColon}: only one accent can be specify (\lstinline!'>'!, \lstinline!'.'!, \lstinline!'^'! or \lstinline!'-'!). The character \lstinline!'|'!, for a detached note, can be added after or before (for more information about detached notes, see the section \ref{sec:TiesAndSlurs}).
+In fact, the \lstinline!:! operator is like the \lstinline!+! operator: it merges two array of notes in the same way. The difference is the optional argument, a string which indicates the accent and if the note is detached. The string is composed with the characters of the table \ref{table:charsOfColon}: only one accent can be specify (\lstinline!'>'!, \lstinline!'.'!, \lstinline!'^'! or \lstinline!'-'!).
+
+The character \lstinline!'|'!, for a detached note, can be added after or before (for more information about detached notes, see the section \ref{sec:TiesAndSlurs}).
+
+The character \lstinline!'$'! indicate an arpeggiated chord. If the note is tied (and not detached), the arpeggio is ignored.
 
 \begin{table}
 	\center
 \begin{tabular}{ccp{7cm}}
-\lstinline!'>'! & accent & raise the dynamics of the note \\
+\lstinline!'>'! & accent & \verb!toto! raise the dynamics of the note \\
 \lstinline!'.'! & staccato & the note is played only during the half of its duration \\
 \lstinline!'^'! & marcato & like an accent and a staccato \\
 \lstinline!'-'! & tenuto & like an accent and the delay between the previous note and this one is risen \\
-\lstinline!'|'! & detached & the note is detached, even if it is tied
+\lstinline!'|'! & detached & the note is detached, even if it is tied \\
+\lstinline!'$'! & arpeggio & the chord is arpeggiated. \\
 \end{tabular}
 \caption{Characters composing the optional string of the \lstinline!:! operator}
 \label{table:charsOfColon}
@@ -664,7 +682,8 @@ Dynamics are really important: they add all the expressiveness.
 \begin{table}
 	\centering
 	\begin{tabular}{rll}
-		\lstinline!'fff'! & forteissimo possibile & loudest possible \\
+		\lstinline!'inf'! & & loudest possible \\
+		\lstinline!'fff'! & forteissimo possibile & very \emph{very} loud \\
 		\lstinline!'ff'! & fortissimo & very loud \\
 		\lstinline!'f'! & forte & loud \\
 		\lstinline!'mf'! & mezzo-forte & moderately loud (default) \\
@@ -699,7 +718,7 @@ To play a crescendo, you have to add a note created by \lstinline!Note( keyword,
 	\item \lstinline!delay! is an optional double or a duration \lstinline!Note!. Like for the dynamic \lstinline!Note!, the crescendo starts only after this duration (and ends at \lstinline!delay+duration!).
 \end{itemize}
 
-Like simple dynamics, \cacofonix look at the current dynamic at the start of the note, and apply this dynamic for the attack of the note. So you can't play crescendo or decrescendo on one note.
+Like plain dynamics, \cacofonix look at the current dynamic at the start of the note, and apply this dynamic for the attack of the note. So you can't play crescendo or decrescendo on one note.
 
 \subsubsection{The velocity}
 \label{sec:Velocity}
@@ -708,7 +727,7 @@ To each dynamic corresponds a velocity: it's a value between $0$ and $127$ which
 \begin{lstlisting}
 cacofonix( filename, ..., 'Velocity', velocities, ... )
 \end{lstlisting}
-where \lstinline!velocities! is an array of $8$ values which gives the velocity values of dynamics \lstinline!'ppp'! to \lstinline!'fff'!. You can't set the velocity of the dynamic \lstinline!'0'!, which is always $0$. Per default, the values are \lstinline![ 16 33 49 64 80 96 112 126 ]!.
+where \lstinline!velocities! is an array of $8$ values which gives the velocity values of dynamics \lstinline!'ppp'! to \lstinline!'fff'!. You can't set the velocity of the dynamic \lstinline!'0'! and \lstinline!'inf'!, which are always $0$ and $127$. Per default, the values are \lstinline![ 16 33 49 64 80 96 112 126 ]!.
 
 \subsubsection{Channel dynamics}
 \label{sec:ChannelDynamics}
