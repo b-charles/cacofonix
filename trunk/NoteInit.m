@@ -1,6 +1,5 @@
 
 clc
-% clear classes
 
 V = Note( 'void' );
 
