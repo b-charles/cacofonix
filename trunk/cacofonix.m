@@ -1,3 +1,27 @@
+%CACOFONIX create a midi file from a set of Note arrays.
+%	cacofonix( files, ... ) specify the output file.
+%
+%	cacofonix( ..., mainSheet, ... ) (with no playable notes) defines a
+%	main sheet.
+%
+%	cacofonix( ..., sheet, ... ) (with playable notes) defines a piano
+%	sheet.
+%
+%	cacofonix( ..., instrument, sheet, ... ) defines a sheet for a
+%	particular instrument.
+%
+%	cacofonix( ..., 'Tempo', tempo, ... ) sets the default tempo
+%
+%	cacofonix( ..., 'Velocities', velocities, ... ) maps plain dynamics to
+%	velocity values.
+%
+%	cacofonix -instruments displays all availables instruments.
+%
+%	cacofonix -percussions displays all availables percussions.
+%
+%	See also: Note.
+%
+
 function cacofonix( filepath, varargin )
 
 %% ### CONSTANTS

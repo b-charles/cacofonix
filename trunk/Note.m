@@ -1,14 +1,24 @@
-% Tonality:		Note( 'do' ), Note ( 'C' )
-% Octave:		Note( '+0' ), Note( '++' ), Note( '-' )
-% Dynamics:		Note( 'dynamics', 'mf' )
-% Crescendo:	Note( 'cresc', [ N C ], 'fff' )
-% Bar:			Note( 'bar' )
-% Sustain:		Note( 'sustain', 'on'|'off' )
-% Tempo:		Note( 'tempo', 120 )
-% Fermata:		Note( 'fermata', B, R )
-% Acc/Rall:		Note( 'accel'|'rall', B, 80 )
-% Duration:		B = Note( 2 )
-% Meter:		Note( [3 4] )
+%NOTE Create a note.
+%	myNote = Note( ... ) creates a note.
+%
+%	Tonality:	Note( 'do' ), Note ( 'C' )
+%	Rest:		Note( 'rest' )
+%	Void:		Note( 'void' )
+%	Duration:	Note( duration )
+%	Octave:		Note( '+2' ), Note( '--' ), Note( '+0' )
+%	Meter:		Note( [3 4] )
+%	Bar:		Note( 'bar' )
+%	Dynamics:	Note( 'dynamics', 'mf' )
+%	Crescendo:	Note( 'cresc', [ N C ], 'fff' )
+%	Sustain:	Note( 'sustain', 'on'|'off' )
+%	Tempo:		Note( 'tempo', 120 )
+%	Acc/Rall:	Note( 'accel'|'rall', B, 80 )
+%	Fermata:	Note( 'fermata', B, R )
+%	Marker:		Note( 'marker', mark )
+%	Go to:		Note( 'marker*', mark )
+%
+%	See also: cacofonix.
+%
 
 classdef Note
 	
@@ -220,6 +230,13 @@ classdef Note
 				ok = false;
 				
 			end
+			function ok = checkBar( varargin )
+				ok = false;
+				if nargin == 1 && ischar( varargin{1} ) && strcmpi( varargin{1}, 'bar' )
+					note.isBar = true;
+					ok = true;
+				end
+			end
 			function ok = checkDynamics( varargin )
 				ok = false;
 				if ( nargin == 2 || nargin == 3 ) && ...
@@ -243,13 +260,6 @@ classdef Note
 					note.delay = delay_;
 					note.channelDynamics = channel;
 					
-				end
-			end
-			function ok = checkBar( varargin )
-				ok = false;
-				if nargin == 1 && ischar( varargin{1} ) && strcmpi( varargin{1}, 'bar' )
-					note.isBar = true;
-					ok = true;
 				end
 			end
 			function ok = checkCrescendo( varargin )
@@ -457,6 +467,7 @@ classdef Note
 	methods
 		
 		function notes = not( notes )
+			% NOT (~) ties a note with the previous or an array of note.
 			
 			index = [ notes.isNote ];
 			
@@ -482,6 +493,8 @@ classdef Note
 	methods
 		
 		function note = ctranspose( note )
+			% CTRANSPOSE (') adds the half duration (dot)
+			
 			dot = note.isDotted + 1;
 			note.isDotted = dot;
 			note.duration = note.initialDuration * ( 2 - 2^-dot );
@@ -494,10 +507,14 @@ classdef Note
 	methods
 		
 		function notes = uminus( notes )
+			% UMINUS (-) decreases a note array of one octave
+			
 			notes = addOctave( notes, -1 );
 		end
 		
 		function notes = uplus( notes )
+			% UPLUS (+) raises a note array of one octave
+			
 			notes = addOctave( notes, 1 );
 		end
 		
@@ -506,6 +523,8 @@ classdef Note
 	methods( Access = private )
 		
 		function notes = addOctave( notes, oct )
+			% ADDOCTAVE raises/decreases the octave of notes
+			
 			offset = 12*oct;
 			for i = find( [ notes.isNote ] )
 				
@@ -522,11 +541,13 @@ classdef Note
 		
 	end
 	
-	%% set longueur colon
+	%% set duration colon
 	
 	methods
 		
 		function note = colon( note1, mod, note2 )
+			% COLON (:) sets the duration of a note
+			
 			persistent accents accentPattern pattern
 			if isempty( accents )
 				accents = Note.ACCENTS;
@@ -561,11 +582,12 @@ classdef Note
 		
 	end
 	
-	%% accord plus
+	%% chord plus
 	
 	methods
 		
 		function note = plus( notes, note2 )
+			% PLUS (+) merge two notes in a chord
 			
 			function B = myUnique( A )
 				[ toto, I ] = unique( A', 'rows', 'first' );
@@ -615,6 +637,8 @@ classdef Note
 	methods
 		
 		function notes = mpower( notes, height )
+			% MPOWER (^) transposes an array of notes
+			
 			persistent degree2HalfTons halfTons2Degree
 			if isempty( degree2HalfTons )
 				degree2HalfTons = [ 0 2 4 5 7 9 11 ];
@@ -651,8 +675,8 @@ classdef Note
 	methods( Access = private )
 		
 		function notes = internalTranspose( notes, height )
+			% INTERNALTRANSPOSE realizes the transposition
 			
-			% realize the transposition
 			for i = find( [ notes.isNote ] )
 				
 				ton = notes(i).tonality;
@@ -676,6 +700,7 @@ classdef Note
 	methods
 		
 		function notes = mtimes( accord, riff )
+			% MTIMES (*) expands a riff
 			
 			if isnumeric( riff )
 				notes = repmat( accord, 1, riff );
@@ -744,6 +769,7 @@ classdef Note
 	methods
 		
 		function notes = times( accord, riff )
+			% TIMES (.*) expands 
 			
 			if isnumeric( riff )
 				notes = repmat( accord, 1, riff );
@@ -788,13 +814,14 @@ classdef Note
 	methods
 		
 		function notes = minus( notes, index )
+			% MINUS (-) indexes the note
 			
 			for i = find( [ notes.isVoid ] )
 				
 				info = notes(i).voidInfo; nbInfo = size( info, 2 );
 				if nbInfo > 1
 					error( 'CACOFONIX:SetIndex', ...
-						'Index can not be defined for accords' );
+						'Index can not be defined for chords' );
 				else
 					notes(i).voidInfo = [ index; info( 2:end ) ];
 				end
@@ -810,6 +837,8 @@ classdef Note
 	methods
 		
 		function sheet = mrdivide( A, B )
+			% MRDIVIDE (/) creates a polyphonic section
+			
 			persistent NoteStart NoteNext NoteEnd
 			if isempty( NoteStart )
 				NoteStart = Note( '__PARALLEL_START__' );
@@ -837,6 +866,7 @@ classdef Note
 	methods
 		
 		function sheet = or( arg1, arg2 )
+			% OR (|) extract an array of note from or to a marker
 			
 			function sheet = mainExtract( sheet )
 				persistent NoteStart NoteNext NoteEnd
@@ -940,10 +970,16 @@ classdef Note
 	methods( Static )
 		
 		function setNbCharByQuater( newValue )
+			% SETNBCHARBYQUATER sets the number of characters by quater
+			% notes
+			
 			Note.internCharByQuater( 'set', newValue );
 		end
 		
 		function value = getNbCharByQuater()
+			% GETNBCHARBYQUATER returns the number of characters by quater
+			% notes
+			
 			value = Note.internCharByQuater( 'get' );
 		end
 		
@@ -952,6 +988,9 @@ classdef Note
 	methods( Static, Access = private )
 		
 		function currentValue = internCharByQuater( flag, newValue )
+			% INTERNCHARBYQUATER manages the number of characters by quater
+			% notes
+			
 			persistent value
 			if isempty( value )
 				value = 24;
@@ -975,6 +1014,7 @@ classdef Note
 	methods
 		
 		function display( notes )
+			% DISPLAY diplays an array of notes.
 			
 			persistent dynamicsNames
 			if isempty( dynamicsNames )
