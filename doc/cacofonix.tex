@@ -376,7 +376,7 @@ All features of \cacofonix can be classified in three sets: either it's a specia
 There is another classification of the features of \cacofonix: the scope. There are four possible scopes: note, monophonic, channel or global.
 \begin{itemize}
 	\item A feature with a note scope will modify only one note (or sometimes, an array of notes), and the next notes are not influenced.
-	\item A feature with a monophonic scope modify the next notes of the monophonic part. If the feature is placed in a monophonic section, which is a part of a polyphonic section, the other monophonic parts (which are played in parallel) are not modified, influenced or perturbed, in any way. If, after the modification, a new polyphonic section starts, the feature will be apply in every new monophonic parts. Last point: after the polyphonic section, the last modification of the last written monophonic part will be active. See this example (see section \ref{sec:PlainDynamics} for explications about dynamics):
+	\item A feature with a monophonic scope modify the next notes of the monophonic part. If the feature is placed in a monophonic section, which is a part of a polyphonic section, the other monophonic parts (which are played in parallel) are not modified, influenced or perturbed, in any way. If, after the modification, a new polyphonic section starts, the feature will be apply in every new monophonic parts. Last point: after the polyphonic section, the last modification of the last written monophonic part will be active. This is a good example (see section \ref{sec:PlainDynamics} for explications about dynamics):
 \begin{lstlisting}
 NoteInit
 sheet = [ C:N bar ...      % default dynamic: mf
@@ -398,7 +398,7 @@ sheet = [ C:N bar ...      % default dynamic: mf
 	];
 \end{lstlisting}
 	\item A feature with a channel scope modify at the same time all played monophonic sections of the sheet.
-	\item Finally, a feature with a global scope modify all sheets given to the \lstinline!cacofonix! function.
+	\item Finally, a feature with a global scope modify all sheets given to the \lstinline!cacofonix! function. For more readability, this features can be grouped in a main sheet, see the section \ref{sec:MainSheet}.
 \end{itemize}
 
 \me{I not sure to understand\dots}
@@ -502,16 +502,12 @@ The final note is tied, detached or arpeggiated if in the two arrays, at least o
 
 Officially, the \lstinline!colon! operator (\lstinline!:!) associates a tonality note (or an array of tonality notes) with a duration note (or an array of duration notes): \lstinline!mynote = tonality:duration!.
 
-In fact, the \lstinline!:! operator is like the \lstinline!+! operator: it merges two array of notes in the same way. The difference is the optional argument, a string which indicates the accent and if the note is detached. The string is composed with the characters of the table \ref{table:charsOfColon}: only one accent can be specify (\lstinline!'>'!, \lstinline!'.'!, \lstinline!'^'! or \lstinline!'-'!).
-
-The character \lstinline!'|'!, for a detached note, can be added after or before (for more information about detached notes, see the section \ref{sec:TiesAndSlurs}).
-
-The character \lstinline!'$'! indicate an arpeggiated chord. If the note is tied (and not detached), the arpeggio is ignored.
+In fact, the \lstinline!:! operator is like the \lstinline!+! operator: it merges two array of notes in the same way. The difference is the optional argument, a string which is composed with the characters of the table \ref{table:charsOfColon}: only one accent can be specify (\lstinline!'>'!, \lstinline!'.'!, \lstinline!'^'! or \lstinline!'-'!), the characters \lstinline!'|'!, for a detached note, and \lstinline!'$'!, for an arpeggiated chord, can be added after or before (for more information about detached notes, see the section \ref{sec:TiesAndSlurs}). If the note id tied (and not detached), the arpeggio is ignored.
 
 \begin{table}
 	\center
 \begin{tabular}{ccp{7cm}}
-\lstinline!'>'! & accent & \verb!toto! raise the dynamics of the note \\
+\lstinline!'>'! & accent & raise the dynamics of the note \\
 \lstinline!'.'! & staccato & the note is played only during the half of its duration \\
 \lstinline!'^'! & marcato & like an accent and a staccato \\
 \lstinline!'-'! & tenuto & like an accent and the delay between the previous note and this one is risen \\
@@ -738,7 +734,7 @@ Standard dynamics and channel dynamics are independent: even if the current plai
 
 \subsubsection{Example}
 
-This is an example of the using dynamics: \\
+This is an example of the dynamics using: \\
 \begin{lilypond}
 	\relative c'' { \new Staff { \time 4/4 c2\ff g a\> b c2\mp b2 g1\< a1\sfz } }
 \end{lilypond}
@@ -770,13 +766,39 @@ cacofonix( filename, ..., 'Tempo', tempo, ... )
 	\item the tempo is not constant: to set a new tempo, add in the sheet a note created with \lstinline!Note('tempo',tempo)!.
 \end{itemize}
 
-All sheets share the same tempo in the same time, so you should set the tempo only in one sheet. 
+The tempo is independent of the meters: the double \lstinline!tempo! is always the number of quarter notes (\lstinline!Note(1)!) per minutes.
+
+All sheets share the same tempo in the same time (tempo has a global scope), so you should set the tempo only in one sheet.
 
 \subsubsection{Accelerando/Rallentando}
 \label{sec:AccelerandoRallentando}
 
+You can set a new tempo progressively with \lstinline!Note( keyword, duration, newTempo )!, where \lstinline!keyword! is \lstinline!'accelerando'!, \lstinline!'rallentendo'!, \lstinline!'accel.'!, \lstinline!'rall.'!, \lstinline!'accel'! or \lstinline!'rall'!, \lstinline!duration! is the transition duration (a double or a duration \lstinline!Note!), and \lstinline!newTempo! is the final tempo, reached after the given duration.
+
 \subsubsection{Fermata}
 \label{sec:Fermata}
+
+You can indicate a fermata with \lstinline!Note( 'fermata', duration, playedDuration )!: \lstinline!duration! is the duration of the fermata (\emph{on the sheet}) and \lstinline!playedDuration! is wanted duration of the fermata with the current tempo (\emph{played duration}).
+
+\subsubsection{Example}
+
+This is an example of the tempo using: \\
+\begin{lilypond}
+	\relative c'' { \new Staff { \time 4/4 c2\ff g a\> b c2\mp b2 g1\< a1\sfz } }
+\end{lilypond}
+
+\begin{lstlisting}
+NoteInit
+sheet = [ ...
+	Note( 'dynamics', 'ff' ) +C:N2 G:N2 bar ...
+	Note( 'decresc', N, 'mp' ) A:N2 B:N2 bar ...
+	+C:N2 B:N2 bar ...
+	Note( 'dynamics', 'mf' ) ...
+	Note( 'dynamics*', 'mp' ) ...
+	Note( 'cresc*', N, 'mf' ) G:N bar ...
+	Note( 'dynamics*', 'ff' ) ...
+	Note( 'dynamics*', 'mf', N8 ) G:N bar ];
+\end{lstlisting}
 
 \subsection{Polyphonic \lstinline!/!}
 \label{sec:Polyphonic}
