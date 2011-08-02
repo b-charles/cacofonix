@@ -373,6 +373,7 @@ In this reference guide, we will see every possibilities to transcribe any sheet
 
 All features of \cacofonix can be classified in three sets: either it's a special use of the \lstinline!Note! constructor (see table \ref{tab:NoteAPI}), or it's a member function or an operator of the \lstinline!Note! class (see table \ref{tab:NoteFunctions}) or it's about the \lstinline!cacofonix! function (see table \ref{tab:CacofonixAPI}).
 
+\label{sec:scope}
 There is another classification of the features of \cacofonix: the scope. There are four possible scopes: note, monophonic, channel or global.
 \begin{itemize}
 	\item A feature with a note scope will modify only one note (or sometimes, an array of notes), and the next notes are not influenced.
@@ -786,7 +787,7 @@ You can indicate a fermata with \lstinline!Note( 'fermata', duration, playedDura
 
 \subsubsection{Example}
 
-This is an example of the tempo using: \\
+This is an example of the tempo feature: \\
 \begin{lilypond}
 	\relative c'' { \new Staff { \time 4/4 c4^\markup{ \italic Vivace } b a g f_\markup{ \italic rall... } e d c a'2 g\fermata } }
 \end{lilypond}
@@ -801,6 +802,46 @@ sheet = [ ...
 
 \subsection{Polyphony \lstinline!/!}
 \label{sec:Polyphony}
+
+Polyphonic sections are really useful, in particular in two cases: you can't play more than 15 sheets (midi 1.0 specifications allowed only 16 channels, with one channel for percussions), so when you have several sheets with the same instrument, you can merge theses sheets and get an unique sheets by instrument. Or, more often, your instrument has the possibility to play several notes independantly, like a piano with the right and left hands.
+
+Polyphonic sections are easy to use: just merge two sheets with the \lstinline!mrdivide! (\lstinline!/!) operator. The two sheets are called \emph{monophonic sections}, even if they contain smaller polyphonic sections. You can merge more than two sheets: to play \lstinline!sheet1!, \lstinline!sheet2!, \lstinline!sheet3!\dots at in the same time, just apply the operator to add each sheet: \lstinline!sheet1 / sheet2 / sheet3 /...! Only one rule: every sheet has to have the same total duration.
+
+Monophonic sections can contain everything: bars, crescendo, tempo\dots Just be careful to the scope of the feature, as explained at \ref{sec:scope}.
+
+\me{It's funny.}
+\myself{Hm hm. The polyphony is funny. Are you high?}
+\begin{meenv}%
+Have you ever apply the function \lstinline!length! on a sheet?
+\begin{lstlisting}
+>> NoteInit
+>> sheet1 = [ C:N4 D:N4 E:N4 F:N4 ];
+>> length( sheet1 )
+
+ans =
+
+     4
+
+>> sheet2 = [ G:N4 A:N4 B:N4 +C:N4 ];
+>> length( sheet2 )
+
+ans =
+
+     4
+
+\end{lstlisting}
+Nothing wrong. But:
+\begin{lstlisting}
+>> length( sheet1 / sheet2 )
+
+ans =
+
+    11
+
+\end{lstlisting}
+Where come from the $3$ extra notes?%
+\end{meenv}
+\myself{Well, \cacofonix use extra special notes to know where start polyphonic section.}
 
 \subsection{Sustain}
 \label{sec:Sustain}
