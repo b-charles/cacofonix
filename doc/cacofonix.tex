@@ -442,7 +442,7 @@ sheet = [ C:N bar ...      % default dynamic: mf
 		\lstinline!ctranspose! & \lstinline!'! & dot & N & \ref{sec:DottedNotes} \\
 		\lstinline!not! & \lstinline!~! & tie & N & \ref{sec:TiesAndSlurs} \\
 		\lstinline!uplus!, \lstinline!uminus! & \lstinline!+!, \lstinline!-! & octave & N & \ref{sec:OctaveOperators} \\
-		\lstinline!mrdivide! & \lstinline!/! & polyphonic section & N & \ref{sec:Polyphonic} \\
+		\lstinline!mrdivide! & \lstinline!/! & polyphonic section & N & \ref{sec:Polyphony} \\
 		\lstinline!mpower! & \lstinline!^! & transposition & N & \ref{sec:Transpose} \\
 		\lstinline!mtimes! & \lstinline!.*! & riff & N & \ref{sec:RepeatRiff} \\
 		\lstinline!or! & \lstinline!|! & extraction & C & \ref{sec:Extraction} \\
@@ -778,30 +778,29 @@ You can set a new tempo progressively with \lstinline!Note( keyword, duration, n
 \subsubsection{Fermata}
 \label{sec:Fermata}
 
-You can indicate a fermata with \lstinline!Note( 'fermata', duration, playedDuration )!: \lstinline!duration! is the duration of the fermata (\emph{on the sheet}) and \lstinline!playedDuration! is wanted duration of the fermata with the current tempo (\emph{played duration}).
+You can indicate a fermata with \lstinline!Note( 'fermata', duration, playedDuration )!: \lstinline!duration! is the duration of the fermata (on the sheet) and \lstinline!playedDuration! is wanted duration of the fermata with the current tempo. \lstinline!duration! and \lstinline!playedDuration! can be doubles or duration \lstinline!Note! objects.
+
+\myself{Generally, the \lstinline!playedDuration! is twice bigger than \lstinline!duration!.}
+\me{So, why the \lstinline!playedDuration! is not optional with a default value setted to twice \lstinline!duration!?}
+\myself{Because I'm lazy.}
 
 \subsubsection{Example}
 
 This is an example of the tempo using: \\
 \begin{lilypond}
-	\relative c'' { \new Staff { \time 4/4 c2\ff g a\> b c2\mp b2 g1\< a1\sfz } }
+	\relative c'' { \new Staff { \time 4/4 c4^\markup{ \italic Vivace } b a g f_\markup{ \italic rall... } e d c a'2 g\fermata } }
 \end{lilypond}
 
 \begin{lstlisting}
 NoteInit
 sheet = [ ...
-	Note( 'dynamics', 'ff' ) +C:N2 G:N2 bar ...
-	Note( 'decresc', N, 'mp' ) A:N2 B:N2 bar ...
-	+C:N2 B:N2 bar ...
-	Note( 'dynamics', 'mf' ) ...
-	Note( 'dynamics*', 'mp' ) ...
-	Note( 'cresc*', N, 'mf' ) G:N bar ...
-	Note( 'dynamics*', 'ff' ) ...
-	Note( 'dynamics*', 'mf', N8 ) G:N bar ];
+	Note( 'tempo', 140 ) +C:N4 B:N4 A:N4 G:N4 bar ...
+	Note( 'rall', N, 100 ) F:N4 E:N4 D:N4 C:N4 bar ...
+	A:N2 Note( 'fermata', N2, N ) G:N2 bar ];
 \end{lstlisting}
 
-\subsection{Polyphonic \lstinline!/!}
-\label{sec:Polyphonic}
+\subsection{Polyphony \lstinline!/!}
+\label{sec:Polyphony}
 
 \subsection{Sustain}
 \label{sec:Sustain}
