@@ -28,6 +28,7 @@ call:azip "GO AWAY!.zip" GerudoValley.m
 call:azip "GO AWAY!.zip" LApresMidi.m
 call:azip "GO AWAY!.zip" MyFreezeRay.m
 call:azip "GO AWAY!.zip" MysteryTrain.m
+call:azip "GO AWAY!.zip" OnTheRise.m
 call:azip "GO AWAY!.zip" SongOfStorms.m
 call:azip "GO AWAY!.zip" TheEntertainer.m
 call:azip "GO AWAY!.zip" ThePianoDuet.m
