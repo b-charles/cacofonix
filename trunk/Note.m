@@ -468,6 +468,12 @@ classdef Note
 		
 		function notes = not( notes )
 			% NOT (~) ties a note with the previous or an array of note.
+			% NOT applied on a Marker note create a goto Marker
+			
+			if length( notes )==1 && notes.isMarker
+				notes.goto = true;
+				return
+			end
 			
 			index = [ notes.isNote ];
 			
