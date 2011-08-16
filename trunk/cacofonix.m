@@ -36,7 +36,7 @@ roundDuration = @(dur) round( dur / precisionDuration ) * precisionDuration;
 detachSeparatorFix = 0.1;
 detachSeparatorLim = 0.05;
 
-deltaArpeggio = 0.2;
+deltaArpeggio = 0.15;
 
 crescendoSampling = 0.25;
 
