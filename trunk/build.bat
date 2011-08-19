@@ -26,6 +26,7 @@ call:azip "GO AWAY!.zip" DragonRoostIsland.m
 call:azip "GO AWAY!.zip" FarewellHyruleKing.m
 call:azip "GO AWAY!.zip" GerudoValley.m
 call:azip "GO AWAY!.zip" LApresMidi.m
+call:azip "GO AWAY!.zip" LegendaryHero.m
 call:azip "GO AWAY!.zip" MyFreezeRay.m
 call:azip "GO AWAY!.zip" MysteryTrain.m
 call:azip "GO AWAY!.zip" OnTheRise.m
