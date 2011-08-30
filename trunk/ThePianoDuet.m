@@ -193,7 +193,6 @@ VICTORMG = [ ...
 	];
 
 
-% cacofonix( 'LApresMidi', 'Velocity', linspace( 25, 100, 8 ), EMILYMD / EMILYMG, VICTORMD / VICTORMG );
-cacofonix( 'PianoDuet', MAIN, VICTORMD / VICTORMG, EMILYMD / EMILYMG );
+cacofonix( 'PianoDuet', 'Velocity', linspace( 25, 100, 8 ), MAIN, VICTORMD / VICTORMG, EMILYMD / EMILYMG );
 
 

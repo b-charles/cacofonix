@@ -22,6 +22,7 @@ erase /F "cacofonix.pdf"
 
 REM Démos
 
+call:azip "GO AWAY!.zip" DarkWorld.m
 call:azip "GO AWAY!.zip" DragonRoostIsland.m
 call:azip "GO AWAY!.zip" FarewellHyruleKing.m
 call:azip "GO AWAY!.zip" GerudoValley.m
