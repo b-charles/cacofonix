@@ -503,6 +503,10 @@ classdef Note
 		function note = ctranspose( note )
 			% CTRANSPOSE (') adds the half duration (dot)
 			
+			if length( note )~=1
+				error( 'CACOFONIX:Note:ctranspose', 'Array of notes can''t be dotted' );
+			end
+			
 			dot = note.isDotted + 1;
 			note.isDotted = dot;
 			note.duration = note.initialDuration * ( 2 - 2^-dot );
@@ -569,6 +573,10 @@ classdef Note
 				mod = '';
 			end
 			
+			if ~ischar( mod )
+				error( 'CACOFONIX:Note:colon', 'Optionnal argument has to be a string' );
+			end
+			
 			note = plus( [ note1 note2 ] );
 			
 			if ~isempty( mod )
@@ -607,7 +615,7 @@ classdef Note
 			end
 			
 			if any( ~[ notes.isNote ] )
-				error( 'CACOFONIX:Note:plus', 'Only notes can be added' );
+				error( 'CACOFONIX:Note:plus', 'Only playable notes can be added' );
 			end
 			
 			note = notes( 1 );
