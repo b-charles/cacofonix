@@ -18,8 +18,8 @@ Bf = Note( 'Bf' ); B = Note( 'B' ); Bs = Note( 'Bs' );
 N = Note( 4 );
 N2 = Note( 2 );
 N4 = Note( 1 );
-N8 = Note( 0.5 );
-N16 = Note( 0.25 );
+N8 = Note( 1/2 );
+N16 = Note( 1/4 );
 N12 = Note( 1/3 );
 
 DynFFF = Note( 'Dynamics', 'fff');
@@ -44,7 +44,10 @@ Cdim7 = [ V V^[2 -1] V^[4 -1] V^[6 -2] ];
 Cm7f5 = [ V V^[2 -1] V^[4 -1] V^[6 -1] ];
 Cmin7 = [ V V^[2 -1] V^[4 0] V^[6 -1] ];	Cm7 = Cmin7;
 CmM7 = [ V V^[2 -1] V^[4 0] V^[6 0] ];
-Cdom7 = [ V V^[2 0] V^[4 0] V^[6 -1] ];	C7 = Cdom7;
-Cmaj7 = [ V V^[2 0] V^[4 0] V^[6 0] ];	CM7 = Cmaj7;
+Cdom7 = [ V V^[2 0] V^[4 0] V^[6 -1] ];	    C7 = Cdom7;
+Cmaj7 = [ V V^[2 0] V^[4 0] V^[6 0] ];	    CM7 = Cmaj7;
 Caug7 = [ V V^[2 0] V^[4 1] V^[6 -1] ];
 CM7s5 = [ V V^[2 0] V^[4 1] V^[6 0] ];
+
+sus2 = [ V-1 (V-1)^[1 0] V-3 V-4 ];
+sus4 = [ V-1 (V-1)^[3 0] V-3 V-4 ];

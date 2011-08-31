@@ -1,6 +1,17 @@
 %#ok<*BDSCA>
 clc
 
+NoteInit_fr
+
+DynpFFF = Note( 'Dynamics*', 'fff');
+DynpFF = Note( 'Dynamics*', 'ff');
+DynpF = Note( 'Dynamics*', 'f');
+DynpMF = Note( 'Dynamics*', 'mf');
+DynpMP = Note( 'Dynamics*', 'mp');
+DynpP = Note( 'Dynamics*', 'p');
+DynpPP = Note( 'Dynamics*', 'pp');
+DynpPPP = Note( 'Dynamics*', 'ppp');
+
 Note.setNbCharByQuater( 48 );
 
 MARK1  = Note( 'Marker', '#1#' );

@@ -1100,6 +1100,15 @@ classdef Note
 			
 			charByQuater = Note.internCharByQuater( 'get' );
 			
+			% no duration, only tonality array
+			arrayMode = sum( [ notes.duration ] ) == 0;
+			
+			% displayed char when a note is played
+			playChar = '-';
+			if arrayMode
+				playChar = ' ';
+			end
+			
 			noteString = '';
 			dynString = '';
 			tempoString = '';
@@ -1129,7 +1138,7 @@ classdef Note
 				
 				if note.isNote
 					
-					if isempty( note.duration )
+					if arrayMode
 						dur = charByQuater;
 					else
 						dur = round( note.duration * charByQuater );
@@ -1137,9 +1146,9 @@ classdef Note
 					
 					ton = note.tonality;
 					if isempty( ton ) % void
-						noteString = append( noteString, currentLine, currentChar, '|', false );
-						noteString = append( noteString, currentLine, currentChar, repmat( '-', 1, dur ), false );
 						noteString = append( noteString, currentLine, currentChar + round( (dur-1)/2 ), 'V', true );
+						noteString = append( noteString, currentLine, currentChar, '|', false );
+						noteString = append( noteString, currentLine, currentChar, repmat( playChar, 1, dur ), false );
 						
 					elseif any( isnan( ton ) ) % rest
 						noteString = append( noteString, currentLine, currentChar, repmat( ' ', 1, dur ), false );
@@ -1170,7 +1179,8 @@ classdef Note
 							noteString = append( noteString, currentLine, currentChar, '|', false );
 						end
 						
-						noteString = append( noteString, currentLine, currentChar, repmat( '-', 1, dur ), false );
+						noteString = append( noteString, currentLine, currentChar, repmat( playChar, 1, dur ), false );
+						
 					end
 					
 					currentChar = currentChar + dur;

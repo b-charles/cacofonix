@@ -115,7 +115,7 @@ ACC2 = [ -A D F ];
 ACC3 = [ -G D E ];
 ACC4 = [ -G -B Fn ];
 
-RYT = [ V:N8 V:N8 V:N8 V:N8 R:N8 V:N4 V:N8 bar ];
+RYT = [ V-0:N8 V-0:N8 V-0:N8 V-0:N8 R:N8 V-0:N4 V-0:N8 bar ];
 
 RIFF = [ ...
 	ACC1*RYT ACC1*RYT ...

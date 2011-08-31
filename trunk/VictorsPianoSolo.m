@@ -24,10 +24,10 @@ MAIN = [ ...
 	Note('Tempo', 76) Note([6 8]) [ S:B' bar ]*13 ];
 
 
-[faN,fa] = deal( fa, faD );
-[doN,do] = deal( do, doD );
-[solN,sol] = deal( sol, solD );
-[reN,re] = deal( re, reD );
+[fa,faN] = deal( faD, fa );
+[do,doN] = deal( doD, do );
+[sol,solN] = deal( solD, sol );
+[re,reN] = deal( reD, re );
 
 MD = [
 	Note('+') DynPP Note('cresc',[C R],'p') +fa:C bar ...
