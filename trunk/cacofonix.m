@@ -48,6 +48,14 @@ deltaSustain = 0.001;
 
 deltaStartAndEndTrack = 0.001;
 
+persistent finishAlert
+if isempty( finishAlert )
+	y = []; Fs = [];
+	load train
+	finishAlert = struct( 'y', y, 'Fs', Fs );
+	clear y Fs
+end
+
 %% Instruments
 
 persistent INSTRUMENTS PERCUSSIONS
@@ -1307,5 +1315,9 @@ for ii = 1:nbSheets
 end
 
 fclose( fid );
+
+%% ### FINISH ALERT
+
+wavplay( finishAlert.y, finishAlert.Fs, 'async' );
 
 end
