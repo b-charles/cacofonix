@@ -51,7 +51,7 @@ classdef Note
 		ACCENTS = struct( ...
 			'pat', { '.', '^', '>', '-' }, ...
 			'value', { 1 2 3 4 } );
-				
+		
 	end
 	
 	%% Properties
@@ -73,12 +73,13 @@ classdef Note
 		isDetached = NaN;
 		
 		isVoid = false;
-		voidInfo = zeros(3,0); % [ index; trans degres; trans ton ]
+		voidIndex = [];
+		voidTranspo = zeros(2,0); % transpo: [ trans degres; trans ton ]
 		
 		isBar = false;
 		
 		delay = []; % for dynamics (TODO: and tempo)
-
+		
 		defDynamics = false;
 		dynamics = NaN;
 		durationCresc = 0;
@@ -99,7 +100,7 @@ classdef Note
 		defFermata = false;
 		fermataDuration = [];
 		fermataPlayedDuration = [];
-	
+		
 		defModifiedTempo = false;
 		transitionDuration = [];
 		endTempo = [];
@@ -189,7 +190,8 @@ classdef Note
 						strcmpi( varargin{1}, 'void' ) )
 					note.isNote = true;
 					note.isVoid = true;
-					note.voidInfo = [Inf;0;0];
+					note.voidIndex = 1;
+					note.voidTranspo = [0;0];
 					ok = true;
 				end
 			end
@@ -340,7 +342,7 @@ classdef Note
 					
 					[ok, fermataDuration_ ] = getDuration( varargin{2} );
 					if ~ok, return; end
-
+					
 					[ok, fermataPlayedDuration_] = getDuration( varargin{3} );
 					if ~ok, return; end
 					
@@ -430,9 +432,9 @@ classdef Note
 						strcmpi( varargin{1}, '__SET_TONALITY__' ) && ...
 						isnumeric( varargin{2} ) && numel( varargin{2} ) == 1
 					
-						note.isNote = true;
-						note.tonality = [0;varargin{2}];
-						ok = true;
+					note.isNote = true;
+					note.tonality = [0;varargin{2}];
+					ok = true;
 					
 				end
 			end
@@ -538,9 +540,9 @@ classdef Note
 				ton(2,:) = ton(2,:) + offset;
 				notes(i).tonality = ton;
 				
-				info = notes(i).voidInfo;
-				info(3,:) = info(3,:) + offset;
-				notes(i).voidInfo = info;
+				transpo = notes(i).voidTranspo;
+				transpo(2,:) = transpo(2,:) + offset;
+				notes(i).voidTranspo = transpo;
 				
 			end
 		end
@@ -563,7 +565,7 @@ classdef Note
 			end
 			
 			if nargin == 2
-				note2 = mod; 
+				note2 = mod;
 				mod = '';
 			end
 			
@@ -619,6 +621,10 @@ classdef Note
 			end
 			note.tonality = ton;
 			
+			note.isVoid = any( [ notes.isVoid ] );
+			note.voidIndex = [ notes.voidIndex ];
+			note.voidTranspo = [ notes.voidTranspo ];
+			
 			note.duration = sum( [ notes.duration ] );
 			note.initialDuration = note.duration;
 			note.isDotted = 0;
@@ -630,9 +636,6 @@ classdef Note
 			note.isDetached = any( [ notes.isDetached ] );
 			
 			note.isArpeggiated = any( [ notes.isArpeggiated ] );
-			
-			note.isVoid = any( [ notes.isVoid ] );
-			note.voidInfo = myUnique( [ notes.voidInfo ] );
 			
 		end
 		
@@ -672,7 +675,7 @@ classdef Note
 				
 			end
 			
-			notes = internalTranspose( notes, [ nbDeg, absHalfTon ] );
+			notes = internalTranspose( notes, [ nbDeg; absHalfTon ] );
 			
 		end
 		
@@ -690,13 +693,12 @@ classdef Note
 				ton(2,:) = ton(2,:) + height(2);
 				notes(i).tonality = ton;
 				
-				info = notes(i).voidInfo;
-				info(2,:) = info(2,:) + height(1);
-				info(3,:) = info(3,:) + height(2);
-				notes(i).voidInfo = info;
-
+				transpo = notes(i).voidTranspo;
+				transpo = transpo + repmat( height, 1, size( transpo, 2 ) );
+				notes(i).voidTranspo = transpo;
+				
 			end
-						
+			
 		end
 		
 	end
@@ -724,30 +726,28 @@ classdef Note
 				
 				if notes( nRiff ).isVoid
 					
-					riffNote = notes( nRiff );
+					riffNote = riff( nRiff );
 					
-					info = riffNote.voidInfo;
-					nbInfo = size( info, 2 );
+					index = riffNote.voidIndex;
+					tranpo = riffNote.voidTranspo;
+					nbNotes = length( index );
 					
-					notesOfVoid = cell( 1, nbInfo );
+					notesOfVoid = cell( 1, nbNotes );
 					
 					% get all indexed notes
-					for i = 1:nbInfo
+					for i = 1:nbNotes
 						
-						idx = info(1,i);
-						if isinf( idx )
+						idx = index(i);
+						if idx == 0
 							idx = 1:lAcc;
-						elseif idx == 0
-							error( 'CACOFONIX:Note:NullIndex', ...
-								'A void note has a null index' );
-						elseif idx > 0
-							idx = mod( idx-1, lAcc ) + 1;
-						else % idx < 0
-							idx = lAcc - mod( -idx-1, lAcc );
+						else
+							idx = idx( idx <= lAcc );
 						end
 						
 						% get transposed notes
-						notesOfVoid{i} = internalTranspose( accord( idx ), info([2 3],i) );
+						if ~isempty( idx )
+							notesOfVoid{i} = internalTranspose( accord( idx ), tranpo(:,i) );
+						end
 						
 					end
 					
@@ -755,12 +755,18 @@ classdef Note
 					
 					% flush void
 					riffNote.isVoid = false;
-					riffNote.voidInfo = zeros(3,0);
+					riffNote.voidIndex = [];
+					riffNote.voidTranspo = zeros(2,0);
 					
 					% create the new note
 					riffNote = notesOfVoid:riffNote; %#ok<BDSCI>
 					
-					notes( nRiff ) = riffNote;
+					if riffNote.isVoid || ~isempty( riffNote.tonality ) %#ok<BDSCI,BDLGI>
+						notes( nRiff ) = riffNote;
+					else
+						% no final note
+						notes( nRiff ) = [];
+					end
 					
 				end
 				
@@ -775,7 +781,7 @@ classdef Note
 	methods
 		
 		function notes = times( accord, riff )
-			% TIMES (.*) expands 
+			% TIMES (.*) expands
 			
 			if isnumeric( riff )
 				notes = repmat( accord, 1, riff );
@@ -819,20 +825,43 @@ classdef Note
 	
 	methods
 		
-		function notes = minus( notes, index )
+		function notes = minus( note, index )
 			% MINUS (-) indexes the note
 			
-			for i = find( [ notes.isVoid ] )
-				
-				info = notes(i).voidInfo; nbInfo = size( info, 2 );
-				if nbInfo > 1
-					error( 'CACOFONIX:SetIndex', ...
-						'Index can not be defined for chords' );
-				else
-					notes(i).voidInfo = [ index; info( 2:end ) ];
-				end
-				
+			if length( note ) > 1
+				error( 'CACOFONIX:SetIndex', ...
+					'Index can not be called on array of Note' );
 			end
+			if ~note.isVoid
+				error( 'CACOFONIX:SetIndex', ...
+					'Index can be called only on a void Note' );
+			end
+			
+			idx = note.voidIndex;
+			
+			if length( idx )>1 || idx~=1
+				error( 'CACOFONIX:SetIndex', ...
+					'Index can not be defined for chorded void notes' );
+			end
+			
+			if ~all( isfinite( index ) )
+				error( 'CACOFONIX:SetIndex', ...
+					'Index has to be an array of finite values' );
+			elseif ( any( index == 0 ) && length( index ) > 1 ) || any( index < 0 )
+				error( 'CACOFONIX:SetIndex', ...
+					'Index has to be 0 or an array of strictly positive values' );
+			end
+			
+			nbIndex = length( index );
+			
+			notes = cell( 1, nbIndex );
+			for i = 1:nbIndex
+				n = note;
+				n.voidIndex = index( i );
+				notes{i} = n;
+			end
+			
+			notes = [ notes{:} ];
 			
 		end
 		
@@ -1034,6 +1063,7 @@ classdef Note
 				degree2HalfTons = [ 0 2 4 5 7 9 11 ];
 			end
 			
+			% add the message str at startChar in string
 			function string = append( string, line, startChar, str, overwrite )
 				
 				startChar = max( 1, startChar );
@@ -1042,7 +1072,7 @@ classdef Note
 				[nl, nc] = size( string );
 				if nl < line
 					string = [ string; repmat( ' ', line-nl, nc ) ];
-					nl = size( string, 1 );
+					nl = line;
 				end
 				if nc < startChar + lenStr - 1
 					string = [ string repmat( ' ', nl, startChar + lenStr - nc - 1 ) ];
@@ -1068,8 +1098,8 @@ classdef Note
 			%octaveString = '';
 			sustainString = '';
 			
-			currentChar = 1;
-			currentLine = 1;
+			currentChar = 1; % current time
+			currentLine = 1; % current monophonic number
 			
 			currentMeasure = 1;
 			
@@ -1091,7 +1121,7 @@ classdef Note
 				
 				if note.isNote
 					
-					if isempty( note.duration ) || note.duration == 0
+					if isempty( note.duration )
 						dur = charByQuater;
 					else
 						dur = round( note.duration * charByQuater );
@@ -1102,7 +1132,7 @@ classdef Note
 						noteString = append( noteString, currentLine, currentChar, '|', false );
 						noteString = append( noteString, currentLine, currentChar, repmat( '-', 1, dur ), false );
 						noteString = append( noteString, currentLine, currentChar + round( (dur-1)/2 ), 'V', true );
-
+						
 					elseif any( isnan( ton ) ) % rest
 						noteString = append( noteString, currentLine, currentChar, repmat( ' ', 1, dur ), false );
 						
@@ -1200,13 +1230,13 @@ classdef Note
 					noteString = append( noteString, 1, currentChar, sprintf( '%d', note.meter(2) ), true );
 					noteString = append( noteString, 2, currentChar, sprintf( '%d', note.meter(1) ), true );
 					
-				%elseif note.defOctave
-				%	if note.octave < 0
-				%		str = sprintf( '-%d', -note.octave );
-				%	else
-				%		str = sprintf( '+%d', note.octave );
-				%	end
-				%	octaveString = append( octaveString, 1, currentChar, str, true );
+					%elseif note.defOctave
+					%	if note.octave < 0
+					%		str = sprintf( '-%d', -note.octave );
+					%	else
+					%		str = sprintf( '+%d', note.octave );
+					%	end
+					%	octaveString = append( octaveString, 1, currentChar, str, true );
 					
 				elseif note.defSustain
 					if note.startSustain
@@ -1244,7 +1274,7 @@ classdef Note
 				% add '/' in marker string
 				str = repmat( '/', 1, max( [ idxBar idxMarker size( noteString, 2 ) ] ) );
 				markerString = append( markerString, 1, 1, str, true );
-
+				
 				eventPos = unique( [ 0 idxBar idxMarker ] );
 				sinceLastMarker = []; currentMeasure = 1;
 				for c = eventPos
@@ -1265,12 +1295,12 @@ classdef Note
 							str = sprintf( '%d', currentMeasure );
 						end
 						
-						markerString = append( markerString, 1, c, str, true );						
+						markerString = append( markerString, 1, c, str, true );
 						
 					end
 					
 				end
-
+				
 				% cut marker string
 				if length( markerString ) > size( noteString, 2 )
 					markerString = markerString( 1:size( noteString, 2 ) );
@@ -1282,10 +1312,10 @@ classdef Note
 			index = ~cellfun( 'isempty', cellString );
 			string = strvcat( cellString{ index } ); %#ok<VCAT>
 			[ lStr, cStr ] = size( string );
-
+			
 			startLine = repmat( '$', lStr, 1 );
 			endLine = repmat( '$\n', lStr, 1 );
-
+			
 			index = unique( [ 0 min( idxBar-1, cStr ) cStr ] );
 			cellString = mat2cell( string, lStr, diff( index ) );
 			
@@ -1295,7 +1325,7 @@ classdef Note
 			end
 			
 		end
-					
+		
 	end
 	
 end
