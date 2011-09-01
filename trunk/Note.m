@@ -216,18 +216,28 @@ classdef Note
 				end
 				
 				if nargin == 1 && ischar( varargin{1} )
+					
+					if isempty( varargin{1} )
+						ok = true;
+						note.defOctave = true;
+						note.octave = 0;
+						return
+					end
+					
 					[ok, val] = getNbSymbol( varargin{1}, '+' );
 					if ok
 						note.defOctave = true;
 						note.octave = val;
 						return
 					end
+					
 					[ok, val] = getNbSymbol( varargin{1}, '-' );
 					if ok
 						note.defOctave = true;
 						note.octave = -val;
 						return
 					end
+					
 				end
 				ok = false;
 				
