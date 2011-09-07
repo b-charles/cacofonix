@@ -1,0 +1,17 @@
+#!/bin/bash
+
+# To create the documentation, you need LaTeX and Lilypond.
+# Then, run this script (don't forget to set this file executable)
+
+rm -rf out
+
+lilypond-book --format=latex --output=out --lily-output-dir=out -V cacofonix.tex || pause
+
+cd out
+latex cacofonix.tex
+latex cacofonix.tex
+latex cacofonix.tex || pause
+
+dvips cacofonix.dvi
+cp cacofonix.ps ../
+

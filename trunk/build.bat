@@ -13,6 +13,7 @@ REM Doc
 
 call:azip doc_src.zip ../doc/cacofonix.tex
 call:azip doc_src.zip ../doc/make.bat
+call:azip doc_src.zip ../doc/make
 call:azip "cacofonix.zip" doc_src.zip
 erase /F doc_src.zip
 
