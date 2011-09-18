@@ -1,5 +1,6 @@
 REM To create the documentation, you need LaTeX and Lilypond.
 REM Then, run this script (don't forget to add lilypond executables in your path)
+REM The complete path to the cacofonix folder can't contain space. 
 
 lilypond-book.py --format=latex --output=out --lily-output-dir=out -V cacofonix.tex || pause
 
