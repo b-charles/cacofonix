@@ -284,7 +284,6 @@ Yes, but it's nice in a canon:
 	[ sheet delay ] / [ delay sheet ] );
 \end{lstlisting}%
 \end{myselfenv}
-\me{100\% rock'n'roll.}
 
 \subsection{Display}
 
@@ -757,7 +756,7 @@ To play a crescendo, you have to add a note created by \lstinline!Note( keyword,
 	\item \lstinline!delay! is an optional double or a duration \lstinline!Note!. Like for the dynamic \lstinline!Note!, the crescendo starts only after this duration (and ends at \lstinline!delay+duration!).
 \end{itemize}
 
-Like plain dynamics, \cacofonix look at the current dynamic at the start of the note, and apply this dynamic only for the attack of the note. So you can't play crescendo or decrescendo on one note.
+Like plain dynamics, \cacofonix looks at the current dynamic at the start of the note, and apply this dynamic only for the attack of the note. So you can't play crescendo or decrescendo on one note.
 
 \subsubsection{The velocity}
 \label{sec:Velocity}
@@ -854,6 +853,8 @@ sheet = [ Note('-') Note('Tempo', 80) ...
 cacofonix( 'CelloSuite_Prelude', 'Cello', sheet );
 \end{lstlisting}
 
+\myself{For more informations about the operator \lstinline!.*! (line 7), see the section \ref{sec:RepeatRiff}.}
+
 \subsection{Polyphony \lstinline!/!}
 \label{sec:Polyphony}
 
@@ -895,7 +896,7 @@ ans =
 \end{lstlisting}
 Where come from the $3$ extra notes?%
 \end{meenv}
-\myself{Well, \cacofonix use extra special notes to know where starts a polyphonic section. It's not a big deal: this kind a ghost notes are really rare and it's completely transparent for you. Why would you apply \lstinline!length! on a sheet anyway?}
+\myself{Well, \cacofonix uses extra special notes to know where starts a polyphonic section. It's not a big deal: this kind a ghost notes are really rare and it's completely transparent for you. Why would you apply \lstinline!length! on a sheet anyway?}
 \begin{meenv}%
 No reason. I guess I was boring. But, wait\dots If sometimes notes are added, it's pretty hazardous to use indexation like \lstinline!mysheet(5:25)!. How to get safely an extract of a sheet?%
 \end{meenv}
@@ -911,18 +912,28 @@ If a \lstinline!Note('Sustain', 'on')! is added, the \cacofonix function adds au
 Sustain is a feature with a channel scope.
 
 \begin{lilypond}
-\relative c'' { \new Staff { \time 4/4 c\sustainOn a b2\sustainOff g4 a b\sustainOn c d\sustainOn g, c2 } }
+\new GrandStaff <<
+\new Staff { \set Staff.pedalSustainStyle = #'mixed \key fis \minor \clef treble \relative c' { \time 2/4 cis4.\(\sustainOn fis8\) a4.\(\sustainOff\sustainOn fis8\) eis4.\(\sustainOff\sustainOn fis16 gis16\) fis2\sustainOff\sustainOn } }
+\new Staff { \key fis \minor \clef bass \relative c, { \time 2/4 fis8( <a cis a'>\arpeggio\staccato) cis,\staccato <cis' a'>\staccato fis,( <a cis a'>\arpeggio\staccato) cis,\staccato <cis' a'>\staccato fis,( <b d b'>\arpeggio\staccato) b,\staccato <d' b'>\staccato fis,( <a cis a'>\arpeggio\staccato) cis,\staccato <cis' a'>\staccato } } >>
 \end{lilypond}
 \begin{lstlisting}
 NoteInit
 
-SustainOn = Note( 'Sustain', 'on' );
-SustainOff = Note( 'Sustain', 'off' );
+SusOn = Note( 'Sustain', 'on' );
+SusOff = Note( 'Sustain', 'off' );
 
-sheet = [ ...
-	SustainOn +C:N4 A:N4 B:N2 SustainOff bar ...
-	G:N4 A:N4 SustainOn B:N4 +C:N4 bar ...
-	SustainOn +D:N4 G:N4 +C:N2 bar ];
+sheet = [ Note([2 4]) ...
+	SusOn Cs:N4' ~Fs:N8 bar ...
+	SusOn A:N4' ~Fs:N8 bar ...
+	SusOn Es:N4' ~Fs:N16 Gs:N16 bar ...
+	SusOn Fs:N2 SusOff bar ...
+	] / [ Note('--') ...
+	Fs:N8 ~A++Cs++A:'$.':N8 Cs:'.':N8 +Cs++A:'.':N8 bar ...
+	Fs:N8 ~A++Cs++A:'$.':N8 Cs:'.':N8 +Cs++A:'.':N8 bar ...
+	Fs:N8 ~B++D++Gs:'$.':N8 -B:'.':N8 +D++Gs:'.':N8 bar ...
+	Fs:N8 ~A++Cs++A:'$.':N8 Cs:'.':N8 +Cs++A:'.':N8 bar ];
+
+cacofonix( 'HungarianDanceN5', 'Tempo', 100, sheet );
 \end{lstlisting}
 
 \subsection{Markers}
@@ -964,7 +975,7 @@ Markers are very useful when \cacofonix crashes: the error message gives the pro
 \subsubsection{Go to a marker}
 \label{sec:Goto}
 
-Sometimes, a sheet contains a long pause of several measures. Of course, you can fill theses measures with rests, but it can be more convenient to use a special note with the meaning ``From now and to this marker, don't play anything''. This kind of note is called a \emph{goto} marker\footnote{The name comes from of an instruction of BASIC, the language of my first computer, an \textsc{Amstrad} CPC 464/6128+.} and can be created by two ways: 
+Sometimes, a sheet contains a long pause of several measures. Of course, you can fill theses measures with rests, but it can be more convenient to use a special note with the meaning ``From now and to this marker, don't play anything''. This kind of note is called a \emph{goto} marker\footnote{The name comes from of the famous instruction of BASIC.} and can be created by two ways: 
 \begin{lstlisting}
 >> gotomarker = Note( 'Marker*', 'mymarker' );
 \end{lstlisting}
@@ -1002,7 +1013,58 @@ A goto marker is first a marker: it can be use for an extraction (see the next s
 \subsubsection{Extraction \lstinline!|!}
 \label{sec:Extraction}
 
+Sometimes, it can be useful to extract a piece of a sheet which has been already transcode: to play something twice or to add a coda\dots This operation can be very complicated with polyphonic sections, so the operator \lstinline!or! (\lstinline!|!) realize neatly this function.
 
+To extract a sheet from the start to a marker labelled \emph{myMarker}, just execute this code:
+\begin{lstlisting}
+>> finalSheet = sheet|'myMarker';
+\end{lstlisting}
+or
+\begin{lstlisting}
+>> myMarker = Note( 'Marker', 'myMarker' );
+>> finalSheet = sheet|myMarker;
+\end{lstlisting}
+Of course, the marker (or a goto marker) have to be present in the sheet, in every monophonic parts at the right place.
+
+In the same way, to extract a piece of sheet, from the marker \emph{myMarker} to the end, execute this code:
+\begin{lstlisting}
+>> finalSheet = 'myMarker'|sheet;
+\end{lstlisting}
+or
+\begin{lstlisting}
+>> myMarker = Note( 'Marker', 'myMarker' );
+>> finalSheet = myMarker|sheet;
+\end{lstlisting}
+
+So, this is how extract a piece from a marker to an other:
+
+\begin{lilypond}
+\new GrandStaff <<
+\new Staff { \key c \major \time 4/4 \relative c' { a'^\markup{ B } a g2 f4^\markup{ C } f e e } }
+\new Staff { \key c \major \time 4/4 \clef bass \relative c { f4 <a c> e <g c> f <a c> e <g c> } } >>
+\end{lilypond}
+\begin{lstlisting}
+>> NoteInit
+>> markA = Note( 'Marker', 'A' );
+>> markB = Note( 'Marker', 'B' );
+>> markC = Note( 'Marker', 'C' );
+>> markD = Note( 'Marker', 'D' );
+>> sheet1 = [ ...
+	markA C:N4 C:N4 G:N4 G:N4 bar ...
+	markB A:N4 A:N4 G:N2 bar ...
+	markC F:N4 F:N4 E:N4 E:N4 bar ...
+	markD D:N4 D:N4 C:N2 bar ];
+>> sheet2 = [ Note('-') ...
+	markA C:N4 E+G:N4 C:N4 E+G:N4 bar ...
+	markB F:N4 A++C:N4 E:N4 G++C:N4 bar ...
+	markC F:N4 A++C:N4 E:N4 G++C:N4 bar ...
+	markD D:N4 G+B:N4 C+E+G:N2 bar ];
+>> sheet = markB | (sheet1/sheet2) | markD;
+\end{lstlisting}
+
+\myself{The markers are included in the extracted sheet. If you are using a player which displays the markers in the midi file, you should see them.}
+\me{And if it doesn't?}
+\myself{Sometimes, you are a really annoying person.}
 
 \subsection{Display}
 \label{sec:Display}
@@ -1051,7 +1113,7 @@ $|  G   |  A   |  B   |  C   |  D   |  E   |  F#  $
 \end{lstlisting}
 The second solution is one octave higher than the first.
 
-When \lstinline!^! is used only with a double, \cacofonix search basically the name the most likely. So, in our example, raise \lstinline!scale! of $3$ half steps will make the scale of D flat major (five flats at the key), not the scale of C sharp major (seven sharps at the key):
+When \lstinline!^! is used only with a double, \cacofonix searches basically the name the most likely. So, in our example, raise \lstinline!scale! of $3$ half steps will make the scale of D flat major (five flats at the key), not the scale of C sharp major (seven sharps at the key):
 \begin{lstlisting}
 >> scale^3
 $|  Db  |  Eb  |  F   |  Gb  |  Ab  |  Bb  |  C   $
