@@ -26,6 +26,9 @@
 \newcommand\wiktionary{\textsc{Wiktionary}\xspace}
 \newcommand\google{\textsc{Google}\xspace}
 
+\newcommand\ie{\emph{i.e.}\xspace}
+\newcommand\eg{\emph{e.g.}\xspace}
+
 \newcommand\footurl[1]{\footnote{\url{#1}}\xspace}
 \newcommand\exchange[2]{\texttt{#1}\footnote{\url{#2}}\xspace}
 
@@ -554,7 +557,7 @@ sheet = +[ C:N bar E:N bar G:N bar ];
 
 Sometimes, a sheet or a section of a sheet is naturally high or low pitched. So, instead of add \lstinline!+! or \lstinline!-! behind each note
 \myself{\dots or use them on an array like a tramp \dots} \\
-\dots you can add a special note which means the default octave. To create a note which raises of $n$ octaves, you have call the constructor \lstinline!Note! with a string \lstinline!'+n'! (\emph{e.g.}, \lstinline!Note('+2')! to raise of two octaves). Use a string \lstinline!'-n'! to lower of $n$ octaves. To restore the default octave, you can use \lstinline!Note('+0')! or \lstinline!Note('-0')!. \\
+\dots you can add a special note which means the default octave. To create a note which raises of $n$ octaves, you have call the constructor \lstinline!Note! with a string \lstinline!'+n'! (\eg, \lstinline!Note('+2')! to raise of two octaves). Use a string \lstinline!'-n'! to lower of $n$ octaves. To restore the default octave, you can use \lstinline!Note('+0')! or \lstinline!Note('-0')!. \\
 \begin{lilypond}
 \relative c' { \new Staff { \time 4/4 g4 a d f, g a d f, g'' f a g g, f a g } }
 \end{lilypond}
@@ -770,7 +773,7 @@ where \lstinline!velocities! is an array of $8$ values which gives the velocity 
 \subsubsection{Channel dynamics}
 \label{sec:ChannelDynamics}
 
-When you create a \lstinline!Note! object with \lstinline!'dynamics'!, \lstinline!'crescendo'!, \lstinline!'cresc'!, \lstinline!'decrescendo'! or \lstinline!'decresc'!, you specify only the attacks of next notes. But there is an other way to modify the dynamics: when you add \lstinline!*! at the end of these keywords (\emph{e.g.} \lstinline!'cresc*'!), you modify the volume of the instrument (or the volume of the \emph{channel}). It's pretty convenient for modify the dynamic of notes after the attack, but never forget that, in polyphonic sections, all monophonic sections will be influenced, and it's only modify the volume, whereas a plain dynamic (without \lstinline!*!) is more realistic and can modify the volume and the timbre of the instrument.
+When you create a \lstinline!Note! object with \lstinline!'dynamics'!, \lstinline!'crescendo'!, \lstinline!'cresc'!, \lstinline!'decrescendo'! or \lstinline!'decresc'!, you specify only the attacks of next notes. But there is an other way to modify the dynamics: when you add \lstinline!*! at the end of these keywords (\eg \lstinline!'cresc*'!), you modify the volume of the instrument (or the volume of the \emph{channel}). It's pretty convenient for modify the dynamic of notes after the attack, but never forget that, in polyphonic sections, all monophonic sections will be influenced, and it's only modify the volume, whereas a plain dynamic (without \lstinline!*!) is more realistic and can modify the volume and the timbre of the instrument.
 
 Plain dynamics and channel dynamics are independent: even if the current plain dynamic is set, the current channel dynamic is not modify. Also, you can boost a plain dynamic with a channel dynamic, but the experience shown that mix the two kinds of dynamics is quickly messy and it's often a bad idea.
 
@@ -1013,7 +1016,7 @@ A goto marker is first a marker: it can be use for an extraction (see the next s
 \subsubsection{Extraction \lstinline!|!}
 \label{sec:Extraction}
 
-Sometimes, it can be useful to extract a piece of a sheet which has been already transcode: to play something twice or to add a coda\dots This operation can be very complicated with polyphonic sections, so the operator \lstinline!or! (\lstinline!|!) realize neatly this function.
+Sometimes, it can be useful to extract a piece of a sheet which has been already transcode (\eg to play something twice, or to add a coda\dots). This operation can be very complicated with polyphonic sections, so the operator \lstinline!or! (\lstinline!|!) realize neatly this function.
 
 To extract a sheet from the start to a marker labelled \emph{myMarker}, just execute this code:
 \begin{lstlisting}
@@ -1024,7 +1027,7 @@ or
 >> myMarker = Note( 'Marker', 'myMarker' );
 >> finalSheet = sheet|myMarker;
 \end{lstlisting}
-Of course, the marker (or a goto marker) have to be present in the sheet, in every monophonic parts at the right place.
+Of course, the markers (or goto markers) have to be present in the sheet, in every monophonic parts at the right place.
 
 In the same way, to extract a piece of sheet, from the marker \emph{myMarker} to the end, execute this code:
 \begin{lstlisting}
@@ -1036,7 +1039,7 @@ or
 >> finalSheet = myMarker|sheet;
 \end{lstlisting}
 
-So, this is how extract a piece from a marker to an other:
+So, this is how to extract a piece from a marker to an other:
 
 \begin{lilypond}
 \new GrandStaff <<
@@ -1062,14 +1065,14 @@ So, this is how extract a piece from a marker to an other:
 >> sheet = markB | (sheet1/sheet2) | markD;
 \end{lstlisting}
 
-\myself{The markers are included in the extracted sheet. If you are using a player which displays the markers in the midi file, you should see them.}
+\myself{The markers are included in the extracted sheet. If you are using a player which displays the markers in the midi file, you should see it.}
 \me{And if it doesn't?}
 \myself{Sometimes, you are a really annoying person.}
 
 \subsection{Display}
 \label{sec:Display}
 
-Someting about the display.
+The \lstinline!display! function has been overloaded: it can be used to display a sheet
 
 \subsection{Transpose \lstinline!\^!}
 \label{sec:Transpose}
