@@ -631,7 +631,7 @@ while numArg <= nbArgs
 		end
 		
 		notes = args{numArg};
-		playableNotes = notes( [ notes.isNote ] );
+		playableNotes = notes( [ notes.isNote ] & ~[ notes.isRest ] );
 		isVoid = [ playableNotes.isVoid ];
 		
 		if ~isempty( idxInstrument ) && ~any( isVoid )
@@ -1221,9 +1221,7 @@ tempoEvt = repmat( struct( ...
 
 	function createNote( note )
 		
-		tonality = note.tonality;
-		
-		if isfinite( tonality )
+		if ~note.isRest
 			
 			tonality = getTonality( note );
 			accent = note.accent;

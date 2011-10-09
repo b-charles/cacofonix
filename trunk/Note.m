@@ -27,7 +27,7 @@ classdef Note
 	properties( Constant, GetAccess = private )
 		
 		NOTES = struct( ...
-			'name', { 'rest', ...
+			'name', { ...
 			'dobb',	 'dob',  'do',  'dod',  'dodd',  'cff', 'cf', 'c', 'cs', 'css', ...
 			'rebb',  'reb',  're',  'red',  'redd',  'dff', 'df', 'd', 'ds', 'dss', ...
 			'mibb',  'mib',  'mi',  'mid',  'midd',  'eff', 'ef', 'e', 'es', 'ess', ...
@@ -35,7 +35,7 @@ classdef Note
 			'solbb', 'solb', 'sol', 'sold', 'soldd', 'gff', 'gf', 'g', 'gs', 'gss', ...
 			'labb',  'lab',  'la',  'lad',  'ladd',  'aff', 'af', 'a', 'as', 'ass', ...
 			'sibb',  'sib',  'si',  'sid',  'sidd',  'bff', 'bf', 'b', 'bs', 'bss' }, ...
-			'tonality', { [NaN;NaN] ...
+			'tonality', { ...
 			[0;-2] [0;-1] [0;0]  [0;1]  [0;2]  [0;-2] [0;-1] [0;0]  [0;1]  [0;2]  ...
 			[1;0]  [1;1]  [1;2]  [1;3]  [1;4]  [1;0]  [1;1]  [1;2]  [1;3]  [1;4]  ...
 			[2;2]  [2;3]  [2;4]  [2;5]  [2;6]  [2;2]  [2;3]  [2;4]  [2;5]  [2;6]  ...
@@ -63,6 +63,7 @@ classdef Note
 		parallelEnd = false;
 		
 		isNote = false;
+		isRest = false;
 		tonality = zeros(2,0); % degree and absolute half-tonality
 		duration = [];
 		initialDuration = [];
@@ -181,6 +182,14 @@ classdef Note
 					end
 				end
 				
+			end
+			function ok = checkRest( varargin )
+				ok = false;
+				if nargin == 1 && ischar( varargin{1} ) && strcmpi( varargin{1}, 'rest' )
+					note.isNote = true;
+					note.isRest = true;
+					ok = true;
+				end
 			end
 			function ok = checkVoid( varargin )
 				ok = false;
@@ -417,7 +426,7 @@ classdef Note
 				
 				if nargin == 1 && isnumeric( varargin{1} ) && numel( varargin{1} ) == 1
 					note.isNote = true;
-					note.tonality = [NaN;NaN];
+					note.isRest = true;
 					note.duration = varargin{1};
 					note.initialDuration = varargin{1};
 					ok = true;
@@ -451,6 +460,7 @@ classdef Note
 			
 			if ~checkParallel( varargin{:} ) && ...
 					~checkTonality( varargin{:} ) && ...
+					~checkRest( varargin{:} ) && ...
 					~checkVoid( varargin{:} ) && ...
 					~checkOctave( varargin{:} ) && ...
 					~checkDynamics( varargin{:} ) && ...
@@ -630,14 +640,8 @@ classdef Note
 			
 			note = notes( 1 );
 			
-			ton = myUnique( [ notes.tonality ] );
-			nanidx = any( isnan( ton ), 1 );
-			if all( nanidx ) && size( ton, 2 ) > 1
-				ton = [ NaN; NaN ];
-			elseif any( nanidx )
-				ton = ton( : , ~nanidx );
-			end
-			note.tonality = ton;
+			note.tonality = myUnique( [ notes.tonality ] );
+			note.isRest = all( [ notes.isRest ] );
 			
 			note.isVoid = any( [ notes.isVoid ] );
 			note.voidIndex = [ notes.voidIndex ];
@@ -1155,12 +1159,12 @@ classdef Note
 					end
 					
 					ton = note.tonality;
-					if isempty( ton ) % void
+					if note.isVoid
 						noteString = append( noteString, currentLine, currentChar + round( (dur-1)/2 ), 'V', true );
 						noteString = append( noteString, currentLine, currentChar, '|', false );
 						noteString = append( noteString, currentLine, currentChar, repmat( playChar, 1, dur ), false );
 						
-					elseif any( isnan( ton ) ) % rest
+					elseif note.isRest
 						noteString = append( noteString, currentLine, currentChar, repmat( ' ', 1, dur ), false );
 						
 					else
