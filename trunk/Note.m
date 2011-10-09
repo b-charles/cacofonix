@@ -742,7 +742,7 @@ classdef Note
 			notes = riff;
 			for nRiff = 1:lRiff
 				
-				if notes( nRiff ).isVoid
+				if riff( nRiff ).isVoid
 					
 					riffNote = riff( nRiff );
 					
