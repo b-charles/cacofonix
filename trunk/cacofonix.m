@@ -42,7 +42,7 @@ crescendoSampling = 0.25;
 
 tempoSample = 10;
 
-deltaTimeTicks = prod( [ 2 2 2 2 2 2 3 3 5 7 ] );
+deltaTimeTicks = prod( [ 2 2 2 2 2 3 3 5 ] );
 
 deltaSustain = 0.001;
 
@@ -52,46 +52,273 @@ persistent finishAlert
 if isempty( finishAlert )
 	y = []; Fs = [];
 	load train
-	finishAlert = struct( 'y', y, 'Fs', Fs );
+	finishAlert = struct( 'y', y/10, 'Fs', Fs );
 	clear y Fs
 end
 
 %% Instruments
 
-persistent INSTRUMENTS PERCUSSIONS
+persistent INSTRUMENTS PERCUSSIONS DRUMKITS
 if isempty( INSTRUMENTS )
 	
-	INSTRUMENTS = struct( 'name', ...
-		{ 'Piano', ...
-		'Acoustic Grand Piano', 'Bright Acoustic Piano', 'Electric Grand Piano', ...
-		'Honky-tonk Piano', 'Electric Piano 1', ...
-		'Electric Piano 2', 'Harpsicord', 'Clavinet', 'Celesta', 'Glockenspiel', ...
-		'Music Box', 'Vibraphone', 'Marimba', 'Xylophone', 'Tubular Bells', ...
-		'Dulcimer', 'Drawbar Organ', 'Percussive Organ', 'Rock Organ', 'Church Organ', ...
-		'Reed Organ', 'Accordion', 'Harmonica', 'Bandoneon', 'Nylon String Guitar', ...
-		'Steel String Guitar', 'Jazz Guitar', 'Clean Guitar', ...
-		'Palm Muted Guitar', 'Overdriven Guitar', ...
-		'Distortion Guitar', 'Guitar Harmonics', 'Acoustic Bass', ...
-		'Fingered Bass', 'Picked Bass', ...
-		'Fretless Bass', 'Slap Bass 1', 'Slap Bass 2', 'Synth Bass 1', 'Synth Bass 2', ...
-		'Violin', 'Viola', 'Cello', 'Contrabass', 'Tremolo Strings', ...
-		'Pizzicato Strings', 'Orchestral Harp', 'Timpani', 'String Ensemble 1', 'String Ensemble 2', ...
-		'Synth Strings 1', 'Synth Strings 2', 'Choir Aahs', 'Voice Oohs', 'Synth Voice', ...
-		'Orchestra Hit', 'Trumpet', 'Trombone', 'Tuba', 'Muted Trumpet', ...
-		'French Horn', 'Brass Section', 'Synth Brass 1', 'Synth Brass 2', 'Soprano Sax', ...
-		'Alto Sax', 'Tenor Sax', 'Baritone Sax', 'Oboe', 'English Horn', ...
-		'Bassoon', 'Clarinet', 'Piccolo', 'Flute', 'Recorder', ...
-		'Pan Flute', 'Blown Bottle', 'Shakuhachi', 'Whistle', 'Ocarina', ...
-		'Square', 'Sawtooth', 'Calliope', 'Chiff', 'Charang', ...
-		'Voice', 'Fifths', 'Bass+lead', 'New age', 'Warm', ...
-		'Polysynth', 'Choir', 'Bowed', 'Metallic', 'Halo', ...
-		'Sweep', 'Rain', 'Soundtrack', 'Crystal', 'Atmosphere', ...
-		'Brightness', 'Goblins', 'Echoes', 'Sci-fi', 'Sitar', ...
-		'Banjo', 'Shamisen', 'Koto', 'Kalimba', 'Bagpipe', ...
-		'Fiddle', 'Shanai', 'Tinkle Bell', 'Agogo', 'Steel Drums', ...
-		'Woodblock', 'Taiko Drum', 'Melodic Tom', 'Synth Drum', 'Reverse Cymbal', ...
-		'Guitar Fret Noise', 'Breath Noise', 'Seashore', 'Bird Tweet', 'Telephone Ring', ...
-		'Helicopter', 'Applause', 'Gunshot' }, 'patch', num2cell( [ 0 0:127 ] ) );
+	INSTRUMENTS = [ ...
+		struct( 'name', 'Piano',						'patch', 0,		'bank', 0 )
+		struct( 'name', 'Acoustic Grand Piano',			'patch', 0,		'bank', 0 )
+		struct( 'name', 'Wide Acoustic Grand Piano',	'patch', 0,		'bank', 1 )
+		struct( 'name', 'Dark Acoustic Grand Piano',	'patch', 0,		'bank', 2 )
+		struct( 'name', 'Bright Acoustic Piano',		'patch', 1,		'bank', 0 )
+		struct( 'name', 'Wide Bright Acoustic Piano',	'patch', 1,		'bank', 1 )
+		struct( 'name', 'Electric Grand Piano',			'patch', 2,		'bank', 0 )
+		struct( 'name', 'Wide Electric Grand Pinao',	'patch', 2,		'bank', 1 )
+		struct( 'name', 'Honky-tonk Piano',				'patch', 3,		'bank', 0 )
+		struct( 'name', 'Wide Honky-tonk Piano',		'patch', 3,		'bank', 1 )
+		struct( 'name', 'Rhodes Piano',					'patch', 4,		'bank', 0 )
+		struct( 'name', 'Detuned Electric Piano 1',		'patch', 4,		'bank', 1 )
+		struct( 'name', 'Electric Piano 1 Variation',	'patch', 4,		'bank', 2 )
+		struct( 'name', '60s Electric Piano',			'patch', 4,		'bank', 3 )
+		struct( 'name', 'Chorused Electric Piano',		'patch', 5,		'bank', 0 )
+		struct( 'name', 'Detuned Electric Piano 2',		'patch', 5,		'bank', 1 )
+		struct( 'name', 'Electric Piano 2 Variation',	'patch', 5,		'bank', 2 )
+		struct( 'name', 'Electric Piano Legend',		'patch', 5,		'bank', 3 )
+		struct( 'name', 'Electric Piano Phase',			'patch', 5,		'bank', 4 )
+		struct( 'name', 'Harpsichord',					'patch', 6,		'bank', 0 )
+		struct( 'name', 'Coupled Harpsichord',			'patch', 6,		'bank', 1 )
+		struct( 'name', 'Wide Harpsichord',				'patch', 6,		'bank', 2 )
+		struct( 'name', 'Open Harpsichord',				'patch', 6,		'bank', 3 )
+		struct( 'name', 'Clavinet',						'patch', 7,		'bank', 0 )
+		struct( 'name', 'Pulse Clavinet',				'patch', 7,		'bank', 1 )
+		struct( 'name', 'Celesta',						'patch', 8,		'bank', 0 )
+		struct( 'name', 'Glockenspiel',					'patch', 9,		'bank', 0 )
+		struct( 'name', 'Music Box',					'patch', 10,	'bank', 0 )
+		struct( 'name', 'Vibraphone',					'patch', 11,	'bank', 0 )
+		struct( 'name', 'Wet Vibraphone',				'patch', 11,	'bank', 1 )
+		struct( 'name', 'Marimba',						'patch', 12,	'bank', 0 )
+		struct( 'name', 'Wide Marimba',					'patch', 12,	'bank', 1 )
+		struct( 'name', 'Xylophone',					'patch', 13,	'bank', 0 )
+		struct( 'name', 'Tubular Bell',					'patch', 14,	'bank', 0 )
+		struct( 'name', 'Church Bell',					'patch', 14,	'bank', 1 )
+		struct( 'name', 'Carillon',						'patch', 14,	'bank', 2 )
+		struct( 'name', 'Santur',						'patch', 15,	'bank', 0 )
+		struct( 'name', 'Hammond Organ',				'patch', 16,	'bank', 0 )
+		struct( 'name', 'Detuned Organ',				'patch', 16,	'bank', 1 )
+		struct( 'name', '60s Organ',					'patch', 16,	'bank', 2 )
+		struct( 'name', 'Organ 4',						'patch', 16,	'bank', 3 )
+		struct( 'name', 'Percussive Organ',				'patch', 17,	'bank', 0 )
+		struct( 'name', 'Detuned Organ 2',				'patch', 17,	'bank', 1 )
+		struct( 'name', 'Organ 5',						'patch', 17,	'bank', 2 )
+		struct( 'name', 'Rock Organ',					'patch', 18,	'bank', 0 )
+		struct( 'name', 'Church Organ 1',				'patch', 19,	'bank', 0 )
+		struct( 'name', 'Church Organ 2',				'patch', 19,	'bank', 1 )
+		struct( 'name', 'Church Organ 3',				'patch', 19,	'bank', 2 )
+		struct( 'name', 'Reed Organ',					'patch', 20,	'bank', 0 )
+		struct( 'name', 'Puff Organ',					'patch', 20,	'bank', 1 )
+		struct( 'name', 'French Accordion',				'patch', 21,	'bank', 0 )
+		struct( 'name', 'Italian Accordion',			'patch', 21,	'bank', 1 )
+		struct( 'name', 'Harmonica',					'patch', 22,	'bank', 0 )
+		struct( 'name', 'Bandoneon',					'patch', 23,	'bank', 0 )
+		struct( 'name', 'Nylon-String Guitar',			'patch', 24,	'bank', 0 )
+		struct( 'name', 'Ukulele',						'patch', 24,	'bank', 1 )
+		struct( 'name', 'Open Nylon Guitar',			'patch', 24,	'bank', 2 )
+		struct( 'name', 'Nylon Guitar 2',				'patch', 24,	'bank', 3 )
+		struct( 'name', 'Steel-String Guitar',			'patch', 25,	'bank', 0 )
+		struct( 'name', '12-String Guitar',				'patch', 25,	'bank', 1 )
+		struct( 'name', 'Mandolin',						'patch', 25,	'bank', 2 )
+		struct( 'name', 'Steel + Body',					'patch', 25,	'bank', 3 )
+		struct( 'name', 'Jazz Guitar',					'patch', 26,	'bank', 0 )
+		struct( 'name', 'Hawaiian Guitar',				'patch', 26,	'bank', 1 )
+		struct( 'name', 'Clean Electric Guitar',		'patch', 27,	'bank', 0 )
+		struct( 'name', 'Chorus Guitar',				'patch', 27,	'bank', 1 )
+		struct( 'name', 'Mid Tone Guitar',				'patch', 27,	'bank', 2 )
+		struct( 'name', 'Muted Electric Guitar',		'patch', 28,	'bank', 0 )
+		struct( 'name', 'Funk Guitar',					'patch', 28,	'bank', 1 )
+		struct( 'name', 'Funk Guitar 2',				'patch', 28,	'bank', 2 )
+		struct( 'name', 'Jazz Man',						'patch', 28,	'bank', 3 )
+		struct( 'name', 'Overdriven Guitar',			'patch', 29,	'bank', 0 )
+		struct( 'name', 'Guitar Pinch',					'patch', 29,	'bank', 1 )
+		struct( 'name', 'Distortion Guitar',			'patch', 30,	'bank', 0 )
+		struct( 'name', 'Feedback Guitar',				'patch', 30,	'bank', 1 )
+		struct( 'name', 'Distortion Rtm Guitar',		'patch', 30,	'bank', 2 )
+		struct( 'name', 'Guitar Harmonics',				'patch', 31,	'bank', 0 )
+		struct( 'name', 'Guitar Feedback',				'patch', 31,	'bank', 1 )
+		struct( 'name', 'Acoustic Bass',				'patch', 32,	'bank', 0 )
+		struct( 'name', 'Fingered Bass',				'patch', 33,	'bank', 0 )
+		struct( 'name', 'Finger Slap',					'patch', 33,	'bank', 1 )
+		struct( 'name', 'Picked Bass',					'patch', 34,	'bank', 0 )
+		struct( 'name', 'Fretless Bass',				'patch', 35,	'bank', 0 )
+		struct( 'name', 'Slap Bass 1',					'patch', 36,	'bank', 0 )
+		struct( 'name', 'Slap Bass 2',					'patch', 37,	'bank', 0 )
+		struct( 'name', 'Synth Bass 1',					'patch', 38,	'bank', 0 )
+		struct( 'name', 'Synth Bass 101',				'patch', 38,	'bank', 1 )
+		struct( 'name', 'Synth Bass 3',					'patch', 38,	'bank', 2 )
+		struct( 'name', 'Clavi Bass',					'patch', 38,	'bank', 3 )
+		struct( 'name', 'Hammer',						'patch', 38,	'bank', 4 )
+		struct( 'name', 'Synth Bass 2',					'patch', 39,	'bank', 0 )
+		struct( 'name', 'Synth Bass 4',					'patch', 39,	'bank', 1 )
+		struct( 'name', 'Rubber Bass',					'patch', 39,	'bank', 2 )
+		struct( 'name', 'Attack Pulse',					'patch', 39,	'bank', 3 )
+		struct( 'name', 'Violin',						'patch', 40,	'bank', 0 )
+		struct( 'name', 'Slow Violin',					'patch', 40,	'bank', 1 )
+		struct( 'name', 'Viola',						'patch', 41,	'bank', 0 )
+		struct( 'name', 'Cello',						'patch', 42,	'bank', 0 )
+		struct( 'name', 'Contrabass',					'patch', 43,	'bank', 0 )
+		struct( 'name', 'Tremolo Strings',				'patch', 44,	'bank', 0 )
+		struct( 'name', 'Pizzicato Strings',			'patch', 45,	'bank', 0 )
+		struct( 'name', 'Harp',							'patch', 46,	'bank', 0 )
+		struct( 'name', 'Yang Qin',						'patch', 46,	'bank', 1 )
+		struct( 'name', 'Timpani',						'patch', 47,	'bank', 0 )
+		struct( 'name', 'String Ensemble',				'patch', 48,	'bank', 0 )
+		struct( 'name', 'Orchestra Strings',			'patch', 48,	'bank', 1 )
+		struct( 'name', '60s Strings',					'patch', 48,	'bank', 2 )
+		struct( 'name', 'Slow String Ensemble',			'patch', 49,	'bank', 0 )
+		struct( 'name', 'Synth Strings 1',				'patch', 50,	'bank', 0 )
+		struct( 'name', 'Synth Strings 3',				'patch', 50,	'bank', 1 )
+		struct( 'name', 'Synth Strings 2',				'patch', 51,	'bank', 0 )
+		struct( 'name', 'Choir Aahs',					'patch', 52,	'bank', 0 )
+		struct( 'name', 'Choir Aahs 2',					'patch', 52,	'bank', 1 )
+		struct( 'name', 'Voice Oohs',					'patch', 53,	'bank', 0 )
+		struct( 'name', 'Humming',						'patch', 53,	'bank', 1 )
+		struct( 'name', 'Synth Voice',					'patch', 54,	'bank', 0 )
+		struct( 'name', 'Analog Voice',					'patch', 54,	'bank', 1 )
+		struct( 'name', 'Orchestra Hit',				'patch', 55,	'bank', 0 )
+		struct( 'name', 'Bass Hit',						'patch', 55,	'bank', 1 )
+		struct( 'name', '6th Hit',						'patch', 55,	'bank', 2 )
+		struct( 'name', 'Euro Hit',						'patch', 55,	'bank', 3 )
+		struct( 'name', 'Trumpet',						'patch', 56,	'bank', 0 )
+		struct( 'name', 'Dark Trumpet',					'patch', 56,	'bank', 1 )
+		struct( 'name', 'Trombone',						'patch', 57,	'bank', 0 )
+		struct( 'name', 'Trombone 2',					'patch', 57,	'bank', 1 )
+		struct( 'name', 'Bright Trombone',				'patch', 57,	'bank', 2 )
+		struct( 'name', 'Tuba',							'patch', 58,	'bank', 0 )
+		struct( 'name', 'Muted Trumpet',				'patch', 59,	'bank', 0 )
+		struct( 'name', 'Muted Trumpet 2',				'patch', 59,	'bank', 1 )
+		struct( 'name', 'French Horns',					'patch', 60,	'bank', 0 )
+		struct( 'name', 'French Horn 2',				'patch', 60,	'bank', 1 )
+		struct( 'name', 'Brass Section 1',				'patch', 61,	'bank', 0 )
+		struct( 'name', 'Brass Section 2',				'patch', 61,	'bank', 1 )
+		struct( 'name', 'Synth Brass 1',				'patch', 62,	'bank', 0 )
+		struct( 'name', 'Synth Brass 3',				'patch', 62,	'bank', 1 )
+		struct( 'name', 'Analog Brass 1',				'patch', 62,	'bank', 2 )
+		struct( 'name', 'Jump Brass',					'patch', 62,	'bank', 3 )
+		struct( 'name', 'Synth Brass 2',				'patch', 63,	'bank', 0 )
+		struct( 'name', 'Synth Brass 4',				'patch', 63,	'bank', 1 )
+		struct( 'name', 'Analog Brass 2',				'patch', 63,	'bank', 2 )
+		struct( 'name', 'Soprano Sax',					'patch', 64,	'bank', 0 )
+		struct( 'name', 'Alto Sax',						'patch', 65,	'bank', 0 )
+		struct( 'name', 'Tenor Sax',					'patch', 66,	'bank', 0 )
+		struct( 'name', 'Baritone Sax',					'patch', 67,	'bank', 0 )
+		struct( 'name', 'Oboe',							'patch', 68,	'bank', 0 )
+		struct( 'name', 'English Horn',					'patch', 69,	'bank', 0 )
+		struct( 'name', 'Bassoon',						'patch', 70,	'bank', 0 )
+		struct( 'name', 'Clarinet',						'patch', 71,	'bank', 0 )
+		struct( 'name', 'Piccolo',						'patch', 72,	'bank', 0 )
+		struct( 'name', 'Flute',						'patch', 73,	'bank', 0 )
+		struct( 'name', 'Recorder',						'patch', 74,	'bank', 0 )
+		struct( 'name', 'Pan Flute',					'patch', 75,	'bank', 0 )
+		struct( 'name', 'Bottle Blow',					'patch', 76,	'bank', 0 )
+		struct( 'name', 'Shakuhachi',					'patch', 77,	'bank', 0 )
+		struct( 'name', 'Whistle',						'patch', 78,	'bank', 0 )
+		struct( 'name', 'Ocarina',						'patch', 79,	'bank', 0 )
+		struct( 'name', 'Square Lead',					'patch', 80,	'bank', 0 )
+		struct( 'name', 'Square Wave',					'patch', 80,	'bank', 1 )
+		struct( 'name', 'Sine Wave',					'patch', 80,	'bank', 2 )
+		struct( 'name', 'Saw Lead',						'patch', 81,	'bank', 0 )
+		struct( 'name', 'Saw Wave',						'patch', 81,	'bank', 1 )
+		struct( 'name', 'Doctor Solo',					'patch', 81,	'bank', 2 )
+		struct( 'name', 'Natural Lead',					'patch', 81,	'bank', 3 )
+		struct( 'name', 'Sequenced Saw',				'patch', 81,	'bank', 4 )
+		struct( 'name', 'Synth Calliope',				'patch', 82,	'bank', 0 )
+		struct( 'name', 'Chiffer Lead',					'patch', 83,	'bank', 0 )
+		struct( 'name', 'Charang',						'patch', 84,	'bank', 0 )
+		struct( 'name', 'Wire Lead',					'patch', 84,	'bank', 1 )
+		struct( 'name', 'Solo Synth Vox',				'patch', 85,	'bank', 0 )
+		struct( 'name', '5th Saw Wave',					'patch', 86,	'bank', 0 )
+		struct( 'name', 'Bass & Lead',					'patch', 87,	'bank', 0 )
+		struct( 'name', 'Delayed Lead',					'patch', 87,	'bank', 1 )
+		struct( 'name', 'Fantasia Pad',					'patch', 88,	'bank', 0 )
+		struct( 'name', 'Warm Pad',						'patch', 89,	'bank', 0 )
+		struct( 'name', 'Sine Pad',						'patch', 89,	'bank', 1 )
+		struct( 'name', 'Polysynth Pad',				'patch', 90,	'bank', 0 )
+		struct( 'name', 'Space Voice Pad',				'patch', 91,	'bank', 0 )
+		struct( 'name', 'Itopia',						'patch', 91,	'bank', 1 )
+		struct( 'name', 'Bowed Glass Pad',				'patch', 92,	'bank', 0 )
+		struct( 'name', 'Metal Pad',					'patch', 93,	'bank', 0 )
+		struct( 'name', 'Halo Pad',						'patch', 94,	'bank', 0 )
+		struct( 'name', 'Sweep Pad',					'patch', 95,	'bank', 0 )
+		struct( 'name', 'Ice Rain',						'patch', 96,	'bank', 0 )
+		struct( 'name', 'Soundtrack',					'patch', 97,	'bank', 0 )
+		struct( 'name', 'Crystal',						'patch', 98,	'bank', 0 )
+		struct( 'name', 'Synth Mallet',					'patch', 98,	'bank', 1 )
+		struct( 'name', 'Atmosphere',					'patch', 99,	'bank', 0 )
+		struct( 'name', 'Brightness',					'patch', 100,	'bank', 0 )
+		struct( 'name', 'Goblin',						'patch', 101,	'bank', 0 )
+		struct( 'name', 'Echo Drops',					'patch', 102,	'bank', 0 )
+		struct( 'name', 'Echo Bell',					'patch', 102,	'bank', 1 )
+		struct( 'name', 'Echo Pan',						'patch', 102,	'bank', 2 )
+		struct( 'name', 'Star Theme',					'patch', 103,	'bank', 0 )
+		struct( 'name', 'Sitar',						'patch', 104,	'bank', 0 )
+		struct( 'name', 'Sitar 2',						'patch', 104,	'bank', 1 )
+		struct( 'name', 'Banjo',						'patch', 105,	'bank', 0 )
+		struct( 'name', 'Shamisen',						'patch', 106,	'bank', 0 )
+		struct( 'name', 'Koto',							'patch', 107,	'bank', 0 )
+		struct( 'name', 'Taisho Koto',					'patch', 107,	'bank', 1 )
+		struct( 'name', 'Kalimba',						'patch', 108,	'bank', 0 )
+		struct( 'name', 'Bagpipe',						'patch', 109,	'bank', 0 )
+		struct( 'name', 'Fiddle',						'patch', 110,	'bank', 0 )
+		struct( 'name', 'Shanai',						'patch', 111,	'bank', 0 )
+		struct( 'name', 'Tinkle Bell',					'patch', 112,	'bank', 0 )
+		struct( 'name', 'Agogo',						'patch', 113,	'bank', 0 )
+		struct( 'name', 'Steel Drums',					'patch', 114,	'bank', 0 )
+		struct( 'name', 'Woodblock',					'patch', 115,	'bank', 0 )
+		struct( 'name', 'Castanets',					'patch', 115,	'bank', 1 )
+		struct( 'name', 'Taiko',						'patch', 116,	'bank', 0 )
+		struct( 'name', 'Concert Bass Drum',			'patch', 116,	'bank', 1 )
+		struct( 'name', 'Melodic Tom 1',				'patch', 117,	'bank', 0 )
+		struct( 'name', 'Melodic Tom 2',				'patch', 117,	'bank', 1 )
+		struct( 'name', 'Synth Drum',					'patch', 118,	'bank', 0 )
+		struct( 'name', '808 Tom',						'patch', 118,	'bank', 1 )
+		struct( 'name', 'Electric Percussion',			'patch', 118,	'bank', 2 )
+		struct( 'name', 'Reverse Cymbal',				'patch', 119,	'bank', 0 )
+		struct( 'name', 'Guitar Fret Noise',			'patch', 120,	'bank', 0 )
+		struct( 'name', 'Guitar Cut Noise',				'patch', 120,	'bank', 1 )
+		struct( 'name', 'String Slap',					'patch', 120,	'bank', 2 )
+		struct( 'name', 'Breath Noise',					'patch', 121,	'bank', 0 )
+		struct( 'name', 'Flute Key Click',				'patch', 121,	'bank', 1 )
+		struct( 'name', 'Seashore',						'patch', 122,	'bank', 0 )
+		struct( 'name', 'Rain',							'patch', 122,	'bank', 1 )
+		struct( 'name', 'Thunder',						'patch', 122,	'bank', 2 )
+		struct( 'name', 'Wind',							'patch', 122,	'bank', 3 )
+		struct( 'name', 'Stream',						'patch', 122,	'bank', 4 )
+		struct( 'name', 'Bubble',						'patch', 122,	'bank', 5 )
+		struct( 'name', 'Bird',							'patch', 123,	'bank', 0 )
+		struct( 'name', 'Dog',							'patch', 123,	'bank', 1 )
+		struct( 'name', 'Horse-Gallop',					'patch', 123,	'bank', 2 )
+		struct( 'name', 'Bird 2',						'patch', 123,	'bank', 3 )
+		struct( 'name', 'Telephone 1',					'patch', 124,	'bank', 0 )
+		struct( 'name', 'Telephone 2',					'patch', 124,	'bank', 1 )
+		struct( 'name', 'Door Creaking',				'patch', 124,	'bank', 2 )
+		struct( 'name', 'Door Closing',					'patch', 124,	'bank', 3 )
+		struct( 'name', 'Scratch',						'patch', 124,	'bank', 4 )
+		struct( 'name', 'Wind Chimes',					'patch', 124,	'bank', 5 )
+		struct( 'name', 'Helicopter',					'patch', 125,	'bank', 0 )
+		struct( 'name', 'Car-Engine',					'patch', 125,	'bank', 1 )
+		struct( 'name', 'Car-Stop',						'patch', 125,	'bank', 2 )
+		struct( 'name', 'Car-Pass',						'patch', 125,	'bank', 3 )
+		struct( 'name', 'Car-Crash',					'patch', 125,	'bank', 4 )
+		struct( 'name', 'Siren',						'patch', 125,	'bank', 5 )
+		struct( 'name', 'Train',						'patch', 125,	'bank', 6 )
+		struct( 'name', 'Jetplane',						'patch', 125,	'bank', 7 )
+		struct( 'name', 'Starship',						'patch', 125,	'bank', 8 )
+		struct( 'name', 'Burst Noise',					'patch', 125,	'bank', 9 )
+		struct( 'name', 'Applause',						'patch', 126,	'bank', 0 )
+		struct( 'name', 'Laughing',						'patch', 126,	'bank', 1 )
+		struct( 'name', 'Screaming',					'patch', 126,	'bank', 2 )
+		struct( 'name', 'Punch',						'patch', 126,	'bank', 3 )
+		struct( 'name', 'Heart Beat',					'patch', 126,	'bank', 4 )
+		struct( 'name', 'Footsteps',					'patch', 126,	'bank', 5 )
+		struct( 'name', 'Gun Shot',						'patch', 127,	'bank', 0 )
+		struct( 'name', 'Machine Gun',					'patch', 127,	'bank', 1 )
+		struct( 'name', 'Lasergun',						'patch', 127,	'bank', 2 )
+		struct( 'name', 'Explosion',					'patch', 127,	'bank', 3 ) ];
 
 	PERCUSSIONS = [ ...
 		struct( 'name', 'High Q',				'ton', -33 )
@@ -157,21 +384,93 @@ if isempty( INSTRUMENTS )
 		struct( 'name', 'Castanets',			'ton', 25 )
 		struct( 'name', 'Mute Surdo',			'ton', [ 26 27 ] )
 		struct( 'name', 'Open Surdo',			'ton', [ 27 26 ] ) ];
-
+	
+	DRUMKITS = [ ...
+		struct( 'name', 'Standard',				'program', 0 )
+		struct( 'name', 'Room',					'program', 8 )
+		struct( 'name', 'Power',				'program', 16 )
+		struct( 'name', 'Electronic',			'program', 24 )
+		struct( 'name', 'TR-808',				'program', 25 )
+		struct( 'name', 'Jazz',					'program', 32 )
+		struct( 'name', 'Brush',				'program', 40 )
+		struct( 'name', 'Orchestra',			'program', 48 )
+		struct( 'name', 'Sound FX',				'program', 56 )
+		struct( 'name', 'CM-64/CM-32L',			'program', 127 ) ];
+	
 end
 
 %% ### INPUTS
 
 %% Only display available programs
 
-if nargin == 1 && ischar( filepath ) && strcmpi( filepath, '-instruments' )
-	fprintf( ' - %s\n', INSTRUMENTS.name );
+if nargin >= 1 && ischar( filepath ) && strcmpi( filepath, '-instruments' )
+	if nargin == 1
+		displayInstruments( INSTRUMENTS( [ INSTRUMENTS.bank ] == 0 ) );
+	elseif nargin == 2 && ischar( varargin{1} ) && strcmpi( varargin{1}, '-level2' )
+		displayInstruments( INSTRUMENTS );
+	else
+		throwError( 'CACOFONIX:UnexpectedArgument', 'Unexpected argument' );
+	end
 	return
 end
-if nargin == 1 && ischar( filepath ) && strcmpi( filepath, '-percussions' )
-	fprintf( ' - %s\n', PERCUSSIONS(9:55).name );
+if nargin >= 1 && ischar( filepath ) && strcmpi( filepath, '-percussions' )
+	if nargin == 1
+		displayPercussions( PERCUSSIONS(9:55) );
+	elseif nargin >= 2 && ischar( varargin{1} ) && strcmpi( varargin{1}, '-level2' )
+		displayPercussions( PERCUSSIONS );
+	else
+		throwError( 'CACOFONIX:UnexpectedArgument', 'Unexpected argument' );
+	end
 	return
 end
+if nargin >= 1 && ischar( filepath ) && strcmpi( filepath, '-drumkits' )
+	if nargin == 1
+		displayDrumkits( DRUMKITS );
+	else
+		throwError( 'CACOFONIX:UnexpectedArgument', 'Unexpected argument' );
+	end
+	return
+end
+
+	function displayInstruments( instru )
+		
+		function displayGroup( title, instru )
+			fprintf( ' \n - %s -\n', upper(title) );
+			fprintf( ' \t%s\n', instru.name );
+		end
+		
+		patchs = [ instru.patch ];
+		dispGroup = @( title, s, e )displayGroup( title, instru( s <= patchs & patchs <= e ) );
+		
+		dispGroup( 'Piano', 0, 7 );
+		dispGroup( 'Chromatic Percussion', 8, 15 );
+		dispGroup( 'Organ', 16, 23 );
+		dispGroup( 'Guitar', 24, 31 );
+		dispGroup( 'Bass', 32, 39 );
+		dispGroup( 'Orchestra Solo', 40, 47 );
+		dispGroup( 'Orchestra Ensemble', 48, 55 );
+		dispGroup( 'Brass', 56, 63 );
+		dispGroup( 'Reed', 64, 71 );
+		dispGroup( 'Wind', 72, 79 );
+		dispGroup( 'Synth Lead', 80, 87 );
+		dispGroup( 'Synth Pad', 88, 95 );
+		dispGroup( 'Synth Sound FX', 96, 103 );
+		dispGroup( 'Ethnic', 104, 111 );
+		dispGroup( 'Percussive', 112, 119 );
+		dispGroup( 'Sound Effect', 120, 127 );
+		fprintf( '\n' );
+		
+	end
+	function displayPercussions( percu )
+		fprintf( '\n' );
+		fprintf( ' \t%s\n', percu.name );
+		fprintf( '\n' );
+	end
+	function displayDrumkits( drums )
+		fprintf( '\n' );
+		fprintf( ' \t%s\n', drums.name );
+		fprintf( '\n' );
+	end
 
 %% Search option function
 
@@ -208,13 +507,23 @@ if length( velocityValues ) ~= 8
 		'The velocity vector must have 8 elements.' );
 end
 
+%% Drum kit
+
+drumkitName = getOption( 'DrumKit', 'Standard' );
+idx = find( strcmpi( drumkitName, { DRUMKITS.name } ) );
+if isempty( idx )
+	throwError( 'CACOFONIX:DRUMKIT', ...
+		'Unexpected drum kit:%s', drumkitName );
+end
+
+drumKit = DRUMKITS( idx );
+
 %% Sheets
 
 args = varargin;
 nbArgs = length( args );
 
 sheets = struct( ...
-	'number', {}, ...
 	'name', {}, ...
 	'notes', {}, ...
 	'channel', {}, ...
@@ -222,12 +531,73 @@ sheets = struct( ...
 	'events', {}, ...
 	'bin', {} );
 
+	function addGeneralSheet( notes )
+		sheets = [ struct( ...
+			'name', 'Main', ...
+			'notes', notes, ...
+			'channel', 0, ...
+			'instrument', [], ...
+			'events', [], ...
+			'bin', [] ) sheets ];
+	end
+	function addSheetInstrument( notes, instrument, channel, numSheet )
+		
+		if nargin==3, numSheet = 1; end
+		
+		name = instrument.name;
+		if numSheet > 1, name = sprintf( '%s (%d)', name, numSheet ); end
+		if numSheet == 2
+			sheets(end).name = sprintf( '%s (%d)', sheets(end).name, 1 );
+		end
+		
+		if channel == -1, channel = getAFreeChannel(); end
+		
+		sheets = [ sheets struct( ...
+			'name', name, ...
+			'notes', notes, ...
+			'channel', channel, ...
+			'instrument', instrument, ...
+			'events', [], ...
+			'bin', [] ) ];
+		
+		addASheet = @( notes )addSheetInstrument( notes, instrument, channel, numSheet+1 );
+		
+	end
+	function addSheetPercussion( notes, percussion, numSheet )
+		
+		if nargin==2, numSheet = 1; end
+		
+		name = percussion.name;
+		if numSheet > 1, name = sprintf( '%s (%d)', name, numSheet ); end
+		if numSheet == 2
+			sheets(end).name = sprintf( '%s (%d)', sheets(end).name, 1 );
+		end
+		
+		ton = percussion.ton; nbTon = length( ton );
+		percu = cell( 1, nbTon );
+		for iii = 1:nbTon
+			percu{iii} = Note( '__SET_TONALITY__', ton(iii) );
+		end
+		percu = [ percu{:} ];
+		
+		sheets = [ sheets struct( ...
+			'name', name, ...
+			'notes', percu * notes, ...
+			'channel', 9, ...
+			'instrument', [], ...
+			'events', [], ...
+			'bin', [] ) ];
+		
+		addASheet = @( notes )addSheetPercussion( notes, percussion, numSheet+1 );
+		
+	end
+
+addASheet = @( notes )addSheetInstrument( notes, INSTRUMENTS(1), -1 );
+
 firstSheetGeneral = false;
 
 freeChannels = true( 1, 16 );
 freeChannels( 10 ) = false;
-
-lastInstrument = INSTRUMENTS(1).patch;
 
 	function chan = getAFreeChannel()
 		chan = find( freeChannels, 1, 'first' ) - 1;
@@ -239,63 +609,49 @@ lastInstrument = INSTRUMENTS(1).patch;
 	end
 
 numArg = 1;
-numSheet = 0;
-
 while numArg <= nbArgs
-	
-	numSheet = numSheet + 1;
 	
 	if ischar( args{ numArg } )
 		% 'Intrument'|'Percussion', notes
 		
-		idxInstrument = find( strcmpi( args{ numArg }, { INSTRUMENTS.name } ), 1 );
-		idxPercussion = find( strcmpi( args{ numArg }, { PERCUSSIONS.name } ), 1 );
+		name = args{ numArg };
+		
+		idxInstrument = find( strcmpi( name, { INSTRUMENTS.name } ), 1 );
+		idxPercussion = find( strcmpi( name, { PERCUSSIONS.name } ), 1 );
 		
 		if isempty( idxInstrument ) && isempty( idxPercussion )
 			throwError( 'CACOFONIX:UnexpectedArgument', ...
-				'Unexpected argument: %s', args{ numArg } );
+				'Unexpected argument: %s', name );
 		end
 		
 		numArg = numArg + 1;
 		if numArg > nbArgs || ~isa( args{numArg}, 'Note' )
 			throwError( 'CACOFONIX:NoNoteObjets', ...
-				'Note objects expected after %s', args{ numArg-1 } );
+				'Note objects expected after %s', name );
 		end
 		
-		if ~isempty( idxInstrument )
+		notes = args{numArg};
+		playableNotes = notes( [ notes.isNote ] );
+		isVoid = [ playableNotes.isVoid ];
+		
+		if ~isempty( idxInstrument ) && ~any( isVoid )
 			% add instrument sheet
 			
-			lastInstrument = INSTRUMENTS(idxInstrument).patch;
-
-			sheets = [ sheets struct( ...
-				'number', numSheet, ...
-				'name', INSTRUMENTS(idxInstrument).name, ...
-				'notes', args{numArg}, ...
-				'channel', getAFreeChannel(), ...
-				'instrument', lastInstrument, ...
-				'events', [], ...
-				'bin', [] ) ]; %#ok<AGROW>
+			addSheetInstrument( args{numArg}, INSTRUMENTS(idxInstrument), getAFreeChannel() );
 			
-		else % ~isempty( idxPercussion )
+		elseif ~isempty( idxPercussion ) && all( isVoid )
 			% add percussion sheet
 			
-			% replace all notes by tonality of percussion
+			addSheetPercussion( args{numArg}, PERCUSSIONS(idxPercussion) );
 			
-			ton = PERCUSSIONS( idxPercussion ).ton; nbTon = length( ton );
-			percu = cell( 1, nbTon );
-			for ii = 1:nbTon
-				percu{ii} = Note( '__SET_TONALITY__', ton(ii) );
+		else
+			if ~isempty( idxInstrument )
+				throwError( 'CACOFONIX:VoidNotes', ...
+					'Unexpected void notes in the sheet of %s.', name );
+			else
+				throwError( 'CACOFONIX:VoidNotes', ...
+					'Only void notes are authorized for the sheet %s.', name );
 			end
-			percu = [ percu{:} ];
-			
-			sheets = [ sheets struct( ...
-				'number', numSheet, ...
-				'name', PERCUSSIONS(idxPercussion).name, ...
-				'notes', percu * args{numArg}, ...
-				'channel', 9, ...
-				'instrument', [], ...
-				'events', [], ...
-				'bin', [] ) ]; %#ok<AGROW>
 			
 		end
 		
@@ -311,23 +667,9 @@ while numArg <= nbArgs
 		end
 		
 		if numArg == 1 && firstSheetGeneral
-			sheets = [ sheets struct( ...
-				'number', numSheet, ...
-				'name', 'Main', ...
-				'notes', notes, ...
-				'channel', 0, ...
-				'instrument', [], ...
-				'events', [], ...
-				'bin', [] ) ]; %#ok<AGROW>
+			addGeneralSheet( notes );
 		else
-			sheets = [ sheets struct( ...
-				'number', numSheet, ...
-				'name', '', ...
-				'notes', notes, ...
-				'channel', getAFreeChannel(), ...
-				'instrument', lastInstrument, ...
-				'events', [], ...
-				'bin', [] ) ]; %#ok<AGROW>
+			addASheet( notes );
 		end
 		
 	else
@@ -340,14 +682,7 @@ end
 
 % add a default Main sheet
 if ~firstSheetGeneral
-	sheets = [ struct( ...
-		'number', 0, ...
-		'name', 'Main', ...
-		'notes', [], ...
-		'channel', 0, ...
-		'instrument', [], ...
-		'events', [], ...
-		'bin', [] ) sheets ];
+	addGeneralSheet( [] );
 end
 
 nbSheets = length( sheets );
@@ -455,8 +790,14 @@ nbNotes = 0;
 
 %% EVENTS
 
+BANK_MSB_INSTRUMENT = 121;
+BANK_MSB_PERCUSSION = 120;
+
+TRACK_NAME = 'TRACK_NAME';
 NOTE_ON = 'NOTE_ON';
 NOTE_OFF = 'NOTE_OFF';
+BANK_MSB = 'BANK_MSB';
+BANK_LSB = 'BANK_LSB';
 PROGRAM = 'PROGRAM';
 TEMPO = 'TEMPO';
 VOLUME = 'VOLUME';
@@ -1103,6 +1444,7 @@ tempoEvt = repmat( struct( ...
 
 %% MAIN
 
+drumKitProgramAdded = false;
 maxDuration = deltaStartAndEndTrack;
 
 % read sheets
@@ -1115,10 +1457,22 @@ for numCurrentSheet = 1:nbSheets
 	initMarker();
 	initBarSync();
 	
+	addEvent( TRACK_NAME, 0, sheets(numCurrentSheet).name );
+	
 	currentTime = deltaStartAndEndTrack;
 	
 	if ~isempty( sheets(numCurrentSheet).instrument )
-		addEvent( PROGRAM, 0, sheets(numCurrentSheet).instrument );
+		addEvent( BANK_MSB, currentTime, BANK_MSB_INSTRUMENT );
+		addEvent( BANK_LSB, currentTime, sheets(numCurrentSheet).instrument.bank );
+		addEvent( PROGRAM, currentTime, sheets(numCurrentSheet).instrument.patch );
+		
+	elseif numCurrentSheet > 1 && ~drumKitProgramAdded
+		% add only at the first sheet
+		addEvent( BANK_MSB, currentTime, BANK_MSB_PERCUSSION );
+		addEvent( BANK_LSB, currentTime, 0 );
+		addEvent( PROGRAM, currentTime, drumKit.program );
+		drumKitProgramAdded = true;
+		
 	end
 	
 	if ~isempty( sheets(numCurrentSheet).notes )
@@ -1152,9 +1506,9 @@ initEvents();
 
 % converts tempo events to events
 tempoEvt = getTempoEvents();
-if isempty( tempoEvt ) || tempoEvt(1).time ~= 0
+if isempty( tempoEvt ) || tempoEvt(1).time > deltaStartAndEndTrack
 	% add default tempo
-	addEvent( TEMPO, 0, defaultTempo );
+	addEvent( TEMPO, deltaStartAndEndTrack, defaultTempo );
 end
 for ii = 1:length( tempoEvt )
 	addEvent( TEMPO, tempoEvt(ii).time, tempoEvt(ii).tempo );
@@ -1257,6 +1611,10 @@ for ii = 1:nbSheets
 			case SUSTAIN
 				[ bin(jj).hexa bin(jj).len] = getHexa( ev.time, [ 176+channel 64 ], 127*ev.arg1, 1 );
 				
+			case BANK_MSB
+				[ bin(jj).hexa bin(jj).len ] = getHexa( ev.time, [ 176+channel 0 ], ev.arg1, 1 );
+			case BANK_LSB
+				[ bin(jj).hexa bin(jj).len ] = getHexa( ev.time, [ 176+channel 32 ], ev.arg1, 1 );
 			case PROGRAM
 				[ bin(jj).hexa bin(jj).len ] = getHexa( ev.time, 192+channel, ev.arg1, 1 );
 				
@@ -1264,6 +1622,9 @@ for ii = 1:nbSheets
 				marker = ev.arg1; lMarker = length( marker );
 				[ bin(jj).hexa bin(jj).len] = getHexa( ev.time, [255 6 lMarker ], marker+0, ones(1,lMarker) );
 				
+			case TRACK_NAME
+				name = ev.arg1; lName = length( name );
+				[ bin(jj).hexa bin(jj).len] = getHexa( ev.time, [255 3 lName], name+0, ones(1,lName) );
 			case END_TRACK
 				[ bin(jj).hexa bin(jj).len] = getHexa( ev.time, [255 47], 0, 1 );
 				
