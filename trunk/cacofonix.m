@@ -706,13 +706,7 @@ nbSheets = length( sheets );
 	end
 
 	function str = getCurrentSheetInfo()
-		sheetNumber = sheets( numCurrentSheet ).number;
-		sheetName = sheets( numCurrentSheet ).name;
-		if isempty( sheetName )
-			str = sprintf( 'sheet %d', sheetNumber );
-		else
-			str = sprintf( 'sheet %d (%s)', sheetNumber, sheetName );
-		end
+		str = sprintf( 'sheet %s', sheets( numCurrentSheet ).name );
 	end
 
 	function throwError( identifier, message, varargin )
