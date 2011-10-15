@@ -79,7 +79,7 @@ classdef Note
 		
 		isBar = false;
 		
-		delay = []; % for dynamics (TODO: and tempo)
+		delay = []; % for dynamics and pitch (TODO: and tempo)
 		
 		defDynamics = false;
 		dynamics = NaN;
@@ -109,6 +109,10 @@ classdef Note
 		isMarker = false;
 		goto = false;
 		marker = '';
+		
+		defPitch = false;
+		pitchTransition = 'none'; % 'none' | 'linear' | 'quad'
+		pitchValue = 0;
 		
 	end
 	
@@ -444,6 +448,44 @@ classdef Note
 				end
 				
 			end
+			function ok = checkPitch( varargin )
+				ok = false;
+				
+				function [ str, value ] = addValue( str, value, char, score )
+					idx = str == char;
+					str = str( ~idx );
+					value = value + sum( idx )*score;
+				end
+				
+				if ( nargin==2 || nargin==3 ) && ...
+						ischar( varargin{1} ) && ...
+						any( strcmpi( varargin{1}, { 'Pitch', 'Pitch*' } ) ) && ...
+						ischar( varargin{2} )
+
+					[ str, value_ ] = addValue( varargin{2}, 0, '#', 1 );
+					[ str, value_ ] = addValue( str, value_, '+', 0.5 );
+					[ str, value_ ] = addValue( str, value_, '0', 0 );
+					[ str, value_ ] = addValue( str, value_, '-', -0.5 );
+					[ str, value_ ] = addValue( str, value_, 'b', -1 );
+					if ~isempty( str ), return; end
+					
+					delay_ = 0;
+					if nargin==3
+						[ ok, delay_ ] = getDuration( varargin{3} );
+						if ~ok, return; end
+					end
+					
+					trans = { 'quad', 'none' };
+					note.defPitch = true;
+					note.pitchTransition = trans{ strcmpi( varargin{1}, 'Pitch' ) +1 };
+					note.pitchValue = value_;
+					note.delay = delay_;
+					
+					ok = true;
+					
+				end
+				
+			end
 			function ok = checkSetTonality( varargin )
 				ok = false;
 				if nargin == 2 && ...
@@ -473,6 +515,7 @@ classdef Note
 					~checkMarker( varargin{:} ) && ...
 					~checkDuration( varargin{:} ) && ...
 					~checkMeter( varargin{:} ) && ...
+					~checkPitch( varargin{:} ) && ...
 					~checkSetTonality( varargin{:} )
 				
 				error( 'CACOFONIX:Note:UnexpectedArgument', ...

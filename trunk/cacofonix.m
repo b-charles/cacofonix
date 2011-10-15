@@ -42,6 +42,8 @@ crescendoSampling = 0.25;
 
 tempoSample = 10;
 
+pitchSampling = 0.1;
+
 deltaTimeTicks = prod( [ 2 2 2 2 2 3 3 5 ] );
 
 deltaSustain = 0.001;
@@ -797,6 +799,11 @@ TEMPO = 'TEMPO';
 VOLUME = 'VOLUME';
 SUSTAIN = 'SUSTAIN';
 MARKER = 'MARKER';
+RPN_MSB = 'RPN_MSB';
+RPN_LSB = 'RPN_LSB';
+DATAENTRY_MSB = 'DATAENTRY_MSB';
+DATAENTRY_LSB = 'DATAENTRY_LSB';
+PITCH = 'PITCH';
 END_TRACK = 'END_TRACK';
 
 EVENT = struct( ...
@@ -1062,6 +1069,82 @@ sinceLastMarker = [];
 		m = markers;
 	end
 
+%% PITCH
+
+currentPitch = [0 0]'; % [ -time- ; -pitch- ]
+
+	function initPitch()
+		currentPitch = [0 0]';
+	end
+
+	function addPitch( note )
+		
+		t0 = min( currentTime, currentPitch(1,end) );
+		p0 = interp1( [ currentPitch(1,:) Inf ], [ currentPitch(2,:) 0 ], t0 );
+		t1 = currentTime + note.delay;
+		p1 = note.pitchValue;
+		
+		currentPitch( :, currentPitch(1,:) >= t0 ) = [];
+		
+		if t0 == t1
+			t = t1;
+			p = p1;
+			
+		else
+			
+			switch note.pitchTransition
+				
+				case 'none'
+					t = [ t0 t1 ];
+					p = [ p0 p1 ];
+					
+				case 'linear'
+					t = t0:pitchSampling:t1;
+					p = (p1-p0)*(t-t0)/(t1-t0) + p0;
+					
+				case 'quad'
+					t = t0:pitchSampling:t1;
+					p = (p1-p0)*((t-t0).^2)/((t1-t0)^2) + p0;
+					
+			end
+			
+		end
+		
+		currentPitch = [ currentPitch [ t; p ] ];
+		
+	end
+
+	function addPitchEvents()
+		
+		if size(currentPitch,2)==1 && currentPitch(2,1)==0
+			return
+		end
+		
+		times = currentPitch(1,:);
+		pitchs = currentPitch(2,:);
+		
+		maxRange = ceil( max( abs( pitchs ) ) );
+		
+		idx = [ false diff( times )==0 ];
+		times( idx ) = [];
+		pitchs( idx ) = [];
+		
+		pitchs = min( max( round(pitchs*8192/maxRange)+8192, 0 ), 16383 );
+		idx = [ false diff( pitchs )==0 ];
+		times( idx ) = [];
+		pitchs( idx ) = [];
+		
+		addEvent( RPN_MSB, deltaStartAndEndTrack, 0 );
+		addEvent( RPN_LSB, deltaStartAndEndTrack, 0 );
+		addEvent( DATAENTRY_MSB, deltaStartAndEndTrack, maxRange );
+		addEvent( DATAENTRY_LSB, deltaStartAndEndTrack, 0 );
+		
+		for i = 1:length( times )
+			addEvent( PITCH, times(i), pitchs(i) );
+		end
+		
+	end
+
 %% BARS AND METERS
 
 timesBars = [];
@@ -1229,29 +1312,32 @@ tempoEvt = repmat( struct( ...
 			if isTied
 				
 				indexTime = roundDuration( [ notes(1:nbNotes).stop ] - currentTime ) == 0;
-				
-				if ~isnan( note.isDetached ) && ~note.isDetached
-					% if the note is not detached, search the previous note
-					% with the same tonality and prolongate it. If no note
-					% is found, prolongate all.
+				if any( indexTime )
 					
-					indexTonality = arrayfun( @(n)isequal( n.tonality, tonality ), notes(1:nbNotes) );
-					index = find( indexTime & indexTonality, 1, 'last' );
-					
-					if ~isempty( index )
-						notes( index ).stop = currentTime + duration;
-						duration = notes( index ).stop - notes( index ).start;
+					if ~isnan( note.isDetached ) && ~note.isDetached
+						% if the note is not detached, search the previous note
+						% with the same tonality and prolongate it. If no note
+						% is found, prolongate all.
 						
-						notes( index ).stopPlay = notes( index ).start + getDurationPlay( duration );
+						indexTonality = arrayfun( @(n)isequal( n.tonality, tonality ), notes(1:nbNotes) );
+						index = find( indexTime & indexTonality, 1, 'last' );
 						
-						isAdded = true;
+						if ~isempty( index )
+							notes( index ).stop = currentTime + duration;
+							duration = notes( index ).stop - notes( index ).start;
+							
+							notes( index ).stopPlay = notes( index ).start + getDurationPlay( duration );
+							
+							isAdded = true;
+						end
+						
 					end
 					
-				end
-				
-				if ~isAdded && any( indexTime )
-					% prolongate all
-					[ notes( indexTime ).stopPlay ] = deal( currentTime );
+					if ~isAdded
+						% prolongate all
+						[ notes( indexTime ).stopPlay ] = deal( currentTime );
+					end
+					
 				end
 				
 			end
@@ -1401,6 +1487,9 @@ tempoEvt = repmat( struct( ...
 			elseif note.isMarker
 				addMarker( note );
 				
+			elseif note.defPitch
+				addPitch( note );
+				
 			elseif note.parallelStart
 				
 				createState();
@@ -1448,6 +1537,7 @@ for numCurrentSheet = 1:nbSheets
 	initDynamics();
 	initMarker();
 	initBarSync();
+	initPitch();
 	
 	addEvent( TRACK_NAME, 0, sheets(numCurrentSheet).name );
 	
@@ -1478,6 +1568,9 @@ for numCurrentSheet = 1:nbSheets
 	
 	% converts channel dynamics to events
 	addChannelDynamicsEvents();
+	
+	% add pitch whell events
+	addPitchEvents()
 	
 	% converts notes to events
 	convertsNotes2Events()
@@ -1613,6 +1706,19 @@ for ii = 1:nbSheets
 			case MARKER
 				marker = ev.arg1; lMarker = length( marker );
 				[ bin(jj).hexa bin(jj).len] = getHexa( ev.time, [255 6 lMarker ], marker+0, ones(1,lMarker) );
+				
+			case RPN_MSB
+				[ bin(jj).hexa bin(jj).len ] = getHexa( ev.time, [ 176+channel 101 ], ev.arg1, 1 );
+			case RPN_LSB
+				[ bin(jj).hexa bin(jj).len ] = getHexa( ev.time, [ 176+channel 100 ], ev.arg1, 1 );
+			case DATAENTRY_MSB
+				[ bin(jj).hexa bin(jj).len ] = getHexa( ev.time, [ 176+channel 6 ], ev.arg1, 1 );
+			case DATAENTRY_LSB
+				[ bin(jj).hexa bin(jj).len ] = getHexa( ev.time, [ 176+channel 38 ], ev.arg1, 1 );
+				
+			case PITCH
+				valueStr = dec2bin( round( ev.arg1 ), 14 ); values = [ bin2dec(['0' valueStr(1:7)]) bin2dec(['0' valueStr(8:14)]) ];
+				[ bin(jj).hexa bin(jj).len ] = getHexa( ev.time, 224+channel, values(2), 1, values(1), 1 );
 				
 			case TRACK_NAME
 				name = ev.arg1; lName = length( name );
