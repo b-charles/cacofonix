@@ -341,5 +341,5 @@ PIANOMG = [ Note('-') ...
 
 % faster end
 cacofonix( 'TheEntertainer', 'Velocity', linspace( 50, 100, 8 ), ...
-	[ PIANOMD|MARK_D2 Note('accel', B*16, 130 ) MARK_D|PIANOMD ] / [ PIANOMG|MARK_D2 MARK_D|PIANOMG ] );
+	[ PIANOMD|MARK_D2 Note('accel', B*16, 130 ) MARK_D|PIANOMD ], [ PIANOMG|MARK_D2 MARK_D|PIANOMG ] );
 
