@@ -111,7 +111,7 @@ classdef Note
 		marker = '';
 		
 		defPitch = false;
-		pitchTransition = 'none'; % 'none' | 'linear' | 'quad'
+		pitchTransition = 'none'; % 'none' | 'linear' | 'quad' | 'quad2'
 		pitchValue = 0;
 		
 	end
@@ -457,27 +457,37 @@ classdef Note
 					value = value + sum( idx )*score;
 				end
 				
-				if ( nargin==2 || nargin==3 ) && ...
-						ischar( varargin{1} ) && ...
-						any( strcmpi( varargin{1}, { 'Pitch', 'Pitch*' } ) ) && ...
-						ischar( varargin{2} )
-
-					[ str, value_ ] = addValue( varargin{2}, 0, '#', 1 );
+				if ( 2<=nargin && nargin<=4 ) && ...
+						ischar( varargin{1} ) && strcmpi( varargin{1}, 'Pitch' ) && ...
+						ischar( varargin{2} )						
+					
+					numarg = 2;
+					
+					transition = 'none';
+					if any( strcmpi( varargin{numarg}, { 'none', 'linear', 'quad', 'quad2' } ) )
+						transition = varargin{numarg};
+						numarg = numarg + 1;
+					end
+					
+					if ( nargin < numarg ) || ~ischar( varargin{numarg} ), return; end
+					
+					[ str, value_ ] = addValue( varargin{numarg}, 0, '#', 1 );
 					[ str, value_ ] = addValue( str, value_, '+', 0.5 );
 					[ str, value_ ] = addValue( str, value_, '0', 0 );
 					[ str, value_ ] = addValue( str, value_, '-', -0.5 );
 					[ str, value_ ] = addValue( str, value_, 'b', -1 );
 					if ~isempty( str ), return; end
 					
+					numarg = numarg + 1;
+					
 					delay_ = 0;
-					if nargin==3
-						[ ok, delay_ ] = getDuration( varargin{3} );
+					if nargin>=numarg
+						[ ok, delay_ ] = getDuration( varargin{numarg} );
 						if ~ok, return; end
 					end
 					
-					trans = { 'quad', 'none' };
 					note.defPitch = true;
-					note.pitchTransition = trans{ strcmpi( varargin{1}, 'Pitch' ) +1 };
+					note.pitchTransition = transition;
 					note.pitchValue = value_;
 					note.delay = delay_;
 					

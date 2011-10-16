@@ -1071,7 +1071,7 @@ sinceLastMarker = [];
 
 %% PITCH
 
-currentPitch = [0 0]'; % [ -time- ; -pitch- ]
+currentPitch = [deltaStartAndEndTrack 0]'; % [ -time- ; -pitch- ]
 
 	function initPitch()
 		currentPitch = [0 0]';
@@ -1105,6 +1105,10 @@ currentPitch = [0 0]'; % [ -time- ; -pitch- ]
 				case 'quad'
 					t = t0:pitchSampling:t1;
 					p = (p1-p0)*((t-t0).^2)/((t1-t0)^2) + p0;
+					
+				case 'quad2'
+					t = t0:pitchSampling:t1;
+					p = (p0-p1)*((t-t1).^2)/((t0-t1)^2) + p1;
 					
 			end
 			
