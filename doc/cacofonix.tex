@@ -168,7 +168,7 @@ sheet = [ ...
 	G:N2 ];
 \end{lstlisting}
 
-\me{Nice. Why each measure is on a line? A whim again?}
+\me{Nice. Why each measure is on a line? Again a whim?}
 \myself{I think it's a good practice to separate each measure on a different line: bigger projects become more readable, specially with the bars and markers functionalities of \note.}
 
 \subsection{Bars}
@@ -327,14 +327,14 @@ To set the number of characters per quater note, you have to use the class funct
 
 \subsection{A little more about the \lstinline!cacofonix! function}
 
-As you know, the \lstinline!cacofonix! function writes the final file. It is possible to give several sheets, generally one sheet by instrument. To do that, you have to precise the wanted instrument before the sheet. Suppose you have two sheets, \lstinline!sheet_violin! and \lstinline!sheet_trumpet!:
+As you know, the \lstinline!cacofonix! function writes the final file. It is possible to give several sheets: to do that, you have to precise the wanted instrument before the sheet. Suppose you have two sheets, \lstinline!sheet_violin! and \lstinline!sheet_trumpet!:
 \begin{lstlisting}
 cacofonix( 'myFile.mid', 'Tempo', 100, ...
 	'Violin', sheet_violin, ...
 	'Trumpet', sheet_trumpet )
 \end{lstlisting}
 
-To know the list of available instruments, type \lstinline!cacofonix -instruments!. You can't play more than 15 sheets (if you reach the limit, may be the polyphonic operator \lstinline!/! can be helpful).
+To know the list of available instruments, type \lstinline!cacofonix -instruments!. You can't play more than 15 instruments, but with possibilities to set several sheets for one instrument.
 
 Some percussions are available too, type \lstinline!cacofonix -percussions! to know the list. However, percussion sheets can't have tonality: instead of using tonality notes (\lstinline!Note('G')!), you have to use the void note: \lstinline!V=Note('void')!. There are no restriction about the number of percussion sheet.
 
@@ -367,66 +367,18 @@ Thank you to have read this document, and for your interest about \cacofonix.
 
 \section{Reference guide}
 
-\subsection{Introduction}
+\subsection{Overview}
 
-In this reference guide, we will see every possibilities to transcribe any sheet the most quickly and faithfully as far as it can be. We suggest to have read the tutorial before start the next sections. This first introductive section will be about important and general key concepts of \cacofonix.
+In this reference guide, we will see every possibilities to transcribe any sheet the most quickly and faithfully as far as it can be. We suggest to have read the tutorial before start the next sections.
+
+The first introductive sections will be about important and general key concepts of \cacofonix. From section \ref{sec:Tonalities}, we will see the \emph{advanced usages of the basic features}. Then, from the section \ref{sec:Transpose}, we will gently study the \emph{insane usages of the weird features}. Finally, we will finish with the API of the \lstinline!cacofonix! function.
 
 \me{I feel it will be \dots BOOOOOOOORING!}
 \myself{Well, your analysis is short and simplistic, but correct. The point is: if you want to play \emph{Three Blind Mice}, you have everything you need in the tutorial. If you want to play the Schubert's \emph{Trout Quintet}, you should read carefully this guide.}
 
-\subsubsection{Instruments, sheets and channels}
-
-For \cacofonix, the transcription of a sheet is realized with an array of \lstinline!Note! objects. In all this document, we call a sheet a coherent array of \lstinline!Note! for \cacofonix.
-
-\cacofonix doesn't allow to modify the instrument in a sheet: \emph{one} sheet is written for \emph{one} instrument. This rule is still true for a drum set: each element of the drum set (bass drum, toms, hi-hat, cymbals\dots) and more generally each percussion have to has it's own sheet, with void notes (see \ref{sec:VoidNote}) instead of tonality notes.
-
-The polyphony feature modify subtly the rule: \emph{one} instrument can have \emph{several} sheets, merged with the \lstinline!mrdivide! (\lstinline!/!) operator. So, the sheets for the first and the second trumpet can be merged and given to \cacofonix with the instrument \lstinline!'Trumpet'!. This kind of manipulation is extremely useful and powerful, but not completely without dangers\footnote{Mainly because of channel dynamics. See the next point and the section \ref{sec:ChannelDynamics}.}.
-
-A channel is a midi concept: each channel has, among other things, an instrument timbre, a volume and a list of events (start/end to play that note). It's a kind of out of one instrument, but all percussions are regrouped in one channel. \cacofonix links each instrument/sheet couple to a channel -- but, of course, percussions, which are merged in the correct channel. Midi specification allows only $16$ channel: $15$ for regular instruments and one for percussions. \cacofonix doesn't merged automatically sheets with the same instrument: if you want to reduced the number of instrument/sheet couples to fit $15$ channels, you have to merged sheets manually with the \lstinline!/! operator.
-
-\subsubsection{The scope}
-\label{sec:scope}
-
-For each features of \cacofonix, there is four possible scopes: note, monophonic, channel or global.
-\begin{itemize}
-	\item A feature with a note scope will modify only one note (or sometimes, an array of notes), and the next notes are not influenced.
-	\item A feature with a monophonic scope is \dots a little more complicated. This kind of features modify the next notes of the monophonic part\footnote{It's a sad misuse of language: a polyphonic section is said composed of \emph{monophonic} parts, even if a monophonic part can contains polyphonic sections itself.}. If the feature is placed in a monophonic section, the other monophonic parts (which are played in parallel) are not modified, influenced or perturbed, in any way. If, in the monophonic part and after the modification, a new polyphonic section starts, the feature will be apply in every new monophonic parts. Last point: after the polyphonic section, the last modification of the last written monophonic part will be active. This is a good example (see section \ref{sec:PlainDynamics} for explications about dynamics):
-\begin{lstlisting}
-NoteInit
-sheet = [ C:N bar ...      % default dynamic: mf
-	DynF D:N bar ...       % new dynamic: f
-	[ ...                  % start a monophonic section
-		E:N bar ...        % current dynamic: f
-		DynMP F:N bar ...  % new dynamic: mp
-		G:N bar ... 
-		A:N bar ...
-	] ...                  % end of the monophonic section
-	/ ...                  % polyphonic operator
-	[ ...                  % new monophonic section
-		+E:N bar ...       % current dynamic: f
-		+F:N bar ...       % current dynamic: f (not modified)
-		DynPP +G:N bar ... % new dynamic: pp
-		+A:N bar ...
-	] ...                  % end of the polyphonic section
-	+C:N bar ...           % current dynamic: pp
-	];
-\end{lstlisting}
-	\item A feature with a channel scope modify \dots the channel, and so all played monophonic sections of the sheet at the same time. Be careful: remember that percussions share the same channel!
-	\item Finally, a feature with a global scope modify all sheets given to the \lstinline!cacofonix! function. For more readability, this features can be grouped in a main sheet, see the section \ref{sec:MainSheet}.
-\end{itemize}
-
-\me{I not sure to understand\dots}
-\myself{A feature with a note scope modify a note. When it's a monophonic scope, that modify the monophonic section. A channel scope modify the channel, and a global feature modify all sheets. It's almost logical.}
-\me{Yes, but the monophonic scope seems tricky.}
-\myself{Don't be stressed out. There are more difficult to understand latter.}
-
-\subsubsection{Overview of the reference guide}
-
-After this explanations, the next sections of this guide should can be read in any order. 
-
 To search of a particular point, three tables can help: all features concerning a special use of the \lstinline!Note! constructor are in table \ref{tab:NoteAPI}, member functions and operators are listed in the table \ref{tab:NoteFunctions} and the \lstinline!cacofonix! function API is on the table \ref{tab:CacofonixAPI}.
 
-\begin{table}[p]
+\begin{table}
 	\centering
 	\begin{tabular}{llcl}
 		Contructor syntax & Description & Scope & Section \\
@@ -446,13 +398,14 @@ To search of a particular point, three tables can help: all features concerning 
 		\lstinline!Note( 'sustain', 'on'|'off' )! & sustain & C & \ref{sec:Sustain} \\
 		\lstinline!Note( 'marker', mark )! & marker & G & \ref{sec:Markers} \\
 		\lstinline!Note( 'marker*', mark )! & go to & M & \ref{sec:Goto} \\
+		\lstinline!Note( 'pitch', [ t ], val, [ d ] )! & pitch wheel & C & \ref{sec:Pitch} \\
 		\lstinline!Note( 'void' )! & void note & N & \ref{sec:VoidNote} \\
 	\end{tabular}
 	\caption[\lstinline!Note! constructor API]{\lstinline!Note! constructor API. Scope column: N means note, M means monophonic, C means channel and G means global.}
 	\label{tab:NoteAPI}
 \end{table}
 
-\begin{table}[p]
+\begin{table}
 	\centering
 	\begin{tabular}{lllcl}
 		Member function & Operator & Description & Scope & Section \\
@@ -474,20 +427,77 @@ To search of a particular point, three tables can help: all features concerning 
 	\label{tab:NoteFunctions}
 \end{table}
 
-\begin{table}[p]
+\begin{table}
 	\centering
 	\begin{tabular}{llcl}
 		\lstinline!cacofonix! function syntax & Description & Scope & Section \\
 		\hline
 		\lstinline!cacofonix( file, ... )! & output file & & \ref{sec:CacofonixFunction} \\
-		\lstinline!cacofonix( ..., instrument, sheet, ... )! & add a sheet & C & \ref{sec:CacofonixFunction} \\
+		\lstinline!cacofonix( ..., instrument, sheet, ... )! & add sheets & C & \ref{sec:CacofonixFunction} \\
 		\lstinline!cacofonix( ..., mainSheet, ... )! & main sheet & G & \ref{sec:MainSheet} \\
 		\lstinline!cacofonix( ..., 'Tempo', tempo, ... )! & default tempo & G & \ref{sec:Tempo} \\
 		\lstinline!cacofonix( ..., 'Velocity', velocity, ... )! & velocity & G & \ref{sec:Velocity} \\
+		\lstinline!cacofonix( ..., 'DrumKit', drumkit, ... )! & drum kit & G & \ref{sec:CacofonixFunction} \\
 	\end{tabular}
 	\caption[\lstinline!cacofonix! function API]{\lstinline!cacofonix! function API. Scope column: N means note, M means monophonic, C means channel and G means global.}
 	\label{tab:CacofonixAPI}
 \end{table}
+
+\subsection{Sheets, instruments, tracks and channels}
+
+For \cacofonix, the transcription of a sheet is realized with an array of \lstinline!Note! objects. In all this document, we call a sheet a coherent array of \lstinline!Note! for \cacofonix.
+
+In the midi files, a track is a list of events: play that note, play stronger, use the pitch wheel\dots In fact, a track is the midi side of a sheet: \cacofonix writes each sheet in a track, and a track contains only one sheet. The number of tracks is not limited.
+
+A channel is another midi concept: each channel has, among other things, an instrument timbre, a volume and is controlled by one or several tracks. It's a kind of out of one instrument, but all percussions are regrouped in one (and only one) channel. Midi specification allows only $16$ channel: $15$ for regular instruments and one for percussions.
+
+Last rule of the game: \cacofonix doesn't allow to modify the instrument in a sheet.
+
+\paragraph{}
+
+Now.
+
+\paragraph{}
+
+\emph{One} sheet is written for \emph{one} instrument. It's still true for a drum set: each element of the drum set (bass drum, toms, hi-hat, cymbals\dots) and more generally each percussion have to has it's own sheet, with void notes (see \ref{sec:VoidNote}) instead of tonality notes.
+
+The reciprocal is not true: \emph{one} instrument can have \emph{several} sheets. Either each sheet has its own track, or sheets are merged in the same track with the \lstinline!mrdivide! operator (\lstinline!/!). The two solutions produce exactly the same audible result. The section \ref{sec:CacofonixFunction} describes how create a channel and link it with tracks (in other words: how associate an instrument with sheets).
+
+\subsection{The scope}
+\label{sec:scope}
+
+For each features of \cacofonix, there is four possible scopes: note, monophonic, channel or global.
+\begin{itemize}
+	\item A feature with a note scope will modify only one note (or sometimes, an array of notes), and the next notes are not influenced.
+	\item A feature with a monophonic scope is a little more complicated. This kind of features modify the next notes of the monophonic part\footnote{It's a sad misuse of language: a polyphonic section is said composed of \emph{monophonic} parts, even if a monophonic part can contains polyphonic sections itself.}. If the feature is placed in a monophonic section, the other monophonic parts (which are played in parallel) are not modified, influenced or perturbed, in any way. If, in the monophonic part and after the modification, a new polyphonic section starts, the feature will be apply in every new monophonic parts. Last point: after the polyphonic section, the last modification of the last written monophonic part will be active. This is a good example (see section \ref{sec:PlainDynamics} for explications about dynamics):
+\begin{lstlisting}
+NoteInit
+sheet = [ C:N bar ...      % default dynamic: mf
+	DynF D:N bar ...       % new dynamic: f
+	[ ...                  % start a monophonic section
+		E:N bar ...        % current dynamic: f
+		DynMP F:N bar ...  % new dynamic: mp
+		G:N bar ... 
+		A:N bar ...
+	] ...                  % end of the monophonic section
+	/ ...                  % polyphonic operator
+	[ ...                  % new monophonic section
+		+E:N bar ...       % current dynamic: f
+		+F:N bar ...       % current dynamic: f (not modified)
+		DynPP +G:N bar ... % new dynamic: pp
+		+A:N bar ...
+	] ...                  % end of the polyphonic section
+	+C:N bar ...           % current dynamic: pp
+	];
+\end{lstlisting}
+	\item A feature with a channel scope modify \dots the channel, and so all played sheets of the modified instrument at the same time. Be careful: remember that percussions share the same channel!
+	\item Finally, a feature with a global scope modify all sheets given to the \lstinline!cacofonix! function. For more readability, this features can be grouped in a main sheet, see the section \ref{sec:MainSheet}.
+\end{itemize}
+
+\me{I not sure to understand\dots}
+\myself{A feature with a note scope modify a note. When it's a monophonic scope, that modify the monophonic section. A channel scope modify the channel, and a global feature modify all sheets. It's almost logical.}
+\me{Yes, but the monophonic scope seems tricky.}
+\myself{Don't be stressed out. There are more difficult to understand latter.}
 
 \subsection{Tonalities}
 \label{sec:Tonalities}
@@ -499,7 +509,7 @@ In \noteInitFile and \noteInitFrFile files, only notes with none or one accident
 \subsection{Duration}
 \label{sec:Duration}
 
-To create a duration \lstinline!Note! object, you have to call the constructor with a double, which will be the duration of the note, in number of beats: \lstinline!Note(4)! for a whole note, \lstinline!Note(1)! for a quarter note. Per default, a duration note which has not been associated with a tonality note is the rest.
+To create a duration \lstinline!Note! object, you have to call the constructor with a double, which will be the duration of the note, in number of beats: \lstinline!Note(4)! for a whole note, \lstinline!Note(1)! for a quarter note. Per default, a duration note which has not been associated with a tonality note is a rest.
 
 \noteInitFile and \noteInitFrFile define some useful duration: the whole note to the sixteenth note and the triplet quarter note.
 
@@ -514,8 +524,8 @@ In the tutorial, the binary \lstinline!plus! operator (\lstinline!+!) is used to
 
 The final note is tied, detached or arpeggiated if in the two arrays, at least on note is tied, detached or arpeggiated. See the section \ref{sec:TiesAndSlurs} for more informations about ties and detached notes and the section \ref{sec:SetDuration} for arpeggios.
 
-\me{Arpeggios? Arpeggi?}
-\myself{\wikipedia gives both\footurl{http://en.wikipedia.org/wiki/Arpeggio}, \wiktionary gives only arpeggios\footurl{http://en.wiktionary.org/wiki/arpeggio}. \google finds 3 820 000 results for argeggios and only 634 000 for arpeggi. The \textsc{Oxford Dictionaries} and The \textsc{Cambridge Dictionaries Online} suggest only arpeggios\footurl{http://oxforddictionaries.com/definition/arpeggio}\footurl{http://dictionary.cambridge.org/dictionary/british/arpeggio}. Arpeggios win.}
+% \me{Arpeggios? Arpeggi?}
+% \myself{\wikipedia gives both\footurl{http://en.wikipedia.org/wiki/Arpeggio}, \wiktionary gives only arpeggios\footurl{http://en.wiktionary.org/wiki/arpeggio}. \google finds 3 820 000 results for argeggios and only 634 000 for arpeggi. The \textsc{Oxford Dictionaries} and The \textsc{Cambridge Dictionaries Online} suggest only arpeggios\footurl{http://oxforddictionaries.com/definition/arpeggio}\footurl{http://dictionary.cambridge.org/dictionary/british/arpeggio}. Arpeggios win.}
 
 \subsection{Octave}
 \label{sec:Octave}
@@ -773,7 +783,7 @@ where \lstinline!velocities! is an array of $8$ values which gives the velocity 
 \subsubsection{Channel dynamics}
 \label{sec:ChannelDynamics}
 
-When you create a \lstinline!Note! object with \lstinline!'dynamics'!, \lstinline!'crescendo'!, \lstinline!'cresc'!, \lstinline!'decrescendo'! or \lstinline!'decresc'!, you specify only the attacks of next notes. But there is an other way to modify the dynamics: when you add \lstinline!*! at the end of these keywords (\eg \lstinline!'cresc*'!), you modify the volume of the instrument (or the volume of the \emph{channel}). It's pretty convenient for modify the dynamic of notes after the attack, but never forget that, in polyphonic sections, all monophonic sections will be influenced, and it's only modify the volume, whereas a plain dynamic (without \lstinline!*!) is more realistic and can modify the volume and the timbre of the instrument.
+When you create a \lstinline!Note! object with \lstinline!'dynamics'!, \lstinline!'crescendo'!, \lstinline!'cresc'!, \lstinline!'decrescendo'! or \lstinline!'decresc'!, you specify only the attacks of next notes. But there is an other way to modify the dynamics: when you add \lstinline!*! at the end of these keywords (\eg \lstinline!'cresc*'!), you modify the volume of the instrument (or the volume of the \emph{channel}). It's pretty convenient for modify the dynamic of notes after the attack, but never forget that, in polyphonic sections, all monophonic sections will be influenced, as the other sheets associate to the same instrument, and it's only modify the volume, whereas a plain dynamic (without \lstinline!*!) is more realistic and can modify the volume and the timbre of the instrument.
 
 Plain dynamics and channel dynamics are independent: even if the current plain dynamic is set, the current channel dynamic is not modify. Also, you can boost a plain dynamic with a channel dynamic, but the experience shown that mix the two kinds of dynamics is quickly messy and it's often a bad idea.
 
@@ -861,7 +871,7 @@ cacofonix( 'CelloSuite_Prelude', 'Cello', sheet );
 \subsection{Polyphony \lstinline!/!}
 \label{sec:Polyphony}
 
-Polyphonic sections are really useful, in particular in two cases: you can't play more than 15 sheets (midi 1.0 specifications allowed only 16 channels, with one channel for percussions), so when you have several sheets with the same instrument, you can merge theses sheets and get an unique sheets by instrument. Or, more often, your instrument has the possibility to play several notes independantly, like a piano with the right and left hands.
+Polyphonic sections are really useful, in particular in the case where your instrument has the possibility to play several notes independently, like a piano with the right and left hands.
 
 Polyphonic sections are easy to use: just merge two sheets with the \lstinline!mrdivide! (\lstinline!/!) operator. The two sheets are called \emph{monophonic sections}, even if they contain smaller polyphonic sections. You can merge more than two sheets: to play \lstinline!sheet1!, \lstinline!sheet2!, \lstinline!sheet3!\dots at in the same time, just apply the operator to add each sheet: \lstinline!sheet1 / sheet2 / sheet3 /...! Only one rule: every sheet has to have the same total duration.
 
@@ -1016,7 +1026,7 @@ A goto marker is first a marker: it can be use for an extraction (see the next s
 \subsubsection{Extraction \lstinline!|!}
 \label{sec:Extraction}
 
-Sometimes, it can be useful to extract a piece of a sheet which has been already transcode (\eg to play something twice, or to add a coda\dots). This operation can be very complicated with polyphonic sections, so the operator \lstinline!or! (\lstinline!|!) realize neatly this function.
+Sometimes, it can be useful to extract a piece of a sheet which has been already transcode (\eg to play something twice, or to add a coda\dots). This operation can be very complicated with polyphonic sections, so the operator \lstinline!or! (\lstinline!|!) realizes neatly this function.
 
 To extract a sheet from the start to a marker labelled \emph{myMarker}, just execute this code:
 \begin{lstlisting}
@@ -1069,10 +1079,13 @@ So, this is how to extract a piece from a marker to an other:
 \me{And if it doesn't?}
 \myself{Sometimes, you are a really annoying person.}
 
+\subsection{Pitch}
+\label{sec:Pitch}
+
 \subsection{Display}
 \label{sec:Display}
 
-The \lstinline!display! function has been overloaded: it can be used to display a sheet
+The \lstinline!display! function has been overloaded: it can be used to display a sheet or a vector of \lstinline!Note! without duration.
 
 \subsection{Transpose \lstinline!\^!}
 \label{sec:Transpose}
@@ -1190,5 +1203,6 @@ $| B3b  | Cbb  | Dbb  | E3b  | Fbb  | Gbb  | Abb  $
 \label{sec:MainSheet}
 
 \subsubsection{Percussions}
+\label{sec:Percussions}
 
 \end{document}

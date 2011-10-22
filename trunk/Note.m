@@ -5,7 +5,7 @@
 %	Rest:		Note( 'rest' )
 %	Void:		Note( 'void' )
 %	Duration:	Note( duration )
-%	Octave:		Note( '+2' ), Note( '--' ), Note( '+0' )
+%	Octave:		Note( '+2' ), Note( '--' ), Note( '' )
 %	Meter:		Note( [3 4] )
 %	Bar:		Note( 'bar' )
 %	Dynamics:	Note( 'dynamics', 'mf' )
@@ -16,6 +16,7 @@
 %	Fermata:	Note( 'fermata', B, R )
 %	Marker:		Note( 'marker', mark )
 %	Go to:		Note( 'marker*', mark )
+%	Pitch:		Note( 'pitch', 'bb' ) Note( 'pitch', '+' )
 %
 %	See also: cacofonix.
 %
@@ -458,7 +459,7 @@ classdef Note
 				end
 				
 				if ( 2<=nargin && nargin<=4 ) && ...
-						ischar( varargin{1} ) && strcmpi( varargin{1}, 'Pitch' ) && ...
+						ischar( varargin{1} ) && strcmpi( varargin{1}, 'pitch' ) && ...
 						ischar( varargin{2} )						
 					
 					numarg = 2;
