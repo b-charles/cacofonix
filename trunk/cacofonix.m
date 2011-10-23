@@ -42,7 +42,8 @@ crescendoSampling = 0.25;
 
 tempoSample = 10;
 
-pitchSampling = 0.1;
+pitchSampling = 0.05;
+nbMinSampling = 20;
 
 deltaTimeTicks = prod( [ 2 2 2 2 2 3 3 5 ] );
 
@@ -1079,12 +1080,19 @@ currentPitch = [deltaStartAndEndTrack 0]'; % [ -time- ; -pitch- ]
 
 	function addPitch( note )
 		
-		t0 = min( currentTime, currentPitch(1,end) );
-		p0 = interp1( [ currentPitch(1,:) Inf ], [ currentPitch(2,:) 0 ], t0 );
+		t0 = currentPitch(1,end); %max( currentTime, currentPitch(1,end) );
+		p0 = currentPitch(2,end); %interp1( [ currentPitch(1,:) Inf ], [ currentPitch(2,:) 0 ], t0 );
 		t1 = currentTime + note.delay;
 		p1 = note.pitchValue;
 		
 		currentPitch( :, currentPitch(1,:) >= t0 ) = [];
+		
+		function t = getTimes()
+			t = unique( [ t0:pitchSampling:t1 t1 ] );
+			if length( t ) < nbMinSampling
+				t = linspace( t0, t1, nbMinSampling );
+			end
+		end
 		
 		if t0 == t1
 			t = t1;
@@ -1099,15 +1107,15 @@ currentPitch = [deltaStartAndEndTrack 0]'; % [ -time- ; -pitch- ]
 					p = [ p0 p1 ];
 					
 				case 'linear'
-					t = t0:pitchSampling:t1;
+					t = getTimes();
 					p = (p1-p0)*(t-t0)/(t1-t0) + p0;
 					
 				case 'quad'
-					t = t0:pitchSampling:t1;
+					t = getTimes();
 					p = (p1-p0)*((t-t0).^2)/((t1-t0)^2) + p0;
 					
 				case 'quad2'
-					t = t0:pitchSampling:t1;
+					t = getTimes();
 					p = (p0-p1)*((t-t1).^2)/((t0-t1)^2) + p1;
 					
 			end
