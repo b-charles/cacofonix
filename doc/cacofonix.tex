@@ -79,7 +79,7 @@ real pitchTransQuad( real t ) { return (p1-p0)*((t-t0)^2)/((t1-t0)^2) + p0; }
 real pitchTransQuad2( real t ) { return (p0-p1)*((t-t1)^2)/((t0-t1)^2) + p1; }
 
 void displayPitchTransition( real transi(real) ){
-	size(3cm,3cm,false);
+	size(5cm,3cm,false);
 	draw( graph( transi, t0, t1 ) );
 	draw( (tstart,p0)--(t0,p0)^^(t1,p1)--(tend,p1), gray+dashed );
 	xaxis( "time" );
@@ -407,7 +407,7 @@ Thank you to have read this document, and for your interest about \cacofonix.
 
 In this reference guide, we will see every possibilities to transcribe any sheet the most quickly and faithfully as far as it can be. We suggest to have read the tutorial before start the next sections.
 
-The first introductive sections will be about important and general key concepts of \cacofonix. From section \ref{sec:Tonalities}, we will see the \emph{advanced usages of the basic features}. Then, from the section \ref{sec:Transpose}, we will gently study the \emph{insane usages of the weird features}. Finally, we will finish with the API of the \lstinline!cacofonix! function.
+The first introductive sections will be about important and general key concepts of \cacofonix. From section \ref{sec:Tonalities}, we will see the \emph{advanced usages of the basic features}. Then, from the section \ref{sec:Transpose}, we will gently study the \emph{insane usages of the super weird features}. Finally, we will finish with the API of the \lstinline!cacofonix! function.
 
 \me{I feel it will be \dots BOOOOOOOORING!}
 \myself{Well, your analysis is short and simplistic, but correct. The point is: if you want to play \emph{Three Blind Mice}, you have everything you need in the tutorial. If you want to play the Schubert's \emph{Trout Quintet}, you should read carefully this guide.}
@@ -603,7 +603,7 @@ sheet = +[ C:N bar E:N bar G:N bar ];
 
 Sometimes, a sheet or a section of a sheet is naturally high or low pitched. So, instead of add \lstinline!+! or \lstinline!-! behind each note
 \myself{\dots or use it on an array like a tramp \dots} \\
-\dots you can add a special note which means the default octave. To create a note which raises of $n$ octaves, you have call the constructor \lstinline!Note! with a string \lstinline!'+n'! (\eg, \lstinline!Note('+2')! to raise of two octaves). Use a string \lstinline!'-n'! to lower of $n$ octaves. To restore the default octave, you can use \lstinline!Note('+0')! or \lstinline!Note('-0')!. \\
+\dots you can add a special note which means the default octave. To create a note which raises of $n$ octaves, you have to call the constructor \lstinline!Note! with a string \lstinline!'+n'! (\eg, \lstinline!Note('+2')! to raise of two octaves). Use a string \lstinline!'-n'! to lower of $n$ octaves. To restore the default octave, you can use \lstinline!Note('+0')! or \lstinline!Note('-0')!. \\
 \begin{lilypond}
 \relative c' { \new Staff { \time 4/4 g4 a d f, g a d f, g'' f a g g, f a g } }
 \end{lilypond}
@@ -1154,7 +1154,7 @@ So, this is how to extract a piece from a marker to an other:
 
 \begin{lilypond}
 \new Staff { \tempo 4=80 \clef treble \key bes \major \time 4/4 \relative c {
-f4\fermata\startTrillSpan\mf( f2) f4\stopTrillSpan \glissando
+f2\fermata\startTrillSpan\mf( f4) f4\stopTrillSpan \glissando
 bes''2-> \appoggiatura { aes16[ bes] } \times 2/3 { aes8-. ges-. aes-. } \times 2/3 { ges-. aes-. ges-. }
 f8-- ees-- d-- des--( des) ees-- e-- f--(
 f)\< d bes32( c bes a) aes8->( aes)\> ges f f->\!(
@@ -1165,20 +1165,21 @@ f1) } }
 NoteInit
 N32 = Note(1/8);
 
-tremolo = []; delay = R; val = { '#', 'b' };
-for t = 1:24
+delay = N8; val = { 'b', '#' };
+tremolo = Note( 'pitch', val{1}, delay);
+for t = 1:20
 	delay = delay+N32;
 	tremolo = [ tremolo ...
 		Note( 'pitch', 'quad', val{1+mod(t,2)}, delay) ];
 end
 
-pitch = @(varargin) Note('Pitch',varargin{:});
+pitch = @(varargin) Note('pitch',varargin{:});
 
 sheet = [ ...
-	Note('fermata', N4, N4') tremolo -F:N2' pitch('0') ...
+	Note('fermata', N2, N2') tremolo -F:N2' pitch('0') ...
 		-F:N4 pitch('quad',repmat('#',1,29)) pitch('0') bar ...
 	+Bf:'>':N2 ~[ +Af:Note(1/12) +Bf:Note(1/12) +Af:'.':Note(1/6) ] ...
-		+Gf:N12 +Af:N12 +Gf:N12 +Af:N12 +Gf:N12 bar ...
+		+Gf:'.':N12 +Af:'.':N12 +Gf:'.':N12 +Af:'.':N12 +Gf:'.':N12 bar ...
 	+F:'-':N8 +Ef:'-':N8 +D:'-':N8 +Df:'-':N4 ...
 		+Ef:'-':N8 +E:'-':N8 +F:'-':N8 bar ...
 	Note('cresc',B,'f') ~+F:N8 +D:N8 ~[Bf:N32 +C:N32 Bf:N32 A:N32] ...
