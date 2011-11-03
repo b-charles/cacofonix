@@ -5,10 +5,11 @@
 
 rm -rf out
 
-lilypond-book --format=latex --output=out --lily-output-dir=out -V cacofonix.tex || pause
+lilypond-book --format=latex --output=out --lily-output-dir=out cacofonix.tex || pause
 
 cd out
 latex cacofonix.tex
+asy cacofonix-*.asy || pause
 latex cacofonix.tex
 latex cacofonix.tex || pause
 
