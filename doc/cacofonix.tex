@@ -359,7 +359,7 @@ $8///////////////////////////////////////////////$
 $|-----------------------G-----------------------$
 \end{lstlisting}
 
-New lines are set according to bars, and a lot of stuff can be displayed: chords, polyphonic sheet, meters, markers, dynamics, tempo\dots Only note's octave is never displayed.
+New lines are set according to bars, and a lot of stuff can be displayed: chords, polyphonic sheet, meters, markers, dynamics, tempo\dots Only note's octave and pitch (see \ref{sec:Pitch}) are never displayed.
 
 To set the number of characters per quater note, you have to use the class function \lstinline!setNbCharByQuater! (\eg: \lstinline!Note.setNbCharByQuater(48)! --- the default value is 24).
 
@@ -1229,32 +1229,109 @@ cacofonix( 'RhapsodyInBlue', ...
 \subsection{Display}
 \label{sec:Display}
 
-The \lstinline!display! function has been overloaded: it can be used to display a sheet or a vector of \note without duration.
+The function \lstinline!display! has been overloaded: it can be used to display a sheet or a vector of \note without duration. To do that, just don't add a \lstinline!;! at the end of the \matlab command: \\
+\begin{lilypond}
+\new Staff { \tempo 4=52 \clef treble \key aes \major \time 2/4 \relative c'' {
+c8.\p\(^\markup{ A } ees16 ees4 c8. bes16 aes4\)
+bes8.\( c16 ees8. c16 bes2\)
+c8.\(^\markup{ B } ees16 ees4 c8. bes16 aes4\)
+bes8\( c bes8. aes16 aes2\) } }
+\end{lilypond}
 
-\subsection{Transpose \lstinline!\^!}
-\label{sec:Transpose}
-
-To talk about transposition, we need to look briefly the display of a sheet:
 \begin{lstlisting}
 >> NoteInit
->> Note.setNbCharByQuater( 6 )
+>> markA = Note( 'Marker', 'A' );
+>> markB = Note( 'Marker', 'B' );
+>> Note.setNbCharByQuater( 16 );
+>> sheet = [ Note('+') DynP ...
+	markA ~[ C:N8' Ef:N16 Ef:'|':N4 bar ...
+	C:N8' -Bf:N16 -Af:N4 ] bar ...
+	~[ -Bf:N8' C:N16 Ef:N8' C:N16 bar ...
+	-Bf:N2 ] bar ...
+	markB ~[ C:N8' Ef:N16 Ef:'|':N4 bar ...
+	C:N8' -Bf:N16 -Af:N4 ] bar ...
+	~[ -Bf:N8 C:N8 -Bf:N8' -Af:N16 bar ...
+	-Af:'|':N2 ] bar ]
+$A (1)///////////////////////////$
+$|-----C-----~Eb-|------Eb-------$
+$1 (2)///////////////////////////$
+$~-----C-----~Bb-~------Ab-------$
+$2 (3)///////////////////////////$
+$|----Bb-----~-C-~----Eb-----~-C-$
+$3 (4)///////////////////////////$
+$~--------------Bb---------------$
+$B (5)///////////////////////////$
+$|-----C-----~Eb-|------Eb-------$
+$1 (6)///////////////////////////$
+$~-----C-----~Bb-~------Ab-------$
+$2 (7)///////////////////////////$
+$|--Bb---~---C---~----Bb-----~Ab-$
+$3 (8)///////////////////////////$
+$|--------------Ab---------------$
+>> cacofonix( 'NewWorldSymphony_Largo', ...
+	'Tempo', 52, ...
+	'English Horn', sheet );
+\end{lstlisting}
+
+The output is pretty intuitive: the display show the name of the notes which are contained in the sheet, with a \lstinline!b! for a flat and a \lstinline!#! for a sharp. The display can show every features of \cacofonix: meters, dynamics, tempo, polyphony\dots The measures are numbered for the last marker and from the start of the sheet (in brackets). Only the octave and the pitch are not displayed. The class function \lstinline!setNbCharByQuater! defines the number of characters per quarter notes.
+
+When the array has no duration, each notes contained in the array take the place of a quarter note:
+\begin{lstlisting}
+>> NoteInit
+>> Note.setNbCharByQuater( 6 );
 >> sheet = [ C D Ef Gs ]
 $|  C  |  D  | Eb  | G#  $
 \end{lstlisting}
-So, OK: the display shows the name of the notes which are contained in an array, with a \lstinline!b! for a flat and \lstinline!#! for a sharp. What about chord?
+
+For chord, the note's names are simply concatenated:
 \begin{lstlisting}
 >> sheet = [ C+D Ef+Gs ]
 $| CD  |EbG# $
 \end{lstlisting}
-For chord, the names are simply concatenated. More precisions are in the section \ref{sec:Display} but for transpositions, it will be enough.
 
-Let's go.
+\begin{myselfenv}%
+The display is convenient, but it's not as powerful as the \lstinline!cacofonix! function: no error are thrown when, for example, a bar is misplaced. Only something weird appears.%
+\end{myselfenv}
+\begin{meenv}
+And sometimes, something weird appears even if the sheet is correctly build! If the number of characters per quarter is not chosen cleverly, you can have some approximation problems:
+\begin{lstlisting}
+>> Note.setNbCharByQuater( 18 );
+>> sheet = [ Note('+') ...
+	~[ C:N8' Ef:N16 Ef:'|':N4 bar ...
+	C:N8' -Bf:N16 -Af:N4 ] bar ...
+	~[ -Bf:N8' C:N16 Ef:N8' C:N16 bar ...
+	-Bf:N2 ] bar ...
+	~[ C:N8' Ef:N16 Ef:'|':N4 bar ...
+	C:N8' -Bf:N16 -Af:N4 ] bar ...
+	~[ -Bf:N8 C:N8 -Bf:N8' -Af:N16 bar ...
+	-Af:'|':N2 ] bar ]
+$1////////////////////////////////////$
+$|------C------~-Eb-|-------Eb--------$
+$2////////////////////////////////////$
+$~------C------~-Bb-~-------Ab--------$
+$3/////////////////////////////////////$
+$|-----Bb------~-C--~-----Eb------~-C--$
+$4///////////////////////////////////$
+$~----------------Bb-----------------$
+$5////////////////////////////////////$
+$|------C------~-Eb-|-------Eb--------$
+$6////////////////////////////////////$
+$~------C------~-Bb-~-------Ab--------$
+$7////////////////////////////////////$
+$|---Bb---~---C----~-----Bb------~-Ab-$
+$8///////////////////////////////////$
+$|----------------Ab-----------------$
+\end{lstlisting}
+\end{meenv}
 
-\paragraph{}
+\subsection{Transpose \lstinline!\^!}
+\label{sec:Transpose}
 
 We can transpose a \note or a sheet with the operator \lstinline!mpower! (\lstinline!^!). Two way are possible. The first is use \lstinline!^! with the number of half steps to transpose.
 For example, we have the scale of B flat major:
 \begin{lstlisting}
+>> NoteInit
+>> Note.setNbCharByQuater( 6 )
 >> scale = [ -Bf C D Ef F G A ]
 $|  Bb  |  C   |  D   |  Eb  |  F   |  G   |  A   $
 \end{lstlisting}

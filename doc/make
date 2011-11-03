@@ -8,10 +8,10 @@ rm -rf out
 lilypond-book --format=latex --output=out --lily-output-dir=out cacofonix.tex || pause
 
 cd out
-latex cacofonix.tex
+latex -interaction=batchmode cacofonix.tex
 asy cacofonix-*.asy || pause
-latex cacofonix.tex
-latex cacofonix.tex || pause
+latex -interaction=batchmode cacofonix.tex
+latex -interaction=batchmode cacofonix.tex || pause
 
 dvips cacofonix.dvi
 cp cacofonix.ps ../
