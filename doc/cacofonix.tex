@@ -48,6 +48,10 @@
 
 \newcommand\sfz{s$\!f\!$z\xspace}
 
+% ALGORITHM
+\newenvironment{algo}[1]{\par \noindent \textbf{#1}}{}
+\newcommand{\step}[2]{\par \noindent \textbf{#1} #2}
+
 % ME AND MYSELF
 \definecolor{mecolor}{rgb}{1,0.25,0.25}
 \definecolor{myselfcolor}{rgb}{0.25,0.25,1}
@@ -359,7 +363,7 @@ $8///////////////////////////////////////////////$
 $|-----------------------G-----------------------$
 \end{lstlisting}
 
-New lines are set according to bars, and a lot of stuff can be displayed: chords, polyphonic sheet, meters, markers, dynamics, tempo\dots Only note's octave and pitch (see \ref{sec:Pitch}) are never displayed.
+New lines are set according to bars, and a lot of stuff can be displayed: chords, polyphonic sheet, meters, markers, dynamics, tempo\dots Only note's octave and pitch\footnote{See the \section \ref{sec:Pitch}, but not now\dots} are never displayed.
 
 To set the number of characters per quater note, you have to use the class function \lstinline!setNbCharByQuater! (\eg: \lstinline!Note.setNbCharByQuater(48)! --- the default value is 24).
 
@@ -409,7 +413,7 @@ Thank you to have read this document, and for your interest about \cacofonix.
 
 In this reference guide, we will see every possibilities to transcribe any sheet the most quickly and faithfully as far as it can be. We suggest to have read the tutorial before start the next sections.
 
-The first introductive sections will be about important and general key concepts of \cacofonix. From section \ref{sec:Tonalities}, we will see the \emph{advanced usages of the basic features}. Then, from the section \ref{sec:Transpose}, we will gently study the \emph{insane usages of the super weird features}. Finally, we will finish with the API\footnote{\emph{Application Programming Interface}, of course\dots} of the \lstinline!cacofonix! function.
+The first introductive sections will be about important and general key concepts of \cacofonix. From section \ref{sec:Tonalities}, we will see the \emph{advanced usages of the basic features}. Then, from the section \ref{sec:Transpose}, we will gently study the \emph{insane usages of the super weird features}. Finally, we will finish with the API\footnote{\emph{Application Programming Interface}} of the \lstinline!cacofonix! function.
 
 \me{I feel it will be \dots BOOOOOOOORING!}
 \myself{Well, your analysis is short and simplistic, but correct. The point is: if you want to play \emph{Three Blind Mice}, you have everything you need in the tutorial. If you want to play the Schubert's \emph{Trout Quintet}, you should read carefully this guide.}
@@ -1378,6 +1382,30 @@ $| B3b  | Cbb  | Dbb  | E3b  | Fbb  | Gbb  | Abb  $
 
 \subsection{Repeat / Riff \lstinline!.*!}
 \label{sec:RepeatRiff}
+
+The operator \lstinline!.*! was the first attempt to apply tonalities to a rhythmic (riff). The goal wasn't completely achieved and void notes have been imagined to answer to the problem with more flexibility. But the operator have shown that it is very useful.
+
+The first usage of this operator is repeat a sheet: when you use it on a sheet and on a number, you create a new sheet repeating the original. The number can be on the left or on the right of the operator:
+\begin{lstlisting}
+>> [ C D E ].*4
+\end{lstlisting}
+
+When you use \lstinline!.*! on two sheets, the algorithm is a little more complicated. Says we have two sheets:
+\begin{lstlisting}
+>> A = [ a1 a2 a3 ... an ];
+>> B = [ b1 b2 b3 ... bm ];
+\end{lstlisting}
+The new sheet, \lstinline!C = A.*B!:
+\begin{algo}{Operator \lstinline!.*!}
+	\step{1. Initialize:}{Set \lstinline!i = 1! and \lstinline!j = 1!. Initialize \lstinline!C = []!.}
+	\step{2. Check \lstinline!A!:}{If \lstinline!i > n!, stop the algortihm.}
+	\step{3. Add \lstinline!A(i)!:}{If the \lstinline!i!th element of \lstinline!A! is not a playable note (neither a duration nor a tonality, so a bar, a crescendo\dots) add this element at the end of \lstinline!C!: \lstinline!C(end+1)=A(i)! and go to step 8.}
+	\step{4. Check \lstinline!B!:}{If \lstinline!j > m!, sets \lstinline!j = 1! and go to 8.}
+	\step{5. Add \lstinline!B(j)!:}{If the \lstinline!j!th element of \lstinline!B! is not a playable note (see step 3), add this element at the end of \lstinline!C! and go to the step 7.}
+	\step{6. Add \lstinline!A(i)+B(j)!:}{Merge and add the new note: \lstinline!C(end+1) = A(i)+B(j)!.}
+	\step{7. Increase \lstinline!j!:}{Set \lstinline!j = j + 1!. Go to the step 4.}
+	\step{8. Increase \lstinline!i!:}{Set \lstinline!i = i + 1!. Go to the step 2.}
+\end{algo}
 
 \subsection{The void note}
 \label{sec:VoidNote}
