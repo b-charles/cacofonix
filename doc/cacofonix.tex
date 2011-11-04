@@ -10,6 +10,8 @@
 \usepackage{graphics}
 \usepackage[inline]{asymptote}
 \usepackage{subfig}
+\usepackage{forarray}
+\usepackage{ifthen}
 
 % ASYMPTOTE & SUBFIG
 \makeatletter
@@ -49,8 +51,48 @@
 \newcommand\sfz{s$\!f\!$z\xspace}
 
 % ALGORITHM
-\newenvironment{algo}[1]{\par \noindent \textbf{#1}}{}
-\newcommand{\step}[2]{\par \noindent \textbf{#1} #2}
+\newcounter{algonum}
+\newcounter{algostep}[algonum]
+\newcommand{\listofsteps}{}
+\newlength{\titlesteplen}
+\newlength{\titletemplen}
+\newbox{\titlestepbox}
+
+\makeatletter 
+
+% format a title of a step
+\newcommand{\formattitlestep}[2]{Step #1. \textbf{#2:} }
+
+% add a step
+\newcommand{\step}[3][]{%
+% increment the steps
+\stepcounter{algostep}%
+% add the counter at the list of steps
+\ifthenelse{\thealgostep=1}{\edef\listofsteps{\thealgostep}}{\edef\listofsteps{\listofsteps,\thealgostep}}%
+% add the label in the aux file
+\ifthenelse{\equal{#1}{}}{}{\protected@write\@auxout{}{\string\newlabel{Algo\thealgonum.Step #1}{{\thealgostep}{}{}{}{}}}}%
+% record title and text
+\expandafter\def\csname title@\thealgostep \endcsname {#2}%
+\expandafter\def\csname text@\thealgostep \endcsname {#3}%
+% test if the new title is longer than the previous
+\sbox{\titlestepbox}{\formattitlestep{\thealgostep}{#2}}%
+\settowidth{\titletemplen}{\usebox{\titlestepbox}}%
+\ifthenelse{\lengthtest{\titletemplen>\titlesteplen}}{\setlength{\titlesteplen}{\titletemplen}}{}%
+}
+
+% ref to a step
+\newcommand{\stepref}[1]{\ref{Algo\thealgonum.Step #1}}
+
+% algo env
+\newenvironment{algo}[1]{%
+\stepcounter{algonum}%
+\setlength{\titlesteplen}{0pt}%
+\par \noindent \textbf{#1}%
+}{%
+\ForEachX{,}{\\ \noindent \makebox[\titlesteplen][l]{\formattitlestep{\the\thislevelcount}{\csname title@\the\thislevelcount\endcsname}} \csname text@\the\thislevelcount\endcsname}{\listofsteps}
+}
+
+\makeatother
 
 % ME AND MYSELF
 \definecolor{mecolor}{rgb}{1,0.25,0.25}
@@ -363,7 +405,7 @@ $8///////////////////////////////////////////////$
 $|-----------------------G-----------------------$
 \end{lstlisting}
 
-New lines are set according to bars, and a lot of stuff can be displayed: chords, polyphonic sheet, meters, markers, dynamics, tempo\dots Only note's octave and pitch\footnote{See the \section \ref{sec:Pitch}, but not now\dots} are never displayed.
+New lines are set according to bars, and a lot of stuff can be displayed: chords, polyphonic sheet, meters, markers, dynamics, tempo\dots Only note's octave and pitch\footnote{See the section \ref{sec:Pitch}, but not now\dots} are never displayed.
 
 To set the number of characters per quater note, you have to use the class function \lstinline!setNbCharByQuater! (\eg: \lstinline!Note.setNbCharByQuater(48)! --- the default value is 24).
 
@@ -1390,21 +1432,16 @@ The first usage of this operator is repeat a sheet: when you use it on a sheet a
 >> [ C D E ].*4
 \end{lstlisting}
 
-When you use \lstinline!.*! on two sheets, the algorithm is a little more complicated. Says we have two sheets:
-\begin{lstlisting}
->> A = [ a1 a2 a3 ... an ];
->> B = [ b1 b2 b3 ... bm ];
-\end{lstlisting}
-The new sheet, \lstinline!C = A.*B!:
+When you use \lstinline!.*! on two sheets, the algorithm is a little more complicated. Says we have two sheets, \lstinline!A! and \lstinline!B!, the next algorithm describes how \lstinline!C = A.*B! is computed:
 \begin{algo}{Operator \lstinline!.*!}
-	\step{1. Initialize:}{Set \lstinline!i = 1! and \lstinline!j = 1!. Initialize \lstinline!C = []!.}
-	\step{2. Check \lstinline!A!:}{If \lstinline!i > n!, stop the algortihm.}
-	\step{3. Add \lstinline!A(i)!:}{If the \lstinline!i!th element of \lstinline!A! is not a playable note (neither a duration nor a tonality, so a bar, a crescendo\dots) add this element at the end of \lstinline!C!: \lstinline!C(end+1)=A(i)! and go to step 8.}
-	\step{4. Check \lstinline!B!:}{If \lstinline!j > m!, sets \lstinline!j = 1! and go to 8.}
-	\step{5. Add \lstinline!B(j)!:}{If the \lstinline!j!th element of \lstinline!B! is not a playable note (see step 3), add this element at the end of \lstinline!C! and go to the step 7.}
-	\step{6. Add \lstinline!A(i)+B(j)!:}{Merge and add the new note: \lstinline!C(end+1) = A(i)+B(j)!.}
-	\step{7. Increase \lstinline!j!:}{Set \lstinline!j = j + 1!. Go to the step 4.}
-	\step{8. Increase \lstinline!i!:}{Set \lstinline!i = i + 1!. Go to the step 2.}
+	\step{Initialize}{Initialize \lstinline!C = []!. Set \lstinline!i = 1! and \lstinline!j = 1!.}
+	\step[checki]{Check \lstinline!i!}{If \lstinline!i > length(A)!, stop the algortihm and return \lstinline!C!.}
+	\step[addAi]{Add \lstinline!A(i)!}{If the \lstinline!i!th element of \lstinline!A! is not a playable note (neither a duration nor a tonality, so a bar, a crescendo\dots) add this element at the end of \lstinline!C!: \lstinline!C(end+1)=A(i)! and go to step \stepref{inci}.}
+	\step[checkj]{Check \lstinline!j!}{If \lstinline!j > length(B)!, set \lstinline!j = 1! and go to the step \stepref{inci}.}
+	\step{Add \lstinline!B(j)!}{If the \lstinline!j!th element of \lstinline!B! is not a playable note (see step \stepref{addAi}), add this element at the end of \lstinline!C! and go to the step \stepref{incj}.}
+	\step{Add \lstinline!A(i)+B(j)!}{Merge and add the new note: \lstinline!C(end+1) = A(i)+B(j)!.}
+	\step[incj]{Increase \lstinline!j!}{Set \lstinline!j = j + 1!. Go to the step \stepref{checkj}.}
+	\step[inci]{Increase \lstinline!i!}{Set \lstinline!i = i + 1!. Go to the step \stepref{checki}.}
 \end{algo}
 
 \subsection{The void note}
