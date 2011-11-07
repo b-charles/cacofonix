@@ -54,45 +54,40 @@
 \newcounter{algonum}
 \newcounter{algostep}[algonum]
 \newcommand{\listofsteps}{}
-\newlength{\titlesteplen}
-\newlength{\titletemplen}
-\newbox{\titlestepbox}
-
-\makeatletter 
-
-% format a title of a step
-\newcommand{\formattitlestep}[2]{Step #1. \textbf{#2:} }
+\newcommand{\titlealgo}{}
 
 % add a step
+\makeatletter
+% #1 (optional): label
+% #2           : name
+% #3           : description
 \newcommand{\step}[3][]{%
 % increment the steps
 \stepcounter{algostep}%
 % add the counter at the list of steps
 \ifthenelse{\thealgostep=1}{\edef\listofsteps{\thealgostep}}{\edef\listofsteps{\listofsteps,\thealgostep}}%
 % add the label in the aux file
-\ifthenelse{\equal{#1}{}}{}{\protected@write\@auxout{}{\string\newlabel{Algo\thealgonum.Step #1}{{\thealgostep}{}{}{}{}}}}%
+\ifthenelse{\equal{#1}{}}{}{\protected@write\@auxout{}{\string\newlabel{Algo \titlealgo.Step #1}{{\thealgostep}{}{}{}{}}}}%
 % record title and text
 \expandafter\def\csname title@\thealgostep \endcsname {#2}%
 \expandafter\def\csname text@\thealgostep \endcsname {#3}%
-% test if the new title is longer than the previous
-\sbox{\titlestepbox}{\formattitlestep{\thealgostep}{#2}}%
-\settowidth{\titletemplen}{\usebox{\titlestepbox}}%
-\ifthenelse{\lengthtest{\titletemplen>\titlesteplen}}{\setlength{\titlesteplen}{\titletemplen}}{}%
 }
+\makeatother
 
 % ref to a step
-\newcommand{\stepref}[1]{\ref{Algo\thealgonum.Step #1}}
+\newcommand{\stepref}[2][]{\ifthenelse{\equal{#1}{}}{\titlealgo\ref{Algo \titlealgo.Step #2}}{#1\ref{Algo #1.Step #2}}}
 
 % algo env
-\newenvironment{algo}[1]{%
+% #1: name (one char)
+% #2: short description
+% #3: long description
+\newenvironment{algo}[3]{%
 \stepcounter{algonum}%
-\setlength{\titlesteplen}{0pt}%
-\par \noindent \textbf{#1}%
+\def\titlealgo{#1}%
+\par \noindent \textbf{Algorithm #1} (\emph{#2}) #3%
 }{%
-\ForEachX{,}{\\ \noindent \makebox[\titlesteplen][l]{\formattitlestep{\the\thislevelcount}{\csname title@\the\thislevelcount\endcsname}} \csname text@\the\thislevelcount\endcsname}{\listofsteps}
+\ForEachX{,}{\\ \noindent \makebox[0pt][r]{\textbf{\titlealgo\the\thislevelcount} }[\csname title@\the\thislevelcount\endcsname] \csname text@\the\thislevelcount\endcsname}{\listofsteps}
 }
-
-\makeatother
 
 % ME AND MYSELF
 \definecolor{mecolor}{rgb}{1,0.25,0.25}
@@ -876,7 +871,7 @@ Plain dynamics and channel dynamics are independent: even if the current plain d
 
 This is a famous example using dynamics: \\
 \begin{lilypond}
-\new Staff { \key d \major \time 4/4 \relative c'' { fis2->\ff b,8\mp\< cis d e fis4.->\ff d8 fis4.-> d8 fis4.-> b,8 d b g d' \dim b1\! } }
+\new Staff { \key d \major \time 4/4 \relative c'' { fis2->\ff b,8\mp\< cis d e fis4.->\ff d8 fis4.-> d8 fis4.-> b,8 d b g d' << b1 { s4\> s s\! s } >> } }
 \end{lilypond}
 
 \begin{lstlisting}
@@ -1425,15 +1420,15 @@ $| B3b  | Cbb  | Dbb  | E3b  | Fbb  | Gbb  | Abb  $
 \subsection{Repeat / Riff \lstinline!.*!}
 \label{sec:RepeatRiff}
 
-The operator \lstinline!.*! was the first attempt to apply tonalities to a rhythmic (riff). The goal wasn't completely achieved and void notes have been imagined to answer to the problem with more flexibility. But the operator have shown that it is very useful.
+The operator \lstinline!mtimes! (\lstinline!.*!) was the first attempt to apply tonalities to a rhythmic (riff). The goal wasn't completely achieved and void notes have been imagined to answer to the problem with more flexibility. But the operator have shown that it is very useful.
 
 The first usage of this operator is repeat a sheet: when you use it on a sheet and on a number, you create a new sheet repeating the original. The number can be on the left or on the right of the operator:
 \begin{lstlisting}
 >> [ C D E ].*4
 \end{lstlisting}
 
-When you use \lstinline!.*! on two sheets, the algorithm is a little more complicated. Says we have two sheets, \lstinline!A! and \lstinline!B!, the next algorithm describes how \lstinline!C = A.*B! is computed:
-\begin{algo}{Operator \lstinline!.*!}
+When you use \lstinline!.*! on two sheets, the algorithm is a little more complicated:
+\begin{algo}{M}{Operator \lstinline!.*!}{Given two array \lstinline!A! and \lstinline!B!, we compute \lstinline!C = A.*B! with this algorithm:}
 	\step{Initialize}{Initialize \lstinline!C = []!. Set \lstinline!i = 1! and \lstinline!j = 1!.}
 	\step[checki]{Check \lstinline!i!}{If \lstinline!i > length(A)!, stop the algortihm and return \lstinline!C!.}
 	\step[addAi]{Add \lstinline!A(i)!}{If the \lstinline!i!th element of \lstinline!A! is not a playable note (neither a duration nor a tonality, so a bar, a crescendo\dots) add this element at the end of \lstinline!C!: \lstinline!C(end+1)=A(i)! and go to step \stepref{inci}.}
