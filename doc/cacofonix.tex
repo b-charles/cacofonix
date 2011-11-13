@@ -12,6 +12,7 @@
 \usepackage{subfig}
 \usepackage{forarray}
 \usepackage{ifthen}
+\usepackage{calc}
 
 % ASYMPTOTE & SUBFIG
 \makeatletter
@@ -55,9 +56,16 @@
 \newcounter{algostep}[algonum]
 \newcommand{\listofsteps}{}
 \newcommand{\titlealgo}{}
+\newlength{\algosteplen}
+\newlength{\lentemp}
 
 % add a step
 \makeatletter
+
+%%% FORMAT STEP NAME
+\newcommand{\formatstepname}[2]{\textbf{#1#2.}}
+
+%%% STEP
 % #1 (optional): label
 % #2           : name
 % #3           : description
@@ -66,6 +74,9 @@
 \stepcounter{algostep}%
 % add the counter at the list of steps
 \ifthenelse{\thealgostep=1}{\edef\listofsteps{\thealgostep}}{\edef\listofsteps{\listofsteps,\thealgostep}}%
+% check if the new name is longer than previous
+\settowidth{\lentemp}{\formatstepname{\titlealgo}{\thealgostep}}%
+\ifthenelse{\lengthtest{\lentemp>\algosteplen}}{\setlength{\algosteplen}{\lentemp}}{}%
 % add the label in the aux file
 \ifthenelse{\equal{#1}{}}{}{\protected@write\@auxout{}{\string\newlabel{Algo \titlealgo.Step #1}{{\thealgostep}{}{}{}{}}}}%
 % record title and text
@@ -77,16 +88,18 @@
 % ref to a step
 \newcommand{\stepref}[2][]{\ifthenelse{\equal{#1}{}}{\titlealgo\ref{Algo \titlealgo.Step #2}}{#1\ref{Algo #1.Step #2}}}
 
-% algo env
+%%% ALGO
 % #1: name (one char)
 % #2: short description
 % #3: long description
 \newenvironment{algo}[3]{%
 \stepcounter{algonum}%
 \def\titlealgo{#1}%
+\setlength{\algosteplen}{0pt}%
 \par \noindent \textbf{Algorithm #1} (\emph{#2}) #3%
 }{%
-\ForEachX{,}{\\ \noindent \makebox[0pt][r]{\textbf{\titlealgo\the\thislevelcount} }[\csname title@\the\thislevelcount\endcsname] \csname text@\the\thislevelcount\endcsname}{\listofsteps}
+\setlength{\parskip}{1ex}%
+\ForEachX{,}{\par \noindent \makebox[\algosteplen][r]{\formatstepname{\titlealgo}{\the\thislevelcount}} \parbox[t]{\textwidth-\algosteplen}{[\csname title@\the\thislevelcount\endcsname] \csname text@\the\thislevelcount\endcsname\ifthenelse{\the\thislevelcount=\thealgostep}{\hspace{3mm}\rule[-0.5mm]{1mm}{3mm}}}{}}{\listofsteps}
 }
 
 % ME AND MYSELF
@@ -94,14 +107,8 @@
 \definecolor{myselfcolor}{rgb}{0.25,0.25,1}
 \newenvironment{meenv}{ \par \noindent \makebox[6em][r]{ \textcolor{mecolor}{Me}: `` --~}}{~''}
 \newenvironment{myselfenv}{ \par \noindent \makebox[6em][r]{ \textcolor{myselfcolor}{Myself}: `` --~}}{~''}
-\newcommand{ \me }[1]{%
-\begin{meenv}%
-	#1%
-\end{meenv} }
-\newcommand{ \myself }[1]{%
-\begin{myselfenv}%
-	#1%
-\end{myselfenv} }
+\newcommand{\me}[1]{\begin{meenv}#1\end{meenv}}
+\newcommand{\myself}[1]{\begin{myselfenv}#1\end{myselfenv}}
 
 % MATLAB CODE
 \definecolor{matlabcolor}{rgb}{0,0.5,0.5}
@@ -231,7 +238,7 @@ N16 = Note( 1/4 );
 N12 = Note( 1/3 );
 \end{lstlisting}
 
-In the real \noteInitFile, some other \note objects are instanced also. So, \frerejaques becomes:
+So, including this file, \frerejaques becomes:
 \begin{lstlisting}
 NoteInit
 N8dotted = Note( 3/4 );
@@ -369,7 +376,7 @@ Yes, but it's nice in a canon:
 
 \subsection{Display}
 
-A good way to check errors is to display the sheet: the function \lstinline!display! has been overloaded to represent the sheet. This is the display of \frerejaques:
+A good way for checking errors is to display the sheet: the function \lstinline!display! has been overloaded to represent the sheet. This is the display of \frerejaques:
 \begin{lstlisting}
 >> NoteInit
 >> sheet = [ ...
@@ -400,9 +407,9 @@ $8///////////////////////////////////////////////$
 $|-----------------------G-----------------------$
 \end{lstlisting}
 
-New lines are set according to bars, and a lot of stuff can be displayed: chords, polyphonic sheet, meters, markers, dynamics, tempo\dots Only note's octave and pitch\footnote{See the section \ref{sec:Pitch}, but not now\dots} are never displayed.
+New lines are set according to bars, and a lot of stuff can be displayed: chords, polyphonic sheet, meters, markers, dynamics, tempo\dots Only note's octave and pitch\footnote{Wait the section \ref{sec:Pitch} for more explanations about pitch.} are never displayed.
 
-To set the number of characters per quater note, you have to use the class function \lstinline!setNbCharByQuater! (\eg: \lstinline!Note.setNbCharByQuater(48)! --- the default value is 24).
+To set the number of characters per quater note, you have to use the class function \lstinline!setNbCharByQuater! (\eg \lstinline!Note.setNbCharByQuater(48)! --- the default value is 24).
 
 \subsection{A little more about the \lstinline!cacofonix! function}
 
@@ -413,7 +420,7 @@ cacofonix( 'myFile.mid', 'Tempo', 100, ...
 	'Trumpet', sheet_trumpet )
 \end{lstlisting}
 
-To know the list of available instruments, type \lstinline!cacofonix -instruments!. You can't play more than fifteen instruments, but with possibilities to set several sheets for one instrument.
+To know the list of available instruments, type \lstinline!cacofonix -instruments!. You can't play more than fifteen instruments, but with possibilities to set several sheets for one instrument (the operator \lstinline!/! is one of them).
 
 Some percussions are available too, type \lstinline!cacofonix -percussions! to know the list. However, percussion sheets can't have tonality: instead of using tonality notes (\lstinline!Note('G')!), you have to use the void note: \lstinline!V=Note('void')!. There are no restriction about the number of percussion sheet.
 
@@ -858,7 +865,7 @@ To each dynamic corresponds a velocity: it's a value between $0$ and $127$ which
 \begin{lstlisting}
 cacofonix( filename, ..., 'Velocity', velocities, ... )
 \end{lstlisting}
-where \lstinline!velocities! is an array of $8$ values which gives the velocity values of dynamics \lstinline!'ppp'! to \lstinline!'fff'!. You can't set the velocity of the dynamic \lstinline!'0'! and \lstinline!'inf'!, which are always $0$ and $127$. The default values are $16$, $33$, $49$, $64$, $80$, $96$, $112$ and $126$.
+where \lstinline!velocities! is an array of $8$ values which gives the velocity values of dynamics \lstinline!'ppp'! to \lstinline!'fff'!. You can't set the velocities of the dynamics \lstinline!'0'! and \lstinline!'inf'!, which are always $0$ and $127$. The default values are $16$, $33$, $49$, $64$, $80$, $96$, $112$ and $126$.
 
 \subsubsection{Channel dynamics}
 \label{sec:ChannelDynamics}
@@ -917,8 +924,8 @@ You can set a new tempo progressively with \lstinline!Note( keyword, duration, n
 
 You can indicate a fermata with \lstinline!Note( 'fermata', duration, playedDuration )!: \lstinline!duration! is the duration of the fermata (on the sheet) and \lstinline!playedDuration! is wanted duration of the fermata with the current tempo. \lstinline!duration! and \lstinline!playedDuration! can be doubles or duration \note objects.
 
-\myself{Generally, the \lstinline!playedDuration! is twice bigger than \lstinline!duration!.}
-\me{So, why the \lstinline!playedDuration! is not optional with a default value setted to twice \lstinline!duration!?}
+\myself{Generally, the \lstinline!playedDuration! is half bigger than \lstinline!duration!.}
+\me{So, why the \lstinline!playedDuration! is not optional with a default value setted to \lstinline!1.5*duration!?}
 \myself{Because I'm lazy. But it's on the todo list.}
 
 \subsubsection{Example}
@@ -1226,7 +1233,7 @@ The next example is maybe the most complicated demonstration of this document. T
 f2\fermata\startTrillSpan\mf( f4) f4\stopTrillSpan \glissando
 bes''2-> \appoggiatura { aes16[ bes] } \times 2/3 { aes8-. ges-. aes-. } \times 2/3 { ges-. aes-. ges-. }
 f8-- ees-- d-- des--( des) ees-- e-- f--(
-f)\< d bes32( c bes a) aes8->( aes)\> ges f f->\!(
+f)\< d bes32( c bes a) aes8->( aes)\> ges f\! f->(
 f1) } }
 \end{lilypond}
 
@@ -1294,29 +1301,37 @@ bes8\( c bes8. aes16 aes2\) } }
 	~[ -Bf:N8 C:N8 -Bf:N8' -Af:N16 bar ...
 	-Af:'|':N2 ] bar ]
 $A (1)///////////////////////////$
+$p                               $
 $|-----C-----~Eb-|------Eb-------$
 $1 (2)///////////////////////////$
+$                                $
 $~-----C-----~Bb-~------Ab-------$
 $2 (3)///////////////////////////$
+$                                $
 $|----Bb-----~-C-~----Eb-----~-C-$
 $3 (4)///////////////////////////$
+$                                $
 $~--------------Bb---------------$
 $B (5)///////////////////////////$
+$                                $
 $|-----C-----~Eb-|------Eb-------$
 $1 (6)///////////////////////////$
+$                                $
 $~-----C-----~Bb-~------Ab-------$
 $2 (7)///////////////////////////$
+$                                $
 $|--Bb---~---C---~----Bb-----~Ab-$
 $3 (8)///////////////////////////$
+$                                $
 $|--------------Ab---------------$
 >> cacofonix( 'NewWorldSymphony_Largo', ...
 	'Tempo', 52, ...
 	'English Horn', sheet );
 \end{lstlisting}
 
-The output is pretty intuitive: the display show the name of the notes which are contained in the sheet, with a \lstinline!b! for a flat and a \lstinline!#! for a sharp. The display can show every features of \cacofonix: meters, dynamics, tempo, polyphony\dots The measures are numbered for the last marker and from the start of the sheet (in brackets). Only the octave and the pitch are not displayed. The class function \lstinline!setNbCharByQuater! defines the number of characters per quarter notes.
+The output is pretty intuitive: the display show the name of the notes which are contained in the sheet, with a \lstinline!b! for a flat and a \lstinline!#! for a sharp. The display can show every features of \cacofonix: meters, dynamics, tempo, polyphony\dots Only the octave and the pitch are not displayed. The measures are numbered from the last marker and from the start of the sheet (in brackets). The class function \lstinline!setNbCharByQuater! defines the number of characters per quarter notes.
 
-When the array has no duration, each notes contained in the array take the place of a quarter note:
+When the array has no duration, each note contained in the array takes the place of a quarter note:
 \begin{lstlisting}
 >> NoteInit
 >> Note.setNbCharByQuater( 6 );
@@ -1331,9 +1346,9 @@ $| CD  |EbG# $
 \end{lstlisting}
 
 \begin{myselfenv}%
-The display is convenient, but it's not as powerful as the \lstinline!cacofonix! function: no error are thrown when, for example, a bar is misplaced. Only something weird appears.%
+The display is convenient, but it's not as powerful as the \lstinline!cacofonix! function: it doesn't thrown an error when, for example, a bar is misplaced. Only something weird appears.%
 \end{myselfenv}
-\begin{meenv}
+\begin{meenv}%
 And sometimes, something weird appears even if the sheet is correctly build! If the number of characters per quarter is not chosen cleverly, you can have some approximation problems:
 \begin{lstlisting}
 >> Note.setNbCharByQuater( 18 );
@@ -1368,7 +1383,7 @@ $|----------------Ab-----------------$
 \subsection{Transpose \lstinline!\^!}
 \label{sec:Transpose}
 
-We can transpose a \note or a sheet with the operator \lstinline!mpower! (\lstinline!^!). Two way are possible. The first is use \lstinline!^! with the number of half steps to transpose.
+We can transpose a \note or a sheet with the operator \lstinline!mpower! (\lstinline!^!). Two ways are possible. The first is use \lstinline!^! with the number of half steps to transpose.
 For example, we have the scale of B flat major:
 \begin{lstlisting}
 >> NoteInit
@@ -1420,24 +1435,61 @@ $| B3b  | Cbb  | Dbb  | E3b  | Fbb  | Gbb  | Abb  $
 \subsection{Repeat / Riff \lstinline!.*!}
 \label{sec:RepeatRiff}
 
-The operator \lstinline!mtimes! (\lstinline!.*!) was the first attempt to apply tonalities to a rhythmic (riff). The goal wasn't completely achieved and void notes have been imagined to answer to the problem with more flexibility. But the operator have shown that it is very useful.
+The operator \lstinline!times! (\lstinline!.*!) was the first attempt to apply tonalities to a rhythmic (riff). The goal wasn't completely achieved and void notes have been imagined to answer to the problem with more flexibility. But the operator have shown that it is very useful.
 
 The first usage of this operator is repeat a sheet: when you use it on a sheet and on a number, you create a new sheet repeating the original. The number can be on the left or on the right of the operator:
 \begin{lstlisting}
->> [ C D E ].*4
+>> Note.setNbCharByQuater(8)
+>> 2.*[C:N2 G:N2 bar].*3
+$1///////////////////////////////$
+$|-------C-------|-------G-------$
+$2///////////////////////////////$
+$|-------C-------|-------G-------$
+$3///////////////////////////////$
+$|-------C-------|-------G-------$
+$4///////////////////////////////$
+$|-------C-------|-------G-------$
+$5///////////////////////////////$
+$|-------C-------|-------G-------$
+$6///////////////////////////////$
+$|-------C-------|-------G-------$
 \end{lstlisting}
 
 When you use \lstinline!.*! on two sheets, the algorithm is a little more complicated:
-\begin{algo}{M}{Operator \lstinline!.*!}{Given two array \lstinline!A! and \lstinline!B!, we compute \lstinline!C = A.*B! with this algorithm:}
-	\step{Initialize}{Initialize \lstinline!C = []!. Set \lstinline!i = 1! and \lstinline!j = 1!.}
-	\step[checki]{Check \lstinline!i!}{If \lstinline!i > length(A)!, stop the algortihm and return \lstinline!C!.}
-	\step[addAi]{Add \lstinline!A(i)!}{If the \lstinline!i!th element of \lstinline!A! is not a playable note (neither a duration nor a tonality, so a bar, a crescendo\dots) add this element at the end of \lstinline!C!: \lstinline!C(end+1)=A(i)! and go to step \stepref{inci}.}
-	\step[checkj]{Check \lstinline!j!}{If \lstinline!j > length(B)!, set \lstinline!j = 1! and go to the step \stepref{inci}.}
-	\step{Add \lstinline!B(j)!}{If the \lstinline!j!th element of \lstinline!B! is not a playable note (see step \stepref{addAi}), add this element at the end of \lstinline!C! and go to the step \stepref{incj}.}
-	\step{Add \lstinline!A(i)+B(j)!}{Merge and add the new note: \lstinline!C(end+1) = A(i)+B(j)!.}
-	\step[incj]{Increase \lstinline!j!}{Set \lstinline!j = j + 1!. Go to the step \stepref{checkj}.}
-	\step[inci]{Increase \lstinline!i!}{Set \lstinline!i = i + 1!. Go to the step \stepref{checki}.}
+\begin{algo}{T}{Operator \lstinline!.*!}{Given two arrays \lstinline!A! and \lstinline!B!, we compute \lstinline!C = A.*B! with this algorithm:}
+	\step{Initialize.}{Initialize \lstinline!C = Note.empty()!. Set \lstinline!i = 1! and \lstinline!j = 1!.}
+	\step[checki]{Check \lstinline!i!.}{If \lstinline!i > length(A)!, stop the algortihm and return \lstinline!C!.}
+	\step[addAi]{Add \lstinline!A(i)!.}{If the \lstinline!i!th element of \lstinline!A! is not a playable note (neither a duration nor a tonality, so a bar, a crescendo\dots) add this element at the end of \lstinline!C!: \lstinline!C(end+1)=A(i)! and go to step \stepref{inci}.}
+	\step[checkj]{Check \lstinline!j!.}{If \lstinline!j > length(B)!, set \lstinline!j = 1! and go to the step \stepref{inci}.}
+	\step[addBj]{Add \lstinline!B(j)!.}{If the \lstinline!j!th element of \lstinline!B! is not a playable note (see step \stepref{addAi}), add this element at the end of \lstinline!C! and go to \stepref{incj}.}
+	\step[addAiBj]{Add \lstinline!A(i):B(j)!.}{Merge and add the new note: \lstinline!C(end+1) = A(i):B(j)!.}
+	\step[incj]{Increase \lstinline!j!.}{Set \lstinline!j = j + 1!. Go to \stepref{checkj}.}
+	\step[inci]{Increase \lstinline!i!.}{Set \lstinline!i = i + 1!. Go to \stepref{checki}.}
 \end{algo}
+% \begin{lstlisting}
+% function C = times( A, B )
+% 	C = Note.empty();
+% 
+% 	for i = 1:length( A )
+% 		if ~A(i).isNote
+% 			C(end+1) = A(i);
+% 
+% 		else
+% 			for j = 1:length( B )
+% 				if ~B(j).isNote
+% 					C(end+1) = B(j);
+% 
+% 				else
+% 					C(end+1) = A(i):B(j);
+% 
+% 				end
+% 			end
+% 		end
+% 	end
+% end
+% \end{lstlisting}
+
+The algorithm isn't as complicated as it seems. In fact, the steps \stepref[T]{checki} and \stepref[T]{inci} and the steps \stepref[T]{checkj} and \stepref[T]{incj} define two imbricated \lstinline!for! loops: each note of \lstinline!A! is merged with each note of \lstinline!B! (step \stepref[T]{addAiBj}), unless a note can't be merged (steps \stepref[T]{addAi} and \stepref[T]{addBj}).
 
 \subsection{The void note}
 \label{sec:VoidNote}
