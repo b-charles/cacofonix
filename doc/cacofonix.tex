@@ -1515,30 +1515,30 @@ When you use \lstinline!.*! on two sheets, the algorithm is a little more compli
 	\step[incj]{Increase \lstinline!j!.}{Set \lstinline!j = j + 1!. Go to \stepref{checkj}.}
 	\step[inci]{Increase \lstinline!i!.}{Set \lstinline!i = i + 1!. Go to \stepref{checki}.}
 \end{algo}
-% \begin{lstlisting}
-% function C = times( A, B )
-% 	C = Note.empty();
-% 
-% 	for i = 1:length( A )
-% 		if ~A(i).isNote
-% 			C(end+1) = A(i);
-% 
-% 		else
-% 			for j = 1:length( B )
-% 				if ~B(j).isNote
-% 					C(end+1) = B(j);
-% 
-% 				else
-% 					C(end+1) = A(i):B(j);
-% 
-% 				end
-% 			end
-% 		end
-% 	end
-% end
-% \end{lstlisting}
 
-The algorithm isn't as complicated as it seems. In fact, the steps \stepref[T]{checki} and \stepref[T]{inci} and the steps \stepref[T]{checkj} and \stepref[T]{incj} define two imbricated \lstinline!for! loops: each note of \lstinline!A! is merged with each note of \lstinline!B! (step \stepref[T]{addAiBj}), unless a note can't be merged (steps \stepref[T]{addAi} and \stepref[T]{addBj}).
+The algorithm isn't as complicated as it seems. In fact, the steps \stepref[T]{checki} and \stepref[T]{inci} and the steps \stepref[T]{checkj} and \stepref[T]{incj} define two imbricated \lstinline!for! loops: each note of \lstinline!A! is merged with each note of \lstinline!B! (step \stepref[T]{addAiBj}), unless a note can't be merged (steps \stepref[T]{addAi} and \stepref[T]{addBj}). This is a pseudo \matlab code of this algorithm:
+\begin{lstlisting}
+function C = times( A, B )
+	C = Note.empty();
+
+	for i = 1:length( A )
+		if ~A(i).isNote
+			C(end+1) = A(i);
+
+		else
+			for j = 1:length( B )
+				if ~B(j).isNote
+					C(end+1) = B(j);
+
+				else
+					C(end+1) = A(i):B(j);
+
+				end
+			end
+		end
+	end
+end
+\end{lstlisting}
 
 \subsection{The void note}
 \label{sec:VoidNote}
