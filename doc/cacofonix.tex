@@ -1391,13 +1391,62 @@ For example, we have the scale of B flat major:
 >> scale = [ -Bf C D Ef F G A ]
 $|  Bb  |  C   |  D   |  Eb  |  F   |  G   |  A   $
 \end{lstlisting}
-And we want transpose this scale in G major. To do that, each note have to be reduced of $3$ half steps (or raised of $9$ half steps). Remember the scale steps!
-\begin{center}
-\begin{tabular}{rccccccccccccccc}
-degrees    & C &   & D &   & E &   & F &   & G &   & A &   & B &   & C \\
-half steps &   & 2 &   & 2 &   & 1 &   & 2 &   & 2 &   & 2 &   & 1 & \\
-\end{tabular}
-\end{center}
+And we want transpose this scale in G major. To do that, each note have to be reduced of $3$ half steps (or raised of $9$ half steps). Remember the scale steps (see figure \ref{fig:scalesteps})!
+\begin{figure}
+	\begin{center}
+	\begin{asy}
+		size( 5cm );
+		import labelpath;
+
+		pen circlepen = black;
+		pen degpen = black;
+		pen notepen = blue;
+		pen steppen = red;
+
+		path c = reverse( rotate(90)*unitcircle );
+		int clen = length( c );
+
+		draw( c, circlepen );
+
+		real getPos( real h ){ return clen*h/12; }
+		pair getPair( real h ){ return point( c, getPos(h) ); }
+		path getSub( real a, real b ){ return subpath( c, getPos(a), getPos(b) ); }
+
+		void addDeg( real pos, string deg, string note ){
+			dot( getPair( pos ), degpen );
+			label( deg, getPair( pos ), getPair( pos ), degpen );
+			label( note, getPair( pos ), getPair( pos+6 ), notepen );
+		}
+
+		void addStep( real a, real b, string step ){
+			labelpath( shift(0,1)*Label(step), getSub( a, b ), steppen );
+		}
+
+		addDeg( 0, "I", "C" );
+		addDeg( 2, "II", "D" );
+		addDeg( 4, "III", "E" );
+		addDeg( 5, "IV", "F" );
+		addDeg( 7, "V", "G" );
+		addDeg( 9, "VI", "A" );
+		addDeg( 11, "VII", "B" );
+
+		addStep(  0,  2, "2" );
+		addStep(  2,  4, "2" );
+		addStep(  4,  5, "1" );
+		addStep(  5,  7, "2" );
+		addStep(  7,  9, "2" );
+		addStep(  9, 11, "2" );
+		addStep( 11, 12, "1" );
+	\end{asy}
+	\end{center}
+	\caption[The scale steps]{The scale steps apply to the C major scale: the degree in black, the number of half step in red and the corresponding name of the note in blue.}
+	\label{fig:scalesteps}
+	%\begin{tabular}{rccccccccccccccc}
+	%degrees    & C &   & D &   & E &   & F &   & G &   & A &   & B &   & C \\
+	%half steps &   & 2 &   & 2 &   & 1 &   & 2 &   & 2 &   & 2 &   & 1 & \\
+	%\end{tabular}
+\end{figure}
+
 \begin{lstlisting}
 >> scale^-3
 $|  G   |  A   |  B   |  C   |  D   |  E   |  F#  $
