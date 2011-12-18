@@ -1633,7 +1633,7 @@ cacofonix( 'BillieJean', 'Tempo', 115, ...
 \subsection{The void note}
 \label{sec:VoidNote}
 
-\me{Before start, a little mood music.}
+\me{Before start a description of that monster, a little mood music.}
 
 \vspace{ 0.25in }
 
@@ -1662,6 +1662,8 @@ cacofonix( 'BillieJean', 'Tempo', 115, ...
 
 \myself{And, as recommended by \emph{The Hitchhiker's Guide to the Galaxy}, \textsc{don't panic}. \rightthumbsup}
 
+A void note is a tonality \note, but without defined tonality yet. You can do anything with a void note, like a tonality note: create a chord (you can have only one void note per chord), set a duration, set accents, transpose\dots but the \cacofonix function doesn't accept void notes in sheets -- except for percussion sheets, where \emph{real} tonality \note are not accepted. To set a final tonality to a void note, you have to use the operator \lstinline!*!.
+
 \subsubsection{Expand \lstinline!*!}
 \label{sec:Expand}
 
@@ -1669,6 +1671,39 @@ cacofonix( 'BillieJean', 'Tempo', 115, ...
 \label{sec:Index}
 
 \subsubsection{Examples}
+
+\begin{lilypond}
+\new Staff {
+	\relative c' { \time 4/4 r4^\markup G e4 d8 c8 b4 b4^\markup C c8 b8 ~ b8 a8 g8 a8 b4 c8 b8 ~ b8 a8 g8 a8 \time 2/4 b4^\markup D c4 \time 4/4 b1^\markup E }
+	\addlyrics { My ba -- by don't mess a -- round be -- cause she loves me so and this I know for sho'. }	
+}
+\end{lilypond}
+
+\begin{lstlisting}
+NoteInit
+
+M44 = Note([4 4]);
+M24 = Note([2 4]);
+
+MELODY = [ Note('-') M44 ...
+	R:N4 +E:N4 +D:N8 +C:N8 B:N4 bar ...
+	B:N4 +C:N8 B:[N8 N8] A:N8 G:N8 A:N8 bar ...
+	B:N4 +C:N8 B:[N8 N8] A:N8 G:N8 A:N8 bar ...
+	M24 B:N4 +C:N4 bar ...
+	M44 B:N bar ];
+
+V0 = V-0; RIFF = [ V0:N4 V0:N8 V0:N4 (V0:N8)*3 bar ];
+GUITAR = [ DynMP ...
+	G*CM*RIFF ...
+	C*CM*RIFF ...
+	C*CM*RIFF ...
+	D*CM*[ V0:N4 V0:N8 V0:N8 bar ] ...
+	E*CM*RIFF ];
+
+cacofonix( 'HeyYa', 'Tempo', 160, ...
+	'Oboe', MELODY, ...
+	'Nylon-String Guitar', GUITAR );
+\end{lstlisting}
 
 \subsection{Function \lstinline!cacofonix!}
 \label{sec:CacofonixFunction}
