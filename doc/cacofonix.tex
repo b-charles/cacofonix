@@ -1395,7 +1395,7 @@ And we want transpose this scale in G major. To do that, each note have to be re
 \begin{figure}
 	\begin{center}
 	\begin{asy}
-		size( 5cm );
+		size( 4cm );
 		import labelpath;
 
 		pen circlepen = black;
@@ -1484,7 +1484,7 @@ $| B3b  | Cbb  | Dbb  | E3b  | Fbb  | Gbb  | Abb  $
 \subsection{Repeat / Riff \lstinline!.*!}
 \label{sec:RepeatRiff}
 
-The operator \lstinline!times! (\lstinline!.*!) was the first attempt to apply tonalities to a rhythmic (riff). The goal wasn't completely achieved and void notes have been imagined to answer to the problem with more flexibility. But the operator have shown that it is very useful.
+The operator \lstinline!times! (\lstinline!.*!) was the first attempt to apply tonalities to a rhythmic (riff).
 
 The first usage of this operator is repeat a sheet: when you use it on a sheet and on a number, you create a new sheet repeating the original. The number can be on the left or on the right of the operator:
 \begin{lstlisting}
@@ -1571,7 +1571,64 @@ cacofonix( 'PeterGunn', 'Tempo', 120, ...
 	'Acoustic Bass', BASS );	
 \end{lstlisting}
 
+\me{This explanation needs two remarks.}
+\myself{We share. You take one, and I get the second.}
+\me{Never. If you want to do something, search examples for my speech.}
+\myself{I'll kill you.}
+\me{Excellent. So, the first point is: a rest is a tonality note, so you can't have a rest in the riff -- since it will be associate with a \note of the other array. That's the huge limitation of that operator. Have you found an example?}
+\myself{Do you really expect a \matlab code with this operator to prove that something isn't possible to do with that operator precisely? Sorry, I need a little more time\dots}
+\me{Too bad. Be focus on the next. And search harder, please. The other point: when you want to set an attack, you can use a rest with the operator \lstinline!:!. Examples: \dots}
+\begin{myselfenv}
+	Hum\dots Well, I have one setting the accent on duration notes:
 
+\begin{lilypond}
+	\new DrumStaff \with{
+	drumStyleTable = #percussion-style
+	\override StaffSymbol #'line-count = #1 } {
+	\override Staff.BarLine #'bar-extent = #'(-2 . 2)
+	\drummode { \time 3/4 sn8-> \times 2/3 { sn16 sn sn } sn8-> \times 2/3 { sn16 sn sn } sn8-> sn sn-> \times 2/3 { sn16 sn sn } sn8-> \times 2/3 { sn16 sn sn } \times 2/3 { sn16 sn sn } \times 2/3 { sn16 sn sn } } }
+\end{lilypond}
+
+\begin{lstlisting}
+NoteInit
+
+T = Note(1/6).*3;
+sheet = [ Note([3 4]) V.*[ ...
+	R:'>':N8 T R:'>':N8 T R:'>':N8 N8 bar ...
+	R:'>':N8 T R:'>':N8 T T T bar ] ];
+
+cacofonix( 'Bolero', 'Tempo', 72, ...
+	'Acoustic Snare', 179.*sheet );
+\end{lstlisting}
+
+	And I have another one, where the accents are setted on the tonality notes:
+
+\begin{lilypond}
+\new GrandStaff <<
+\new Staff { \key a \major \time 4/4 \relative c' { <a cis fis>8 r r <b dis gis> r2 <cis e a>8 r r <b dis gis> r2 } }
+\new Staff { \key a \major \time 4/4 \clef bass \relative c, {
+fis8-> cis e fis-> e cis b cis
+fis8-> cis e fis-> e cis b cis
+} } >>
+\end{lilypond}
+
+\begin{lstlisting}
+NoteInit
+
+SYNTH = [ Note([4 4]) ...
+	[ -A+Cs+Fs R R -B+Ds+Gs ].*N8 R:N2 bar ...
+	[ Cs+E+A R R -B+Ds+Gs ].*N8 R:N2 bar ];
+
+BASS = [ Note('--') ...
+	2.*[ Fs:'>':R Cs E Fs:'>':R E Cs -B Cs bar ].*N8 ];
+
+cacofonix( 'BillieJean', 'Tempo', 115, ...
+	'Electric Grand Piano', SYNTH, ...
+	'Acoustic Bass', BASS );
+\end{lstlisting}
+\end{myselfenv}
+\me{Good boy.}
+\myself{Please. Yours explanations are laconic and my demos are awesome. You're nothing without me.}
 
 \subsection{The void note}
 \label{sec:VoidNote}
@@ -1610,6 +1667,8 @@ cacofonix( 'PeterGunn', 'Tempo', 120, ...
 
 \subsubsection{Index \lstinline!-!}
 \label{sec:Index}
+
+\subsubsection{Examples}
 
 \subsection{Function \lstinline!cacofonix!}
 \label{sec:CacofonixFunction}
