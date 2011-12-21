@@ -42,7 +42,7 @@ crescendoSampling = 0.25;
 
 tempoSample = 10;
 
-pitchSampling = 0.05;
+pitchSampling = 0.01;
 nbMinSampling = 20;
 
 deltaTimeTicks = prod( [ 2 2 2 2 2 3 3 5 ] );
