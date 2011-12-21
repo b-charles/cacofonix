@@ -315,7 +315,7 @@ Ties and slurs are written with the same operator: \lstinline!not! (\lstinline!~
 
 A chord is a note with several tonalities and one duration. There are two ways to create a chord: a good one, the operator \lstinline!plus! (\lstinline!+!), and a bad-but-sometimes-convenient one, using an array with the operator \lstinline!colon! (you know, \lstinline!:!). \\
 \begin{lilypond}
-	\relative c' { \new Staff { \time 2/4 <c e g c>2 <g' b d g> <c, e g c> <g' b d g>4( <g b d g>8)( <g b d g> ) } }
+	\relative c' { \new Staff { \time 2/4 <c e g c>2 <g' b d g> <c, e g c> <g' b d g>4 ~ <g b d g>8 ~ <g b d g> } }
 \end{lilypond}
 
 \begin{lstlisting}
@@ -341,7 +341,7 @@ A polyphonic section is a set of sheets with the same duration and played at the
 		{ c2. <c, e g c>2. } \\
 		{ c4( e g) s2. }
 		>> }
-	\new Staff { \clef bass \relative c { c2.( c) } }
+	\new Staff { \clef bass \relative c { c2. ~ c } }
 >>
 \end{lilypond}
 \begin{lstlisting}
@@ -696,7 +696,7 @@ In fact, the operator \lstinline!:! is like the operator \lstinline!+!: it merge
 
 Some examples: \\
 \begin{lilypond}
-	\new Staff { \time 4/4 \relative c'' { c4\accent b\staccato a\marcato g\tenuto c,4\( ^( c8) g'8 g2\accent \) } }
+	\new Staff { \time 4/4 \relative c'' { c4\accent b\staccato a\marcato g\tenuto c,4( ~ c8 g'8 g2\accent ) } }
 \end{lilypond}
 
 \begin{lstlisting}
@@ -1230,11 +1230,11 @@ The second optional argument is the delay: like dynamics, if a delay is given (a
 The next example is maybe the most complicated demonstration of this document. The trill (lines 6 to 12) is an array of \emph{pitch} notes, where each \note has alternatively the value \lstinline!'b'! and \lstinline!'#'! and with an increasing delay. In the final midi file, the trill speeds up because of the fermata. The portamento (lines 14 to 16) is simply two \emph{pitch} notes: the first rises the pitch up of 29 half steps, and the second reset the pitch value. As you can see in the sheet, the trill is placed before the modified note whereas the portamento is placed after. \\
 \begin{lilypond}
 \new Staff { \tempo 4=80 \clef treble \key bes \major \time 4/4 \relative c {
-f2\fermata\startTrillSpan\mf( f4) f4\stopTrillSpan \glissando
+f2\fermata\startTrillSpan\mf ~ f4 f4\stopTrillSpan \glissando
 bes''2-> \appoggiatura { aes16[ bes] } \times 2/3 { aes8-. ges-. aes-. } \times 2/3 { ges-. aes-. ges-. }
-f8-- ees-- d-- des--( des) ees-- e-- f--(
-f)\< d bes32( c bes a) aes8->( aes)\> ges f\! f->(
-f1) } }
+f8-- ees-- d-- des-- ~ des ees-- e-- f-- ~
+f\< d bes32( c bes a) aes8-> ~ aes\> ges f\! f-> ~
+f1 } }
 \end{lilypond}
 
 \begin{lstlisting}
@@ -1544,14 +1544,14 @@ So, why it's so useful? Well, the most often, one of the arrays is reduced to on
 
 \begin{lilypond}
 \new GrandStaff <<
-\new Staff { \key f \major \time 4/4 \relative c' { R1*2 bes2.( bes8) g8-> R1 bes1 <g g'>8->\( dis'8\) r4 r2 } }
+\new Staff { \key f \major \time 4/4 \relative c' { R1*2 bes2. ~ bes8 g8-> R1 bes1 <g g'>8->\( dis'8\) r4 r2 } }
 \new Staff { \key f \major \time 4/4 \clef bass \relative c, {
-c8 c d\( c\) dis\( c\) f\( e\)
-c8 c d\( c\) dis\( c\) f\( e\)
-c8 c d\( c\) dis\( c\) f\( e\)
-c8 c d\( c\) dis\( c\) f\( e\)
-c8 c d\( c\) dis\( c\) f\( e\)
-c8 c d\( c\) dis\( c\) f\( e\)
+c8 c d( c) dis( c) f( e)
+c8 c d( c) dis( c) f( e)
+c8 c d( c) dis( c) f( e)
+c8 c d( c) dis( c) f( e)
+c8 c d( c) dis( c) f( e)
+c8 c d( c) dis( c) f( e)
 } } >>
 \end{lilypond}
 
@@ -1648,11 +1648,11 @@ cacofonix( 'BillieJean', 'Tempo', 115, ...
 \score { <<
 \new Staff { 
 	\set Staff.instrumentName = \markup \center-column { Violin, \line { Clarinet } }
-	\clef treble \key es \major \time 2/4 \relative c'' { r8 g\ff[ g g] es2\fermata r8 f[ f f] d2( d2\fermata) }
+	\clef treble \key es \major \time 2/4 \relative c'' {r8 g\ff[ g g] es2\fermata r8 f[ f f] d2 ~ d2\fermata}
 }
 \new Staff {
 	\set Staff.instrumentName = \markup \center-column { Viol, \line { Cello, } \line { \concat{ Bass } } }
-	\clef bass \key es \major \partcombine { \relative c' { r8 g[ g g] es2\fermata r8 f[ f f] d2( d2\fermata) } } { \relative c { r8 g[ g g] es2 r8 f[ f f] d2( d2) } }
+	\clef bass \key es \major \partcombine { \relative c' { r8 g[ g g] es2\fermata r8 f[ f f] d2 ~ d2\fermata } } { \relative c { r8 g[ g g] es2 r8 f[ f f] d2 ~ d2 } }
 }
 >> }
 \end{lilypond}
