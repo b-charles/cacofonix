@@ -1662,21 +1662,114 @@ cacofonix( 'BillieJean', 'Tempo', 115, ...
 
 \myself{And, as recommended by \emph{The Hitchhiker's Guide to the Galaxy}, \textsc{don't panic}. \rightthumbsup}
 
-A void note is a tonality \note, but without defined tonality yet. You can do anything with a void note, like a tonality note: create a chord (you can have only one void note per chord), set a duration, set accents, transpose\dots but the \cacofonix function doesn't accept void notes in sheets -- except for percussion sheets, where \emph{real} tonality \note are not accepted. To set a final tonality to a void note, you have to use the operator \lstinline!*!.
+A void note is a tonality \note, but without defined tonality yet. You can do anything with a void note, like a tonality note: create a chord (you can have only one void note per chord), set a duration, set accents, transpose\dots but the \lstinline!cacofonix! function doesn't accept void notes in sheets: you have to affect a tonality to the void notes before the call of \lstinline!cacofonix! -- except for percussion sheets, where \emph{real} tonality \note are not accepted. To set a final tonality to a void note, you have to use the operator \lstinline!*!.
 
 \subsubsection{Expand \lstinline!*!}
 \label{sec:Expand}
+
+First of all, the operator \lstinline!mtimes! (\lstinline!*!) works exactly like the operator \lstinline!.*! when it is used on a sheet and a number: the sheet is simply repated.
+\begin{lstlisting}
+>> Note.setNbCharByQuater(8)
+>> 3*[ (G:N2)*2 bar ]
+$1///////////////////////////////$
+$|-------G-------|-------G-------$
+$2///////////////////////////////$
+$|-------G-------|-------G-------$
+$3///////////////////////////////$
+$|-------G-------|-------G-------$
+\end{lstlisting}
+
+But the real purpose of this operator is set the tonality of a void note. The general algorithm is:
+\begin{algo}{M}{Operator \lstinline!*!}{Given a \note \lstinline!n! and a sheet \lstinline!A! (which contains void notes), we compute \lstinline!B = n*A! with this algorithm:}
+	\step{Initialize.}{Initialize \lstinline!B = A!. Set \lstinline!i = 1!.}
+	\step[checki]{Check \lstinline!i!.}{If \lstinline!i > length(A)!, stop the algortihm and return \lstinline!B!.}
+	\step{Set the tonality.}{If the \lstinline!i!th element of \lstinline!A! is a void note, set the tonality of \lstinline!B(i)! with the tonality of \lstinline!n!.}
+	\step{Increase \lstinline!i!.}{Set \lstinline!i = i + 1!. Go to \stepref{checki}.}
+\end{algo}
+
+The algorithm is much simpler than the operator \lstinline!.*!: it's just a for loop and every note of \lstinline!A! get the tonality of \lstinline!n!. For the fun, this is a pseudo \matlab code:
+\begin{lstlisting}
+function C = mtimes( n, A )
+	ton = n.getTonality();
+	B = A;
+
+	for i = 1:length( A )
+		if A(i).isVoid
+			B(i).setTonality( ton );
+
+		end
+	end
+end
+\end{lstlisting}
+
+\me{And what about the half-void notes? You can create a chord with a real note and a void note, what appens when you set the tonality of the void note?}
+\begin{myselfenv}
+Well, do the experiment!
+\begin{lstlisting}
+>> NoteInit
+>> mychord = [ C E V ]:N4
+$|-----------V-----------$
+>> G*mychord
+$|----------GCE----------$
+\end{lstlisting}
+As you can see, the tonalities of the real notes are stored and the new tonality is added. Before that, the display show a \lstinline!V! when the chord is not completly defined. Anyway, create a chord with a void note and real notes is not a common utilisation.
+\end{myselfenv}
+\me{So, what is the common utilisation?}
+\myself{Well, the operator is not so useful without the operator \lstinline!-!. Wait a little.}
+
+\paragraph{Transposed void notes}
+
+A void note can be transposed: the transpositions are applied after the affectation of the tonality. With that behavior, you can create virtual arrays waiting a reference note. For example, how construct quickly different major scales?
+\begin{lstlisting}
+>> NoteInit
+>> Note.setNbCharByQuater( 6 )
+>> majorScale = [ V^[0 0] V^[1 0] V^[2 0] V^[3 0] ...
+	V^[4 0] V^[5 0] V^[6 0] ];
+>> C*majorScale               
+$|  C  |  D  |  E  |  F  |  G  |  A  |  B  $
+>> Ef*majorScale
+$| Eb  |  F  |  G  | Ab  | Bb  |  C  |  D  $
+\end{lstlisting}
+You can also combine transpositions to get relative minor scales:
+\begin{lstlisting}
+>> NoteInit
+>> Note.setNbCharByQuater( 6 )
+>> minorScale = [ V^[0 0] V^[1 0] V^[2 -1] V^[3 0] ...
+	V^[4 0] V^[5 -1] V^[6 0] ]; 
+>> A*minorScale                                                               
+$|  A  |  B  |  C  |  D  |  E  |  F  | G#  $
+>> relativeMinorScale = ( V^[-2 0] )*minorScale;
+>> C*relativeMinorScale
+$|  A  |  B  |  C  |  D  |  E  |  F  | G#  $
+>> Ef*relativeMinorScale
+$|  C  |  D  | Eb  |  F  |  G  | Ab  |  B  $
+\end{lstlisting}
+
+Theses examples are very theorical, but the creation of virtual chords is a direct application of that feature.
+\begin{lstlisting}
+>> NoteInit
+>> Note.setNbCharByQuater( 6 )
+>> ChordMajor = [ V^[0 0] V^[2 0] V^[4 0] ];
+>> ChordMinor = [ V^[0 0] V^[2 -1] V^[4 0] ];
+>> G*ChordMajor
+$|  G  |  B  |  D  $
+>> F*ChordMinor 
+$|  F  | Ab  |  C  $
+\end{lstlisting}
+The files \noteInitFile and \noteInitFrFile contain the common chords and can be excessively used in sheets for piano, guitar, bass\dots Good demonstrations of how use that need the explanation of the operator \lstinline!-! and are grouped at the section \ref{sec:voidExamples}.
 
 \subsubsection{Index \lstinline!-!}
 \label{sec:Index}
 
 \subsubsection{Examples}
+\label{sec:voidExamples}
 
 \begin{lilypond}
-\new Staff {
-	\relative c' { \time 4/4 r4^\markup G e4 d8 c8 b4 b4^\markup C c8 b8 ~ b8 a8 g8 a8 b4 c8 b8 ~ b8 a8 g8 a8 \time 2/4 b4^\markup D c4 \time 4/4 b1^\markup E }
-	\addlyrics { My ba -- by don't mess a -- round be -- cause she loves me so and this I know for sho'. }	
-}
+	\score{ <<
+	\chords{ g1 c s d2 e1 }
+	\relative c' { \time 4/4 r4 e4 d8 c8 b4 b4 c8 b8 ~ b8 a8 g8 a8 b4 c8 b8 ~ b8 a8 g8 a8 \time 2/4 b4 c4 \time 4/4 b1 }
+	\addlyrics { My ba -- by don't mess a -- round be -- cause she loves me so and this I know for sho'. }
+	>> }
 \end{lilypond}
 
 \begin{lstlisting}
@@ -1703,6 +1796,43 @@ GUITAR = [ DynMP ...
 cacofonix( 'HeyYa', 'Tempo', 160, ...
 	'Oboe', MELODY, ...
 	'Nylon-String Guitar', GUITAR );
+\end{lstlisting}
+
+\begin{lilypond}
+	\score{ <<
+	\chords{ s4 f2 a:m bes a:m g:m f a d:m }
+	\relative c' { \key f \major \partial 4 c8 e f4. a8 c2 r8 d d d c2 r8 bes bes bes a2 r8 g g g f2 }
+	\addlyrics { I see trees of green, red ros -- es too, I see them bloom, for me and you. }
+	>> }
+\end{lilypond}
+
+\begin{lstlisting}
+NoteInit
+
+VOICE = [ Note([4 4]) ...
+	C:N8 E:N8 bar ...
+	F:N4' A:N8 +C:N2 bar ...
+	+[ R D D D ].*N8 +C:N2 bar ...
+	[ R Bf Bf Bf ].*N8 A:N2 bar ...
+	[ R G G G ].*N8 F:N2 bar ];
+
+RIFF = [ V-1 V-2 V-3 +V-1 V-3 V-2 ].*N12;
+GUITAR = [ DynMP R:N4 bar ...
+	F*CM*RIFF A*Cm*RIFF bar ...
+	Bf*CM*RIFF A*Cm*RIFF bar ...
+	G*Cm*RIFF F*CM*RIFF bar ...
+	A*CM*RIFF D*Cm*RIFF bar ];
+
+STRINGS = [ DynPP R:N4 bar ...
+	F*CM:N2 A*Cm:N2 bar ...
+	Bf*CM:N2 A*Cm:N2 bar ...
+	G*Cm:N2 F*CM:N2 bar ...
+	A*CM:N2 D*Cm:N2 bar ];
+
+cacofonix( 'WhatAWonderfulWorld', 'Tempo', 70, ...
+	'Bassoon', -VOICE, ...
+	'Nylon-String Guitar', GUITAR, ...
+	'Slow String Ensemble', STRINGS );
 \end{lstlisting}
 
 \subsection{Function \lstinline!cacofonix!}
