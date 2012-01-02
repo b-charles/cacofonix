@@ -935,7 +935,7 @@ This is an example of the tempo features: \\
 \new Staff { \tempo 4=80 \clef bass \key g \major \time 4/4 \relative c {
 g''16 b, d, b' g' b, g' b, g' b, d, b' g' b, g' b, 
 g' a, d, a' g' a, g' a, g' a, d, a' g' a, g' a,
-fis' c d, c'_\markup{ \italic rall... } ~ fis c fis c fis c d, c' fis c fis c
+fis' c d, c'_\markup{ \italic rall... } fis c fis c fis c d, c' fis c fis c
 <g, b' g'>1\fermata } }
 \end{lilypond}
 
@@ -1574,7 +1574,7 @@ cacofonix( 'PeterGunn', 'Tempo', 120, ...
 \me{This explanation needs two remarks.}
 \myself{We share. You take one, and I get the second.}
 \me{Never. If you want to do something, search examples for my speech.}
-\myself{I'll kill you.}
+\myself{I would like to kill you. So much.}
 \me{Excellent. So, the first point is: a rest is a tonality note, so you can't have a rest in the riff -- since it will be associate with a \note of the other array. That's the huge limitation of that operator. Have you found an example?}
 \myself{Do you really expect a \matlab code with this operator to prove that something isn't possible to do with that operator precisely? Sorry, I need a little more time\dots}
 \me{Too bad. Be focus on the next. And search harder, please. The other point: when you want to set an attack, you can use a rest with the operator \lstinline!:!. Examples: \dots}
@@ -1667,7 +1667,7 @@ A void note is a tonality \note, but without defined tonality yet. You can do an
 \subsubsection{Expand \lstinline!*!}
 \label{sec:Expand}
 
-First of all, the operator \lstinline!mtimes! (\lstinline!*!) works exactly like the operator \lstinline!.*! when it is used on a sheet and a number: the sheet is simply repated.
+First of all, the operator \lstinline!mtimes! (\lstinline!*!) works exactly like the operator \lstinline!.*! when it is used on a sheet and a number: the sheet is simply repeated.
 \begin{lstlisting}
 >> Note.setNbCharByQuater(8)
 >> 3*[ (G:N2)*2 bar ]
@@ -1682,7 +1682,7 @@ $|-------G-------|-------G-------$
 But the real purpose of this operator is set the tonality of a void note. The general algorithm is:
 \begin{algo}{M}{Operator \lstinline!*!}{Given a \note \lstinline!n! and a sheet \lstinline!A! (which contains void notes), we compute \lstinline!B = n*A! with this algorithm:}
 	\step{Initialize.}{Initialize \lstinline!B = A!. Set \lstinline!i = 1!.}
-	\step[checki]{Check \lstinline!i!.}{If \lstinline!i > length(A)!, stop the algortihm and return \lstinline!B!.}
+	\step[checki]{Check \lstinline!i!.}{If \lstinline!i > length(A)!, stop the algorithm and return \lstinline!B!.}
 	\step{Set the tonality.}{If the \lstinline!i!th element of \lstinline!A! is a void note, set the tonality of \lstinline!B(i)! with the tonality of \lstinline!n!.}
 	\step{Increase \lstinline!i!.}{Set \lstinline!i = i + 1!. Go to \stepref{checki}.}
 \end{algo}
@@ -1718,6 +1718,7 @@ As you can see, the tonalities of the real notes are stored and the new tonality
 \myself{Well, the operator is not so useful without the operator \lstinline!-!. Wait a little.}
 
 \paragraph{Transposed void notes}
+\label{sec:VirtualArrays}
 
 A void note can be transposed: the transpositions are applied after the affectation of the tonality. With that behavior, you can create virtual arrays waiting a reference note. For example, how construct quickly different major scales?
 \begin{lstlisting}
@@ -1761,8 +1762,20 @@ The files \noteInitFile and \noteInitFrFile contain the common chords and can be
 \subsubsection{Index \lstinline!-!}
 \label{sec:Index}
 
+In fact, the operator \lstinline!*! can be used with two arrays: one with only tonality notes (instead only one tonality note as explain at \ref{sec:Expand}) and a array of \note, which contains some void notes. Per default, if you are using the operator on two arrays: \lstinline!A*B!, all void notes of \lstinline!B! will get the tonality of the first note of \lstinline!A!. So, you can't get the tonalities of the other notes of \lstinline!A!, unless you use the operator \lstinline!-!.
+
+The operator \lstinline!-! define an index on a void note: in the example \lstinline!A*B!, a note \lstinline!V-3! in \lstinline!B! means simply the third note of \lstinline!A!. As we can guess, a void note has per default the index \lstinline!1!. The index \lstinline!0! is special: \lstinline!V-0! creates a chord with all the tonality notes of \lstinline!A!. If the index is greater than the length of the tonality array (\lstinline!A!), the note is deleted without any warning:
+\begin{lstlisting}
+>> NoteInit
+>> Note.setNbCharByQuater( 8 )
+>> [ C E G ]*[ V-1 V-2 V-3 V-4 ].*N8
+$|-C-|-E-|-G-$
+\end{lstlisting}
+
 \subsubsection{Examples}
 \label{sec:voidExamples}
+
+The two following examples show how use the void notes. The first use the void note with the index \lstinline!0!. It is a demonstration of how use the virtual chords seen at the section \ref{sec:VirtualArrays}.
 
 \begin{lilypond}
 	\score{ <<
@@ -1797,6 +1810,8 @@ cacofonix( 'HeyYa', 'Tempo', 160, ...
 	'Oboe', MELODY, ...
 	'Nylon-String Guitar', GUITAR );
 \end{lstlisting}
+
+The second example is a little more complicated: the chords are arpeggiated and one note is raised to the upper octave with the unary operator \lstinline!+!. For the strings, you can see the use of the operator \lstinline!:! directly on the arrays of tonality notes. Of course, the use of a riff \lstinline!V-0:N2! should be possible.
 
 \begin{lilypond}
 	\score{ <<
