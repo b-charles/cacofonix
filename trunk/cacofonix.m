@@ -1789,6 +1789,9 @@ fclose( fid );
 
 %% ### FINISH ALERT
 
-wavplay( finishAlert.y, finishAlert.Fs, 'async' );
+info = audiodevinfo();
+if length( info.output ) > 0
+	play( audioplayer( finishAlert.y, finishAlert.Fs ) );
+end
 
 end
