@@ -805,7 +805,7 @@ classdef Note
 					riffNote = riff( nRiff );
 					
 					index = riffNote.voidIndex;
-					tranpo = riffNote.voidTranspo;
+					transpo = riffNote.voidTranspo;
 					nbNotes = length( index );
 					
 					notesOfVoid = cell( 1, nbNotes );
@@ -822,7 +822,7 @@ classdef Note
 						
 						% get transposed notes
 						if ~isempty( idx )
-							notesOfVoid{i} = internalTranspose( accord( idx ), tranpo(:,i) );
+							notesOfVoid{i} = internalTranspose( accord( idx ), transpo(:,i) );
 						end
 						
 					end
