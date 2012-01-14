@@ -10,6 +10,7 @@ cd out
 latex -quiet cacofonix.tex
 asy cacofonix-*.asy || pause
 latex -quiet cacofonix.tex
+latex -quiet cacofonix.tex
 latex -quiet cacofonix.tex || pause
 
 dvips -q cacofonix.dvi

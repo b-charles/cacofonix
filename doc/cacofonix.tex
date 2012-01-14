@@ -13,6 +13,8 @@
 \usepackage{forarray}
 \usepackage{ifthen}
 \usepackage{calc}
+\usepackage{longtable}
+\usepackage{pifont}
 
 % ASYMPTOTE & SUBFIG
 \makeatletter
@@ -50,6 +52,11 @@
 \newcommand{\exchange}[2]{\texttt{#1}\footnote{\url{#2}}\xspace}
 
 \newcommand\sfz{s$\!f\!$z\xspace}
+
+% instruments
+\newcommand{\instrusection}[1]{ \\[5pt] \multicolumn{4}{l}{\textbf{#1}}\\}
+\newcommand\lvlo{}
+\newcommand\lvlt{\ding{105}}
 
 % ALGORITHM
 \newcounter{algonum}
@@ -457,7 +464,7 @@ Thank you to have read this document, and for your interest about \cacofonix.
 
 In this reference guide, we will see every possibilities to transcribe any sheet the most quickly and faithfully as far as it can be. We suggest to have read the tutorial before start the next sections.
 
-The first introductive sections will be about important and general key concepts of \cacofonix. From section \ref{sec:Tonalities}, we will see the \emph{advanced usages of the basic features}. Then, from the section \ref{sec:Transpose}, we will gently study the \emph{insane usages of the super weird features}. Finally, we will finish with the API\footnote{\emph{Application Programming Interface}} of the \lstinline!cacofonix! function.
+The first introductive sections will be about important and general key concepts of \cacofonix. From section \ref{sec:Tonalities}, we will see the \emph{advanced usages of the basic features}. Then, from the section \ref{sec:Transpose}, we will gently study the \emph{insane usages of the weird features}. Finally, we will finish with the API\footnote{\emph{Application Programming Interface}} of the \lstinline!cacofonix! function.
 
 \me{I feel it will be \dots BOOOOOOOORING!}
 \myself{Well, your analysis is short and simplistic, but correct. The point is: if you want to play \emph{Three Blind Mice}, you have everything you need in the tutorial. If you want to play the Schubert's \emph{Trout Quintet}, you should read carefully this guide.}
@@ -471,9 +478,9 @@ To search of a particular point, three tables can help: all features concerning 
 		\hline
 		\lstinline!Note( tonality )! & tonality & N & \ref{sec:Tonalities} \\
 		\lstinline!Note( duration )! & duration & N & \ref{sec:Duration} \\
+		\lstinline!Note( '+X'|'-X' )! & octave & M & \ref{sec:OctaveNote} \\
 		\lstinline!Note( 'bar' )! & bars & M & \ref{sec:MetersAndBars} \\
 		\lstinline!Note( [upper lower] )! & meters & G & \ref{sec:MetersAndBars} \\
-		\lstinline!Note( '+X'|'-X' )! & octave & M & \ref{sec:OctaveNote} \\
 		\lstinline!Note( 'dynamics', dyn, [ d ] )! & dynamics & M & \ref{sec:Dynamics} \\
 		\lstinline!Note( 'dynamics*', dyn, [ d ] )! & channel dynamics & C & \ref{sec:ChannelDynamics} \\
 		\lstinline!Note( 'cresc', dur, dyn, [ d ] )! & crescendo & M & \ref{sec:Crescendo} \\
@@ -483,7 +490,7 @@ To search of a particular point, three tables can help: all features concerning 
 		\lstinline!Note( 'fermata', dur, play )! & fermata & G & \ref{sec:Fermata} \\
 		\lstinline!Note( 'sustain', 'on'|'off' )! & sustain & C & \ref{sec:Sustain} \\
 		\lstinline!Note( 'marker', mark )! & marker & G & \ref{sec:Markers} \\
-		\lstinline!Note( 'marker*', mark )! & go to & M & \ref{sec:Goto} \\
+		\lstinline!Note( 'marker*', mark )! & goto marker & M & \ref{sec:Goto} \\
 		\lstinline!Note( 'pitch', [ t ], val, [ d ] )! & pitch wheel & C & \ref{sec:Pitch} \\
 		\lstinline!Note( 'void' )! & void note & N & \ref{sec:VoidNote} \\
 	\end{tabular}
@@ -497,14 +504,14 @@ To search of a particular point, three tables can help: all features concerning 
 		Member function & Operator & Description & Scope & Section \\
 		\hline
 		\lstinline!plus! & \lstinline!+! & chord & N & \ref{sec:Chord} \\
+		\lstinline!uplus!, \lstinline!uminus! & \lstinline!+!, \lstinline!-! & octave & N & \ref{sec:OctaveOperators} \\
 		\lstinline!colon! & \lstinline!:! & set duration & N & \ref{sec:SetDuration} \\
 		\lstinline!ctranspose! & \lstinline!'! & dot & N & \ref{sec:DottedNotes} \\
 		\lstinline!not! & \lstinline!~! & tie & N & \ref{sec:TiesAndSlurs} \\
-		\lstinline!uplus!, \lstinline!uminus! & \lstinline!+!, \lstinline!-! & octave & N & \ref{sec:OctaveOperators} \\
 		\lstinline!mrdivide! & \lstinline!/! & polyphonic section & N & \ref{sec:Polyphony} \\
+		\lstinline!or! & \lstinline!|! & extraction & C & \ref{sec:Extraction} \\
 		\lstinline!mpower! & \lstinline!^! & transposition & N & \ref{sec:Transpose} \\
 		\lstinline!mtimes! & \lstinline!.*! & riff & N & \ref{sec:RepeatRiff} \\
-		\lstinline!or! & \lstinline!|! & extraction & C & \ref{sec:Extraction} \\
 		\lstinline!display!& & display & C & \ref{sec:Display} \\
 		\lstinline!times! & \lstinline!*! & expand & N & \ref{sec:Expand} \\
 		\lstinline!minus! & \lstinline!-! & index & N & \ref{sec:Index} \\
@@ -520,7 +527,6 @@ To search of a particular point, three tables can help: all features concerning 
 		\hline
 		\lstinline!cacofonix( file, ... )! & output file & & \ref{sec:CacofonixFunction} \\
 		\lstinline!cacofonix( ..., instrument, sheet, ... )! & add sheets & C & \ref{sec:CacofonixFunction} \\
-		\lstinline!cacofonix( ..., mainSheet, ... )! & main sheet & G & \ref{sec:MainSheet} \\
 		\lstinline!cacofonix( ..., 'Tempo', tempo, ... )! & default tempo & G & \ref{sec:Tempo} \\
 		\lstinline!cacofonix( ..., 'Velocity', velocity, ... )! & velocity & G & \ref{sec:Velocity} \\
 		\lstinline!cacofonix( ..., 'DrumKit', drumkit, ... )! & drum kit & G & \ref{sec:CacofonixFunction} \\
@@ -530,6 +536,7 @@ To search of a particular point, three tables can help: all features concerning 
 \end{table}
 
 \subsection{Sheets, instruments, tracks and channels}
+\label{sec:SITandC}
 
 For \cacofonix, the transcription of a sheet is realized with an array of \note objects. In all this document, we call a sheet a coherent array of \note for \cacofonix.
 
@@ -577,7 +584,7 @@ sheet = [ C:N bar ...      % dyn: mf (default)
 	];
 \end{lstlisting}
 	\item A feature with a channel scope modify\dots the channel, and so all played sheets of the modified instrument at the same time. Be careful: remember that percussions share the same channel!
-	\item Finally, a feature with a global scope modify all sheets given to the \lstinline!cacofonix! function. For more readability, theses features can be grouped in a main sheet, see the section \ref{sec:MainSheet}.
+	\item Finally, a feature with a global scope modify all sheets given to the \lstinline!cacofonix! function. For more readability, theses features can be grouped in a main sheet, see the section \ref{sec:CacofonixFunction}.
 \end{itemize}
 
 \me{I not sure to understand\dots}
@@ -759,7 +766,7 @@ To defined a meter, you have to instantiate a special \note object by calling th
 
 When several sheets are given to \cacofonix, the first sheet defined the meters. Next sheets have to precise bars, but not meters (meters are in the global scope, although bars are only in the monophonic scope). If another sheet specify meters, the meters can't be different from the first sheet. With the same spirit, in polyphonic sections, bars have to be added everywhere and, if the meters have to be defined, the first monophonic section contains meters objects and the others don't have to, but if they do, meters have to be always identical.
 %\me{For project with several sheets, it's maybe a good idea if the first sheet is only composed with meters, and maybe the other things whith a global scope like tempo and markers, do you think?}
-%\myself{Shh! It's explained at the section \ref{sec:MainSheet}. Let him talk.}
+%\myself{Shh! It's explained at the section \ref{sec:CacofonixFunction}. Let him talk.}
 
 The first measure duration is never checked, to allow anacrusis. If no meter is given, the second measure is the reference and all measure have to have the same duration. Even if the first measure is an anacrusis, the other measures have to always have the same duration, or the meter has to be redefined.
 
@@ -1824,39 +1831,377 @@ The second example is a little more complicated: the chords are arpeggiated and 
 \begin{lstlisting}
 NoteInit
 
-VOICE = [ Note([4 4]) ...
-	C:N8 E:N8 bar ...
+VOICE = [ Note('-') C:N8 E:N8 bar ...
 	F:N4' A:N8 +C:N2 bar ...
-	+[ R D D D ].*N8 +C:N2 bar ...
-	[ R Bf Bf Bf ].*N8 A:N2 bar ...
-	[ R G G G ].*N8 F:N2 bar ];
+	R:N8 (+D:N8)*3 +C:N2 bar ...
+	R:N8 (Bf:N8)*3 A:N2 bar ...
+	R:N8 (G:N8)*3 F:N2 bar ];
 
-RIFF = [ V-1 V-2 V-3 +V-1 V-3 V-2 ].*N12;
-GUITAR = [ DynMP R:N4 bar ...
-	F*CM*RIFF A*Cm*RIFF bar ...
-	Bf*CM*RIFF A*Cm*RIFF bar ...
-	G*Cm*RIFF F*CM*RIFF bar ...
-	A*CM*RIFF D*Cm*RIFF bar ];
+RIFF = [ V-1 V-2 V-3 +V-1 +V-4 V-6 V-5 V-4 bar ].*N8;
+GUITAR = [ Note('-') R:N4 bar ...
+	[ F*CM  A*Cm ]*RIFF ...
+	[ Bf*CM A*Cm ]*RIFF ...
+	[ G*Cm  F*CM ]*RIFF ...
+	[ A*CM  D*Cm ]*RIFF ];
 
-STRINGS = [ DynPP R:N4 bar ...
+VIOLIN = [ DynPP R:N4 bar ...
 	F*CM:N2 A*Cm:N2 bar ...
 	Bf*CM:N2 A*Cm:N2 bar ...
 	G*Cm:N2 F*CM:N2 bar ...
 	A*CM:N2 D*Cm:N2 bar ];
 
-cacofonix( 'WhatAWonderfulWorld', 'Tempo', 70, ...
-	'Bassoon', -VOICE, ...
+cacofonix( 'WhatAWonderfulWorld', 'Tempo', 80, ...
+	'Bassoon', VOICE, ...
 	'Nylon-String Guitar', GUITAR, ...
-	'Slow String Ensemble', STRINGS );
+	'Slow String Ensemble', VIOLIN );
 \end{lstlisting}
 
 \subsection{Function \lstinline!cacofonix!}
 \label{sec:CacofonixFunction}
 
-\subsubsection{The Main sheet}
-\label{sec:MainSheet}
+So, it remains one big last question is: how get the midi files from the sheets. Of course, that's the purpose of the function \lstinline!cacofonix!. You have already seen a lot of example of the utilisation of this function, but some features are not explained yet.
 
-\subsubsection{Percussions}
-\label{sec:Percussions}
+The API of \lstinline!cacofonix! to write a midi file can be write like that:
+\begin{lstlisting}
+cacofonix( midiFilePath, ...
+	[ 'Tempo', tempo, ] ...
+	[ 'Velocity', velocity, ] ...
+	[ 'DrumKit', drumkit, ] ...
+	[ mainSheet, ] ...
+	[ pianoSheet1, pianoSheet2, ... ] ...
+	[ instrument1, sheet1, sheet2, ... ] ...
+	[ instrument2, ... ] ... )
+\end{lstlisting}
+\begin{itemize}
+	\item The parameter \lstinline!midiFilePath! is the path to midi file. It is automatically completed by the extension \lstinline!'.mid'!.
+	\item The optional parameter \lstinline!tempo! following the string \lstinline!'Tempo'! define the general tempo. See the section \ref{sec:Tempo} for more informations.
+	\item The optional parameter \lstinline!velocity! following the string \lstinline!'Velocity'! define the velocities to apply to the dynamics. See the section \ref{sec:Velocity} for more informations.
+	\item The optional parameter \lstinline!drumkit! following the string \lstinline!'DrumKit'! define the drum kit to use. Use it at your own risk.
+	\item The parameter \lstinline!mainSheet! is an optional sheet without any playable note: it's the perfect place to define meters, tempos, fermatas and markers when the project contains several instruments.
+	\item The meaning of the next parameters is strongly related to the explanations of the section \ref{sec:SITandC}. The first sheets with playable notes (but without being preceded by the name of an instrument) are associated with an unique channel with the timbre of a piano. When a string containing the name of an instrument or a percussion is given, \lstinline!cacofonix! creates a new channel (with right timbre) and associates the next sheets to that instrument.
+\end{itemize}
+
+The names of the instruments and percussions can be found in the sections \ref{sec:AvailInstruments} and \ref{sec:AvailPercussion}. \lstinline!cacofonix! can manage the instruments of the midi specification level 1 and 2, but not necessarily your midi player: the level 2 is not always supported. You have been warned.
+
+As you have to know, a sheet of an instrument can't contain a void note and a sheet of a percussion has to contain only void notes. Moreover, for some percussions, the indexed void notes \lstinline!V-2! and \lstinline!V-3! have special meanings and can be used to play an other (but related) percussion.
+
+We will finish that guide by a last demonstration:
+
+\begin{lilypond}
+	\score{ <<
+	\relative c'' { \key g \major \time 4/4 d16 e e d e8 e16 d e8 e d16 e e d e8 e16 d e d e8 a g g16 d e8 e16 e8 d16 e8 r16 e, e'8 e e r d16 d d8 d8 a16( b) a g e e ~ e8 b'16 d g4 fis e d e8 e r4 r2 }
+	\addlyrics { Bud -- dy, you're a boy, make a big noise play -- in' in the street. Gon -- na be a big man some -- day. You got mud on yo' face, you big dis -- grace, kick -- in' your can all o -- ver the place, sing -- in' WE WILL, WE WILL ROCK YOU! }
+	>> }
+\end{lilypond}
+
+\begin{lstlisting}
+NoteInit
+
+MVerse = Note( 'Marker', 'Verse' );
+MChorus = Note( 'Marker', 'Chorus' );
+
+P = [ R:N bar ]a
+MAIN = [ Note([4 4]) Note( 'Tempo', 80 ) ...
+	P*2 MVerse P*4 MChorus P*2 ];
+
+VOICE = [ Note('+') ~MVerse ...
+	D:N16 E:N16 E:N16 D:N16 E:N8 E:N16 D:N16 ...
+		E:N8 E:N8 D:N16 E:N16 E:N16 D:N16 bar ...
+	E:N8 E:N16 D:N16 E:N16 D:N16 E:N8 ...
+		A:N8 G:N8 G:N16 D:N16 E:N8 bar ...
+	E:N8 E:N16 D:N16 E:N8 R:N16 -A:N16 ...
+		E:N8 E:N8 E:N8 R:N8 bar ...
+	D:N16 D:N16 D:N8 D:N8 -A:N16 ~-B:N16 ...
+		-A:N16 -G:N16 -E:N16 -E:N8' -B:N16 D:N16 bar ...
+	MChorus G:N4 Fs:N4 E:N4 D:N4 bar ...
+	E:N8 E:N8 R:N2' bar ];
+
+BASS = [ V:N8 V:N8 R:N4     V:N8 V:N8 R:N4     bar ]*8;
+CLAP = [ R:N8 R:N8 V:'>':N4 R:N8 R:N8 V:'>':N4 bar ]*8;
+
+cacofonix( 'WeWillRockYou', MAIN, ...
+	'Soprano Sax', VOICE, ...
+	'Acoustic Bass Drum', BASS, ...
+	'Hand Clap', CLAP );
+\end{lstlisting}
+
+\paragraph{}
+
+That's conclude this document. We hope you will enjoy \cacofonix as much as I had while I was writing it. Happy \cacofonix-ing!
+
+\me{See you!}
+\myself{Good bye!}
+
+\appendix
+
+\section{Listings}
+
+\subsection{Name of the available instruments}
+\label{sec:AvailInstruments}
+
+The names of the available instruments are listed here. The instruments \lstinline!'Piano'! and \lstinline!'Acoustic Grand Piano'! are the same instrument. A star (\lvlt) before a name means that instrument is only defined in the midi specification level 2: if the midi player is a little old and doesn't know that instrument (or the sound bank doesn't define this instrument), it is replace by the first previous instrument without a star. The function \lstinline!cacofonix! can produce this list with:
+\begin{lstlisting}
+>> cacofonix -instruments % only level 1
+>> cacofonix -instruments -level2 % levels 1 and 2
+\end{lstlisting}
+
+\begin{center}
+\begin{longtable}{ll|ll}
+\instrusection{Piano}
+ \lvlo & \lstinline!'Piano'! & \lvlt & \lstinline!'60s Electric Piano'! \\
+ \lvlo & \lstinline!'Acoustic Grand Piano'! & \lvlo & \lstinline!'Chorused Electric Piano'! \\
+ \lvlt & \lstinline!'Wide Acoustic Grand Piano'! & \lvlt & \lstinline!'Detuned Electric Piano 2'! \\
+ \lvlt & \lstinline!'Dark Acoustic Grand Piano'! & \lvlt & \lstinline!'Electric Piano 2 Variation'! \\
+ \lvlo & \lstinline!'Bright Acoustic Piano'! & \lvlt & \lstinline!'Electric Piano Legend'! \\
+ \lvlt & \lstinline!'Wide Bright Acoustic Piano'! & \lvlt & \lstinline!'Electric Piano Phase'! \\
+ \lvlo & \lstinline!'Electric Grand Piano'! & \lvlo & \lstinline!'Harpsichord'! \\
+ \lvlt & \lstinline!'Wide Electric Grand Pinao'! & \lvlt & \lstinline!'Coupled Harpsichord'! \\
+ \lvlo & \lstinline!'Honky-tonk Piano'! & \lvlt & \lstinline!'Wide Harpsichord'! \\
+ \lvlt & \lstinline!'Wide Honky-tonk Piano'! & \lvlt & \lstinline!'Open Harpsichord'! \\
+ \lvlo & \lstinline!'Rhodes Piano'! & \lvlo & \lstinline!'Clavinet'! \\
+ \lvlt & \lstinline!'Detuned Electric Piano 1'! & \lvlt & \lstinline!'Pulse Clavinet'! \\
+ \lvlt & \lstinline!'Electric Piano 1 Variation'! \\
+\instrusection{Chromatic Percussion}
+ \lvlo & \lstinline!'Celesta'! & \lvlt & \lstinline!'Wide Marimba'! \\
+ \lvlo & \lstinline!'Glockenspiel'! & \lvlo & \lstinline!'Xylophone'! \\
+ \lvlo & \lstinline!'Music Box'! & \lvlo & \lstinline!'Tubular Bell'! \\
+ \lvlo & \lstinline!'Vibraphone'! & \lvlt & \lstinline!'Church Bell'! \\
+ \lvlt & \lstinline!'Wet Vibraphone'! & \lvlo & \lstinline!'Carillon'! \\
+ \lvlo & \lstinline!'Marimba'! & \lvlo & \lstinline!'Santur'! \\
+\instrusection{Organ}
+ \lvlo & \lstinline!'Hammond Organ'! & \lvlt & \lstinline!'Church Organ 2'! \\
+ \lvlt & \lstinline!'Detuned Organ'! & \lvlt & \lstinline!'Church Organ 3'! \\
+ \lvlt & \lstinline!'60s Organ'! & \lvlo & \lstinline!'Reed Organ'! \\
+ \lvlt & \lstinline!'Organ 4'! & \lvlt & \lstinline!'Puff Organ'! \\
+ \lvlo & \lstinline!'Percussive Organ'! & \lvlo & \lstinline!'French Accordion'! \\
+ \lvlt & \lstinline!'Detuned Organ 2'! & \lvlt & \lstinline!'Italian Accordion'! \\
+ \lvlt & \lstinline!'Organ 5'! & \lvlo & \lstinline!'Harmonica'! \\
+ \lvlo & \lstinline!'Rock Organ'! & \lvlo & \lstinline!'Bandoneon'! \\
+ \lvlo & \lstinline!'Church Organ 1'! \\
+\instrusection{Guitar}
+ \lvlo & \lstinline!'Nylon-String Guitar'! & \lvlt & \lstinline!'Mid Tone Guitar'! \\
+ \lvlt & \lstinline!'Ukulele'! & \lvlo & \lstinline!'Muted Electric Guitar'! \\
+ \lvlt & \lstinline!'Open Nylon Guitar'! & \lvlt & \lstinline!'Funk Guitar'! \\
+ \lvlt & \lstinline!'Nylon Guitar 2'! & \lvlt & \lstinline!'Funk Guitar 2'! \\
+ \lvlo & \lstinline!'Steel-String Guitar'! & \lvlt & \lstinline!'Jazz Man'! \\
+ \lvlt & \lstinline!'12-String Guitar'! & \lvlo & \lstinline!'Overdriven Guitar'! \\
+ \lvlt & \lstinline!'Mandolin'! & \lvlt & \lstinline!'Guitar Pinch'! \\
+ \lvlt & \lstinline!'Steel + Body'! & \lvlo & \lstinline!'Distortion Guitar'! \\
+ \lvlo & \lstinline!'Jazz Guitar'! & \lvlt & \lstinline!'Feedback Guitar'! \\
+ \lvlt & \lstinline!'Hawaiian Guitar'! & \lvlt & \lstinline!'Distortion Rtm Guitar'! \\
+ \lvlo & \lstinline!'Clean Electric Guitar'! & \lvlo & \lstinline!'Guitar Harmonics'! \\
+ \lvlt & \lstinline!'Chorus Guitar'! & \lvlt & \lstinline!'Guitar Feedback'! \\
+\instrusection{Bass}
+ \lvlo & \lstinline!'Acoustic Bass'! & \lvlt & \lstinline!'Synth Bass 101'! \\
+ \lvlo & \lstinline!'Fingered Bass'! & \lvlt & \lstinline!'Synth Bass 3'! \\
+ \lvlt & \lstinline!'Finger Slap'! & \lvlt & \lstinline!'Clavi Bass'! \\
+ \lvlo & \lstinline!'Picked Bass'! & \lvlt & \lstinline!'Hammer'! \\
+ \lvlo & \lstinline!'Fretless Bass'! & \lvlo & \lstinline!'Synth Bass 2'! \\
+ \lvlo & \lstinline!'Slap Bass 1'! & \lvlt & \lstinline!'Synth Bass 4'! \\
+ \lvlo & \lstinline!'Slap Bass 2'! & \lvlt & \lstinline!'Rubber Bass'! \\
+ \lvlo & \lstinline!'Synth Bass 1'! & \lvlt & \lstinline!'Attack Pulse'! \\
+\instrusection{Orchestra Solo}
+ \lvlo & \lstinline!'Violin'! & \lvlo & \lstinline!'Tremolo Strings'! \\
+ \lvlt & \lstinline!'Slow Violin'! & \lvlo & \lstinline!'Pizzicato Strings'! \\
+ \lvlo & \lstinline!'Viola'! & \lvlo & \lstinline!'Harp'! \\
+ \lvlo & \lstinline!'Cello'! & \lvlt & \lstinline!'Yang Qin'! \\
+ \lvlo & \lstinline!'Contrabass'! & \lvlo & \lstinline!'Timpani'! \\
+\instrusection{Orchestra Ensemble}
+ \lvlo & \lstinline!'String Ensemble'! & \lvlo & \lstinline!'Voice Oohs'! \\
+ \lvlt & \lstinline!'Orchestra Strings'! & \lvlt & \lstinline!'Humming'! \\
+ \lvlt & \lstinline!'60s Strings'! & \lvlo & \lstinline!'Synth Voice'! \\
+ \lvlo & \lstinline!'Slow String Ensemble'! & \lvlt & \lstinline!'Analog Voice'! \\
+ \lvlo & \lstinline!'Synth Strings 1'! & \lvlo & \lstinline!'Orchestra Hit'! \\
+ \lvlt & \lstinline!'Synth Strings 3'! & \lvlt & \lstinline!'Bass Hit'! \\
+ \lvlo & \lstinline!'Synth Strings 2'! & \lvlt & \lstinline!'6th Hit'! \\
+ \lvlo & \lstinline!'Choir Aahs'! & \lvlt & \lstinline!'Euro Hit'! \\
+ \lvlt & \lstinline!'Choir Aahs 2'! \\
+\instrusection{Brass}
+ \lvlo & \lstinline!'Trumpet'! & \lvlo & \lstinline!'French Horns'! \\
+ \lvlt & \lstinline!'Dark Trumpet'! & \lvlt & \lstinline!'French Horn 2'! \\
+ \lvlo & \lstinline!'Trombone'! & \lvlo & \lstinline!'Brass Section 1'! \\
+ \lvlt & \lstinline!'Trombone 2'! & \lvlt & \lstinline!'Brass Section 2'! \\
+ \lvlt & \lstinline!'Bright Trombone'! & \lvlo & \lstinline!'Synth Brass 1'! \\
+ \lvlo & \lstinline!'Tuba'! & \lvlt & \lstinline!'Synth Brass 3'! \\
+ \lvlo & \lstinline!'Muted Trumpet'! & \lvlt & \lstinline!'Analog Brass 1'! \\
+ \lvlt & \lstinline!'Muted Trumpet 2'! \\
+\instrusection{Reed}
+ \lvlt & \lstinline!'Jump Brass'! & \lvlo & \lstinline!'Tenor Sax'! \\
+ \lvlo & \lstinline!'Synth Brass 2'! & \lvlo & \lstinline!'Baritone Sax'! \\
+ \lvlt & \lstinline!'Synth Brass 4'! & \lvlo & \lstinline!'Oboe'! \\
+ \lvlt & \lstinline!'Analog Brass 2'! & \lvlo & \lstinline!'English Horn'! \\
+ \lvlo & \lstinline!'Soprano Sax'! & \lvlo & \lstinline!'Bassoon'! \\
+ \lvlo & \lstinline!'Alto Sax'! & \lvlo & \lstinline!'Clarinet'! \\
+\instrusection{Wind}
+ \lvlo & \lstinline!'Piccolo'! & \lvlo & \lstinline!'Bottle Blow'! \\
+ \lvlo & \lstinline!'Flute'! & \lvlo & \lstinline!'Shakuhachi'! \\
+ \lvlo & \lstinline!'Recorder'! & \lvlo & \lstinline!'Whistle'! \\
+ \lvlo & \lstinline!'Pan Flute'! & \lvlo & \lstinline!'Ocarina'! \\
+\instrusection{Synth Lead}
+ \lvlo & \lstinline!'Square Lead'! & \lvlo & \lstinline!'Synth Calliope'! \\
+ \lvlt & \lstinline!'Square Wave'! & \lvlo & \lstinline!'Chiffer Lead'! \\
+ \lvlt & \lstinline!'Sine Wave'! & \lvlo & \lstinline!'Charang'! \\
+ \lvlo & \lstinline!'Saw Lead'! & \lvlt & \lstinline!'Wire Lead'! \\
+ \lvlt & \lstinline!'Saw Wave'! & \lvlo & \lstinline!'Solo Synth Vox'! \\
+ \lvlt & \lstinline!'Doctor Solo'! & \lvlo & \lstinline!'5th Saw Wave'! \\
+ \lvlt & \lstinline!'Natural Lead'! & \lvlo & \lstinline!'Bass & Lead'! \\
+ \lvlt & \lstinline!'Sequenced Saw'! & \lvlt & \lstinline!'Delayed Lead'! \\
+\instrusection{Synth Pad}
+ \lvlo & \lstinline!'Fantasia Pad'! & \lvlt & \lstinline!'Itopia'! \\
+ \lvlo & \lstinline!'Warm Pad'! & \lvlo & \lstinline!'Bowed Glass Pad'! \\
+ \lvlt & \lstinline!'Sine Pad'! & \lvlo & \lstinline!'Metal Pad'! \\
+ \lvlo & \lstinline!'Polysynth Pad'! & \lvlo & \lstinline!'Halo Pad'! \\
+ \lvlo & \lstinline!'Space Voice Pad'! & \lvlo & \lstinline!'Sweep Pad'! \\
+\instrusection{Synth Sound FX}
+ \lvlo & \lstinline!'Ice Rain'! & \lvlo & \lstinline!'Goblin'! \\
+ \lvlo & \lstinline!'Soundtrack'! & \lvlo & \lstinline!'Echo Drops'! \\
+ \lvlo & \lstinline!'Crystal'! & \lvlt & \lstinline!'Echo Bell'! \\
+ \lvlt & \lstinline!'Synth Mallet'! & \lvlt & \lstinline!'Echo Pan'! \\
+ \lvlo & \lstinline!'Atmosphere'! & \lvlo & \lstinline!'Star Theme'! \\
+ \lvlo & \lstinline!'Brightness'! \\
+\instrusection{Ethnic}
+ \lvlo & \lstinline!'Sitar'! & \lvlt & \lstinline!'Taisho Koto'! \\
+ \lvlt & \lstinline!'Sitar 2'! & \lvlo & \lstinline!'Kalimba'! \\
+ \lvlo & \lstinline!'Banjo'! & \lvlo & \lstinline!'Bagpipe'! \\
+ \lvlo & \lstinline!'Shamisen'! & \lvlo & \lstinline!'Fiddle'! \\
+ \lvlo & \lstinline!'Koto'! & \lvlo & \lstinline!'Shanai'! \\
+\instrusection{Percussive}
+ \lvlo & \lstinline!'Tinkle Bell'! & \lvlo & \lstinline!'Melodic Tom 1'! \\
+ \lvlo & \lstinline!'Agogo'! & \lvlt & \lstinline!'Melodic Tom 2'! \\
+ \lvlo & \lstinline!'Steel Drums'! & \lvlo & \lstinline!'Synth Drum'! \\
+ \lvlo & \lstinline!'Woodblock'! & \lvlt & \lstinline!'808 Tom'! \\
+ \lvlt & \lstinline!'Castanets'! & \lvlt & \lstinline!'Electric Percussion'! \\
+ \lvlo & \lstinline!'Taiko'! & \lvlo & \lstinline!'Reverse Cymbal'! \\
+ \lvlt & \lstinline!'Concert Bass Drum'! \\
+\instrusection{Sound Effect}
+ \lvlo & \lstinline!'Guitar Fret Noise'! & \lvlo & \lstinline!'Helicopter'! \\
+ \lvlt & \lstinline!'Guitar Cut Noise'! & \lvlt & \lstinline!'Car-Engine'! \\
+ \lvlt & \lstinline!'String Slap'! & \lvlt & \lstinline!'Car-Stop'! \\
+ \lvlo & \lstinline!'Breath Noise'! & \lvlt & \lstinline!'Car-Pass'! \\
+ \lvlt & \lstinline!'Flute Key Click'! & \lvlt & \lstinline!'Car-Crash'! \\
+ \lvlo & \lstinline!'Seashore'! & \lvlt & \lstinline!'Siren'! \\
+ \lvlt & \lstinline!'Rain'! & \lvlt & \lstinline!'Train'! \\
+ \lvlt & \lstinline!'Thunder'! & \lvlt & \lstinline!'Jetplane'! \\
+ \lvlt & \lstinline!'Wind'! & \lvlt & \lstinline!'Starship'! \\
+ \lvlt & \lstinline!'Stream'! & \lvlt & \lstinline!'Burst Noise'! \\
+ \lvlt & \lstinline!'Bubble'! & \lvlo & \lstinline!'Applause'! \\
+ \lvlo & \lstinline!'Bird'! & \lvlt & \lstinline!'Laughing'! \\
+ \lvlt & \lstinline!'Dog'! & \lvlt & \lstinline!'Screaming'! \\
+ \lvlt & \lstinline!'Horse-Gallop'! & \lvlt & \lstinline!'Punch'! \\
+ \lvlt & \lstinline!'Bird 2'! & \lvlt & \lstinline!'Heart Beat'! \\
+ \lvlo & \lstinline!'Telephone 1'! & \lvlt & \lstinline!'Footsteps'! \\
+ \lvlt & \lstinline!'Telephone 2'! & \lvlo & \lstinline!'Gun Shot'! \\
+ \lvlt & \lstinline!'Door Creaking'! & \lvlt & \lstinline!'Machine Gun'! \\
+ \lvlt & \lstinline!'Door Closing'! & \lvlt & \lstinline!'Lasergun'! \\
+ \lvlt & \lstinline!'Scratch'! & \lvlt & \lstinline!'Explosion'! \\
+ \lvlt & \lstinline!'Wind Chimes'! \\
+\end{longtable}
+\end{center}
+
+\subsection{Name of the available percussions}
+\label{sec:AvailPercussion}
+
+The names of the available percussions are listed here. A star (\lvlt) before a name means that instrument is only defined in the midi specification level 2. If the percussion is not defined by the midi player, it isn't played. The function \lstinline!cacofonix! can produce this list with:
+\begin{lstlisting}
+>> cacofonix -percussions % only level 1
+>> cacofonix -percussions -level2 % levels 1 and 2
+\end{lstlisting}
+
+\begin{center}
+\begin{longtable}{llll}
+	& \multicolumn{1}{c}{Name (\lstinline!V-1!)} & \multicolumn{1}{c}{\lstinline!V-2!} & \multicolumn{1}{c}{\lstinline!V-3!} \\
+\endfirsthead
+	& \multicolumn{1}{c}{Name (\lstinline!V-1!)} & \multicolumn{1}{c}{\lstinline!V-2!} & \multicolumn{1}{c}{\lstinline!V-3!} \\
+\endhead
+ \lvlt & \lstinline!'High Q'! & & \\
+ \lvlt & \lstinline!'Slap'! & & \\
+ \lvlt & \lstinline!'Scratch'! & & \\
+ \lvlt & \lstinline!'Scratch 2'! & & \\
+ \lvlt & \lstinline!'Sticks'! & & \\
+ \lvlt & \lstinline!'Square'! & & \\
+ \lvlt & \lstinline!'Metronome'! & & \\
+ \lvlt & \lstinline!'Metronome 2'! & & \\
+ \lvlo & \lstinline!'Acoustic Bass Drum'! & & \\
+ \lvlo & \lstinline!'Bass Drum 1'! & & \\
+ \lvlo & \lstinline!'Side Stick'! & & \\
+ \lvlo & \lstinline!'Acoustic Snare'! & & \\
+ \lvlo & \lstinline!'Hand Clap'! & & \\
+ \lvlo & \lstinline!'Electric Snare'! & & \\
+ \lvlo & \lstinline!'Low Floor Tom'! & & \\
+ \lvlo & \lstinline!'Closed Hi-Hat'! & \lstinline!'Open Hi-Hat'! & \lstinline!'Pedal Hi-Hat'! \\
+ \lvlo & \lstinline!'High Floor Tom'! & & \\
+ \lvlo & \lstinline!'Pedal Hi-Hat'! & \lstinline!'Open Hi-Hat'! & \lstinline!'Closed Hi-Hat'! \\
+ \lvlo & \lstinline!'Low Tom'! & & \\
+ \lvlo & \lstinline!'Open Hi-Hat'! & \lstinline!'Pedal Hi-Hat'! & \lstinline!'Closed Hi-Hat'! \\
+ \lvlo & \lstinline!'Low-Mid Tom'! & & \\
+ \lvlo & \lstinline!'Hi-Mid Tom'! & & \\
+ \lvlo & \lstinline!'Crash Cymbal 1'! & & \\
+ \lvlo & \lstinline!'High Tom'! & & \\
+ \lvlo & \lstinline!'Ride Cymbal 1'! & & \\
+ \lvlo & \lstinline!'Chinese Cymbal'! & & \\
+ \lvlo & \lstinline!'Ride Bell'! & & \\
+ \lvlo & \lstinline!'Tambourine'! & & \\
+ \lvlo & \lstinline!'Splash Cymbal'! & & \\
+ \lvlo & \lstinline!'Cowbell'! & & \\
+ \lvlo & \lstinline!'Crash Cymbal 2'! & & \\
+ \lvlo & \lstinline!'Vibraslap'! & & \\
+ \lvlo & \lstinline!'Ride Cymbal 2'! & & \\
+ \lvlo & \lstinline!'Hi Bongo'! & & \\
+ \lvlo & \lstinline!'Low Bongo'! & & \\
+ \lvlo & \lstinline!'Mute Hi Conga'! & & \\
+ \lvlo & \lstinline!'Open Hi Conga'! & & \\
+ \lvlo & \lstinline!'Low Conga'! & & \\
+ \lvlo & \lstinline!'High Timbale'! & & \\
+ \lvlo & \lstinline!'Low Timbale'! & & \\
+ \lvlo & \lstinline!'High Agogo'! & & \\
+ \lvlo & \lstinline!'Low Agogo'! & & \\
+ \lvlo & \lstinline!'Cabasa'! & & \\
+ \lvlo & \lstinline!'Maracas'! & & \\
+ \lvlo & \lstinline!'Short Whistle'! & \lstinline!'Long Whistle'! & \\
+ \lvlo & \lstinline!'Long Whistle'! & \lstinline!'Short Whistle'! & \\
+ \lvlo & \lstinline!'Short Guiro'! & \lstinline!'Long Guiro'! & \\
+ \lvlo & \lstinline!'Long Guiro'! & \lstinline!'Short Guiro'! & \\
+ \lvlo & \lstinline!'Claves'! & & \\
+ \lvlo & \lstinline!'Hi Wood Block'! & & \\
+ \lvlo & \lstinline!'Low Wood Block'! & & \\
+ \lvlo & \lstinline!'Mute Cuica'! & \lstinline!'Open Cuica'! & \\
+ \lvlo & \lstinline!'Open Cuica'! & \lstinline!'Mute Cuica'! & \\
+ \lvlo & \lstinline!'Mute Triangle'! & \lstinline!'Open Triangle'! & \\
+ \lvlo & \lstinline!'Open Triangle'! & \lstinline!'Mute Triangle'! & \\
+ \lvlt & \lstinline!'Shaker'! & & \\
+ \lvlt & \lstinline!'Jingle Bell'! & & \\
+ \lvlt & \lstinline!'Belltree'! & & \\
+ \lvlt & \lstinline!'Castanets'! & & \\
+ \lvlt & \lstinline!'Mute Surdo'! & \lstinline!'Open Surdo'! & \\
+ \lvlt & \lstinline!'Open Surdo'! & \lstinline!'Mute Surdo'! & \\
+\end{longtable}
+\end{center}
+
+\subsection{Name of the available drum kits}
+\label{sec:AvailDrumKits}
+
+The names of the available drum kits are listed here. Only the first kit is fixed by the midi specification level 1. If the drum kit is not defined by the midi player, the standard kit is used. When a drum kit is used, the name of percussions can be completely wrong. The function \lstinline!cacofonix! can produce this list with:
+\begin{lstlisting}
+>> cacofonix -drumkits
+\end{lstlisting}
+
+\begin{center}
+\begin{longtable}{ll}
+\multicolumn{1}{c}{Name} & \multicolumn{1}{c}{Description} \\
+\endfirsthead
+\multicolumn{1}{c}{Name} & \multicolumn{1}{c}{Description} \\
+\endhead
+\lstinline!'Standard'! & the only kit specified by General MIDI Level 1 \\
+\lstinline!'Room'! & more ambient percussive sounds \\
+\lstinline!'Power'! & more powerful kick and snare sounds \\
+\lstinline!'Electronic'! & emulations of various electronic drum machines \\
+\lstinline!'TR-808'! & analog drum kit similar to Roland TR-808 \\
+\lstinline!'Jazz'! & nearly identical to the Standard kit \\
+\lstinline!'Brush'! & many brush sounds added \\
+\lstinline!'Orchestra'! & a collection of concert drums and timpani \\
+\lstinline!'Sound FX'! & a collection of sound effects \\
+\lstinline!'CM-64/CM-32L'! & the standard MT-32 Drum Kit \\
+\end{longtable}
+\end{center}
 
 \end{document}
