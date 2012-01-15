@@ -85,7 +85,7 @@
 \settowidth{\lentemp}{\formatstepname{\titlealgo}{\thealgostep}}%
 \ifthenelse{\lengthtest{\lentemp>\algosteplen}}{\setlength{\algosteplen}{\lentemp}}{}%
 % add the label in the aux file
-\ifthenelse{\equal{#1}{}}{}{\protected@write\@auxout{}{\string\newlabel{Algo \titlealgo.Step #1}{{\thealgostep}{}{}{}{}}}}%
+\ifthenelse{\equal{#1}{}}{}{\protected@write\@auxout{}{\string\newlabel{Algo \titlealgo.Step #1}{{\titlealgo\thealgostep}{\thepage}{}{}{}}}}%
 % record title and text
 \expandafter\def\csname title@\thealgostep \endcsname {#2}%
 \expandafter\def\csname text@\thealgostep \endcsname {#3}%
@@ -93,7 +93,7 @@
 \makeatother
 
 % ref to a step
-\newcommand{\stepref}[2][]{\ifthenelse{\equal{#1}{}}{\titlealgo\ref{Algo \titlealgo.Step #2}}{#1\ref{Algo #1.Step #2}}}
+\newcommand{\stepref}[2][]{\ifthenelse{\equal{#1}{}}{\ref{Algo \titlealgo.Step #2}}{\ref{Algo #1.Step #2}}}
 
 %%% ALGO
 % #1: name (one char)
