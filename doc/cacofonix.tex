@@ -613,7 +613,7 @@ In the tutorial, the binary operator \lstinline!plus! (\lstinline!+!) is used to
 
 \myself{The script can become messy very quickly if this operator is not correctly used.}
 \me{Yes, there is a lot of possibilities: \lstinline!C+N2+E+N8+G!, or \lstinline![C N2]+[E N8]+G!, or \lstinline!C+[N2 E+[N8 G]]!\dots It's awesome.}
-\myself{Every time you don't use that operator correctly and neatly, you make Jesus cry and God kills a kitten.}%, and you will burn in hell to expiate your felony.}
+\myself{Every time you don't use that operator correctly and neatly, you make Jesus cry and God kills a kitten.}
 
 The final note is tied, detached or arpeggiated if in the two arrays, at least on note is tied, detached or arpeggiated. See the section \ref{sec:TiesAndSlurs} for more informations about ties and detached notes and the section \ref{sec:SetDuration} for arpeggios.
 
@@ -765,8 +765,6 @@ To defined a meter, you have to instantiate a special \note object by calling th
 \lstinline!Note('bar')! creates an object representing a bar, and you use it every time you have to separate two measures. You can add bars in tied arrays, in repeated sections (see \ref{sec:RepeatRiff}), or in expandable sections (see \ref{sec:Expand}).
 
 When several sheets are given to \cacofonix, the first sheet defined the meters. Next sheets have to precise bars, but not meters (meters are in the global scope, although bars are only in the monophonic scope). If another sheet specify meters, the meters can't be different from the first sheet. With the same spirit, in polyphonic sections, bars have to be added everywhere and, if the meters have to be defined, the first monophonic section contains meters objects and the others don't have to, but if they do, meters have to be always identical.
-%\me{For project with several sheets, it's maybe a good idea if the first sheet is only composed with meters, and maybe the other things whith a global scope like tempo and markers, do you think?}
-%\myself{Shh! It's explained at the section \ref{sec:CacofonixFunction}. Let him talk.}
 
 The first measure duration is never checked, to allow anacrusis. If no meter is given, the second measure is the reference and all measure have to have the same duration. Even if the first measure is an anacrusis, the other measures have to always have the same duration, or the meter has to be redefined.
 
@@ -857,7 +855,7 @@ Plain dynamics, from \lstinline!'fff'! to \lstinline!'ppp'! are defined in \lsti
 To play a crescendo, you have to add a note created by \lstinline!Note( keyword, duration, dynamics )! or \lstinline!Note( keyword, duration, dynamics, delay )!:
 \begin{itemize}
 	\item \lstinline!keyword! can be \lstinline!'crescendo'!, \lstinline!'cresc'!, \lstinline!'decrescendo'! or \lstinline!'decresc'!.
-		\me{Fun story: you can use indifferently these key words!}% \lstinline!'crescendo'! and \lstinline!'cresc'! can be used to create a decrescendo, and \lstinline!'decrescendo'! and \lstinline!'decresc'! can be used for a crescendo.}
+		\me{Fun story: you can use indifferently these key words!}
 	\item \lstinline!duration! can be a double or a duration \note which indicates the duration of the crescendo (or the decrescendo).
 	\item \lstinline!dynamics! is a string from the table \ref{tab:dynamics}: it gives the final dynamic.
 	\item \lstinline!delay! is an optional double or a duration \note. Like for the dynamic \note, the crescendo starts only after this duration (and ends at \lstinline!delay+duration!).
@@ -1448,10 +1446,6 @@ And we want transpose this scale in G major. To do that, each note have to be re
 	\end{center}
 	\caption[The scale steps]{The scale steps apply to the C major scale: the degree in black, the number of half step in red and the corresponding name of the note in blue.}
 	\label{fig:scalesteps}
-	%\begin{tabular}{rccccccccccccccc}
-	%degrees    & C &   & D &   & E &   & F &   & G &   & A &   & B &   & C \\
-	%half steps &   & 2 &   & 2 &   & 1 &   & 2 &   & 2 &   & 2 &   & 1 & \\
-	%\end{tabular}
 \end{figure}
 
 \begin{lstlisting}
@@ -1486,7 +1480,6 @@ $| B3b  | Cbb  | Dbb  | E3b  | Fbb  | Gbb  | Abb  $
 
 \me{Why a transposition operator? It's really useful?}
 \myself{Sometimes, you have the sheets directly transposed for an instrument, a clarinet in B flat for example. With this operator, you can transcode your sheet as it's written in your paper version and get the \emph{real} notes in one command line. But, and that's why \cacofonix kicks ass, the operator is in fact essentially used on void notes to create \emph{virtual} chords. You can see examples in \noteInitFile, but we will explain that latter more clearly.}
-%\myself{It's not as complicated as it seems. The key is in the breath.}
 
 \subsection{Repeat / Riff \lstinline!.*!}
 \label{sec:RepeatRiff}

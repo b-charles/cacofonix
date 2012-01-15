@@ -1,17 +1,20 @@
 #!/bin/bash
 
-# To create the documentation, you need LaTeX and Lilypond.
-# Then, run this script (don't forget to set this file executable)
+# To create the documentation, you need LaTeX, Lilypond and Asymptote.
+# Don't forget to add asymptote.sty in the latex path.
+# Don't forget to set this file executable.
+# Then, run this script.
 
 rm -rf out
 
-lilypond-book --format=latex --output=out --lily-output-dir=out cacofonix.tex || pause
+lilypond-book --format=latex --output=out --lily-output-dir=out cacofonix.tex
 
 cd out
 latex -interaction=batchmode cacofonix.tex
-asy cacofonix-*.asy || pause
+asy cacofonix-*.asy
 latex -interaction=batchmode cacofonix.tex
-latex -interaction=batchmode cacofonix.tex || pause
+latex -interaction=batchmode cacofonix.tex
+latex -interaction=batchmode cacofonix.tex
 
 dvips cacofonix.dvi
 cp cacofonix.ps ../
