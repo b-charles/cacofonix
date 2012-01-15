@@ -1870,15 +1870,24 @@ cacofonix( midiFilePath, ...
 	\item The optional parameter \lstinline!tempo! following the string \lstinline!'Tempo'! define the general tempo. See the section \ref{sec:Tempo} for more informations.
 	\item The optional parameter \lstinline!velocity! following the string \lstinline!'Velocity'! define the velocities to apply to the dynamics. See the section \ref{sec:Velocity} for more informations.
 	\item The optional parameter \lstinline!drumkit! following the string \lstinline!'DrumKit'! define the drum kit to use. Use it at your own risk.
+		\myself{What? That's all you have to tell about the drum kits? ``Use it at you own risk''?}
+		\me{Well, if you want more clues, you can see the appendix \ref{sec:AvailDrumKits}.}
 	\item The parameter \lstinline!mainSheet! is an optional sheet without any playable note: it's the perfect place to define meters, tempos, fermatas and markers when the project contains several instruments.
 	\item The meaning of the next parameters is strongly related to the explanations of the section \ref{sec:SITandC}. The first sheets with playable notes (but without being preceded by the name of an instrument) are associated with an unique channel with the timbre of a piano. When a string containing the name of an instrument or a percussion is given, \lstinline!cacofonix! creates a new channel (with right timbre) and associates the next sheets to that instrument.
 \end{itemize}
 
-The names of the instruments and percussions can be found in the sections \ref{sec:AvailInstruments} and \ref{sec:AvailPercussion}. \lstinline!cacofonix! can manage the instruments of the midi specification level 1 and 2, but not necessarily your midi player: the level 2 is not always supported. You have been warned.
+The names of the instruments and percussions can be found in the sections \ref{sec:AvailInstruments} and \ref{sec:AvailPercussion}. \lstinline!cacofonix! can manage the instruments of the midi specification level 1 and 2, but not necessarily your midi player: the level 2 is not always supported. You have been warned. 
 
-As you have to know, a sheet of an instrument can't contain a void note and a sheet of a percussion has to contain only void notes. Moreover, for some percussions, the indexed void notes \lstinline!V-2! and \lstinline!V-3! have special meanings and can be used to play an other (but related) percussion.
+\begin{meenv}%
+	Why in the appendix \ref{sec:AvailPercussion}, there are columns \lstinline!V-2! and \lstinline!V-3!?%
+\end{meenv}
+\begin{myselfenv}%
+	As you have to know, a sheet of an instrument can't contain a void note and a sheet of a percussion has to contain only void notes. But, moreover, for some percussions, the indexed void notes \lstinline!V-2! and \lstinline!V-3! have special meanings and can be used to play an other (but very related) percussion.%
+\end{myselfenv}
 
-We will finish that guide by a last demonstration:
+\paragraph{}
+
+We will finish that guide by a last demonstration with percussions:
 
 \begin{lilypond}
 	\score{ <<
