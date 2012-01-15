@@ -1,4 +1,4 @@
-%NOTE Create a note.
+% NOTE Creates a note.
 %	myNote = Note( ... ) creates a note.
 %
 %	Tonality:	Note( 'do' ), Note ( 'C' )
@@ -122,6 +122,28 @@ classdef Note
 	methods
 		
 		function note = Note( varargin )
+			% NOTE Creates a note.
+			%	myNote = Note( ... ) creates a note.
+			%
+			%	Tonality:	Note( 'do' ), Note ( 'C' )
+			%	Rest:		Note( 'rest' )
+			%	Void:		Note( 'void' )
+			%	Duration:	Note( duration )
+			%	Octave:		Note( '+2' ), Note( '--' ), Note( '' )
+			%	Meter:		Note( [3 4] )
+			%	Bar:		Note( 'bar' )
+			%	Dynamics:	Note( 'dynamics', 'mf' )
+			%	Crescendo:	Note( 'cresc', [ N C ], 'fff' )
+			%	Sustain:	Note( 'sustain', 'on'|'off' )
+			%	Tempo:		Note( 'tempo', 120 )
+			%	Acc/Rall:	Note( 'accel'|'rall', B, 80 )
+			%	Fermata:	Note( 'fermata', B, R )
+			%	Marker:		Note( 'marker', mark )
+			%	Go to:		Note( 'marker*', mark )
+			%	Pitch:		Note( 'pitch', 'bb' ) Note( 'pitch', '+' )
+			%
+			%	See also: cacofonix.
+			%
 			
 			function [ok, value] = getDynamics( arg )
 				persistent dynamics dynamicsPattern pattern
@@ -1082,7 +1104,7 @@ classdef Note
 		
 		function setNbCharByQuater( newValue )
 			% SETNBCHARBYQUATER sets the number of characters by quater
-			% notes
+			% note
 			
 			Note.internCharByQuater( 'set', newValue );
 		end
