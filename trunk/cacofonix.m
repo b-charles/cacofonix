@@ -1791,7 +1791,7 @@ fclose( fid );
 
 info = audiodevinfo();
 if length( info.output ) > 0
-	play( audioplayer( finishAlert.y, finishAlert.Fs ) );
+	soundsc( finishAlert.y, finishAlert.Fs );
 end
 
 end
