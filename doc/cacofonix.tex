@@ -469,7 +469,7 @@ The first introductive sections will be about important and general key concepts
 \me{I feel it will be \dots BOOOOOOOORING!}
 \myself{Well, your analysis is short and simplistic, but correct. The point is: if you want to play \emph{Three Blind Mice}, you have everything you need in the tutorial. If you want to play the Schubert's \emph{Trout Quintet}, you should read carefully this guide.}
 
-To search of a particular point, three tables can help: all features concerning a special use of the \note constructor are in table \ref{tab:NoteAPI}, member functions and operators are listed in the table \ref{tab:NoteFunctions} and the \lstinline!cacofonix! function API is on the table \ref{tab:CacofonixAPI}. Theses tables have a column Scope (explained at the section \ref{sec:scope}): N means note, M means monophonic, C means channel and G means global.
+To search of a particular point, three tables can help: all features concerning a special use of the \note constructor are in the table \ref{tab:NoteAPI}, member functions and operators are listed in the table \ref{tab:NoteFunctions} and the \lstinline!cacofonix! function API is in the table \ref{tab:CacofonixAPI}. Theses tables have a column Scope (explained at the section \ref{sec:scope}): N means note, M means monophonic, C means channel and G means global.
 
 \begin{table}
 	\centering
@@ -578,7 +578,7 @@ sheet = [ C:N bar ...      % dyn: mf (default)
 		+E:N bar ...       % dyn: f
 		+F:N bar ...       % dyn: f  (not modified)
 		DynPP +G:N bar ... % dyn: pp (setted)
-		+A:N bar ...
+		+A:N bar ...       % dyn: pp (not modified)
 	] ...                  % end of the poly. section
 	+C:N bar ...           % dyn: pp
 	];
@@ -762,7 +762,7 @@ The operator \lstinline!~! has an other very specific application: it changes a 
 
 To defined a meter, you have to instantiate a special \note object by calling the constructor \note with an array of two double \lstinline!meter = Note([upper lower])!. Without surprise, the double \lstinline!upper! indicates how many beats there are in a measure and the double \lstinline!lower! indicates the note value which represents one beat.
 
-\lstinline!Note('bar')! creates an object representing a bar, and you use it every time you have to separate two measures. You can add bars in tied arrays, in repeated sections (see \ref{sec:RepeatRiff}), or in expandable sections (see \ref{sec:Expand}).
+\lstinline!Note('bar')! creates an object representing a bar, and you use it every time you have to separate two measures.
 
 When several sheets are given to \cacofonix, the first sheet defined the meters. Next sheets have to precise bars, but not meters (meters are in the global scope, although bars are only in the monophonic scope). If another sheet specify meters, the meters can't be different from the first sheet. With the same spirit, in polyphonic sections, bars have to be added everywhere and, if the meters have to be defined, the first monophonic section contains meters objects and the others don't have to, but if they do, meters have to be always identical.
 
@@ -794,7 +794,6 @@ sheet = [ meter68 R:N8 -G+E:N8 bar ...
 	C:N8 G:N8 -G:N8 G:N8 C:N8 G:N8 bar ...
 	C:N8 R:N8 R:N8 -G:N8 R:N8 R:N8 bar ...
 	C:N8 G:N8 -G:N8 G:N8 C:N8 G:N8 bar ];
-	
 
 cacofonix( 'America', 'Tempo', 140, sheet );
 \end{lstlisting}
@@ -1400,7 +1399,7 @@ And we want transpose this scale in G major. To do that, each note have to be re
 \begin{figure}
 	\begin{center}
 	\begin{asy}
-		size( 4cm );
+		size( 5cm );
 		import labelpath;
 
 		pen circlepen = black;
@@ -1680,23 +1679,20 @@ $|-------G-------|-------G-------$
 \end{lstlisting}
 
 But the real purpose of this operator is set the tonality of a void note. The general algorithm is:
-\begin{algo}{M}{Operator \lstinline!*!}{Given a \note \lstinline!n! and a sheet \lstinline!A! (which contains void notes), we compute \lstinline!B = n*A! with this algorithm:}
-	\step{Initialize.}{Initialize \lstinline!B = A!. Set \lstinline!i = 1!.}
-	\step[checki]{Check \lstinline!i!.}{If \lstinline!i > length(A)!, stop the algorithm and return \lstinline!B!.}
-	\step{Set the tonality.}{If the \lstinline!i!th element of \lstinline!A! is a void note, set the tonality of \lstinline!B(i)! with the tonality of \lstinline!n!.}
+\begin{algo}{M}{Operator \lstinline!*!}{Given a \note \lstinline!n! and a sheet \lstinline!A! (which contains void notes), we compute \lstinline!n*A! with this algorithm:}
+	\step{Initialize.}{Set \lstinline!i = 1!.}
+	\step[checki]{Check \lstinline!i!.}{If \lstinline!i > length(A)!, stop the algorithm and return the new \lstinline!A!.}
+	\step{Set the tonality.}{If the \lstinline!i!th element of \lstinline!A! is a void note, set the tonality of \lstinline!A(i)! with the tonality of \lstinline!n!.}
 	\step{Increase \lstinline!i!.}{Set \lstinline!i = i + 1!. Go to \stepref{checki}.}
 \end{algo}
 
 The algorithm is much simpler than the operator \lstinline!.*!: it's just a for loop and every note of \lstinline!A! get the tonality of \lstinline!n!. For the fun, this is a pseudo \matlab code:
 \begin{lstlisting}
-function C = mtimes( n, A )
+function A = mtimes( n, A )
 	ton = n.getTonality();
-	B = A;
-
 	for i = 1:length( A )
 		if A(i).isVoid
-			B(i).setTonality( ton );
-
+			A(i).setTonality( ton );
 		end
 	end
 end
@@ -1717,7 +1713,7 @@ As you can see, the tonalities of the real notes are stored and the new tonality
 \me{So, what is the common utilisation?}
 \myself{Well, the operator is not so useful without the operator \lstinline!-!. Wait a little.}
 
-\paragraph{Transposed void notes}
+\subsubsection{Transposed void notes}
 \label{sec:VirtualArrays}
 
 A void note can be transposed: the transpositions are applied after the affectation of the tonality. With that behavior, you can create virtual arrays waiting a reference note. For example, how construct quickly different major scales?
@@ -2148,15 +2144,15 @@ The names of the available percussions are listed here. A star (\lvlt) before a 
  \lvlo & \lstinline!'Crash Cymbal 2'! & & \\
  \lvlo & \lstinline!'Vibraslap'! & & \\
  \lvlo & \lstinline!'Ride Cymbal 2'! & & \\
- \lvlo & \lstinline!'Hi Bongo'! & & \\
- \lvlo & \lstinline!'Low Bongo'! & & \\
- \lvlo & \lstinline!'Mute Hi Conga'! & & \\
- \lvlo & \lstinline!'Open Hi Conga'! & & \\
- \lvlo & \lstinline!'Low Conga'! & & \\
- \lvlo & \lstinline!'High Timbale'! & & \\
- \lvlo & \lstinline!'Low Timbale'! & & \\
- \lvlo & \lstinline!'High Agogo'! & & \\
- \lvlo & \lstinline!'Low Agogo'! & & \\
+ \lvlo & \lstinline!'Hi Bongo'! & \lstinline!'Low Bongo'! & \\
+ \lvlo & \lstinline!'Low Bongo'! & \lstinline!'Hi Bongo'! & \\
+ \lvlo & \lstinline!'Mute Hi Conga'! & \lstinline!'Open Hi Conga'! & \lstinline!'Low Conga'! \\
+ \lvlo & \lstinline!'Open Hi Conga'! & \lstinline!'Mute Hi Conga'! & \lstinline!'Low Conga'! \\
+ \lvlo & \lstinline!'Low Conga'! & \lstinline!'Open Hi Conga'! & \lstinline!'Mute Hi Conga'! \\
+ \lvlo & \lstinline!'High Timbale'! & \lstinline!'Low Timbale'! & \\
+ \lvlo & \lstinline!'Low Timbale'! & \lstinline!'High Timbale'! & \\
+ \lvlo & \lstinline!'High Agogo'! & \lstinline!'Low Agogo'! & \\
+ \lvlo & \lstinline!'Low Agogo'! & \lstinline!'High Agogo'! & \\
  \lvlo & \lstinline!'Cabasa'! & & \\
  \lvlo & \lstinline!'Maracas'! & & \\
  \lvlo & \lstinline!'Short Whistle'! & \lstinline!'Long Whistle'! & \\
@@ -2164,8 +2160,8 @@ The names of the available percussions are listed here. A star (\lvlt) before a 
  \lvlo & \lstinline!'Short Guiro'! & \lstinline!'Long Guiro'! & \\
  \lvlo & \lstinline!'Long Guiro'! & \lstinline!'Short Guiro'! & \\
  \lvlo & \lstinline!'Claves'! & & \\
- \lvlo & \lstinline!'Hi Wood Block'! & & \\
- \lvlo & \lstinline!'Low Wood Block'! & & \\
+ \lvlo & \lstinline!'Hi Wood Block'! & \lstinline!'Low Wood Block'! & \\
+ \lvlo & \lstinline!'Low Wood Block'! & \lstinline!'Hi Wood Block'! & \\
  \lvlo & \lstinline!'Mute Cuica'! & \lstinline!'Open Cuica'! & \\
  \lvlo & \lstinline!'Open Cuica'! & \lstinline!'Mute Cuica'! & \\
  \lvlo & \lstinline!'Mute Triangle'! & \lstinline!'Open Triangle'! & \\
