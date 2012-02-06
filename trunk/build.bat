@@ -1,57 +1,50 @@
 
 REM MAIN
 
-erase /F "cacofonix.zip"
+del /Q .\cacofonix
 
-call:azip "cacofonix.zip" cacofonix.m
-call:azip "cacofonix.zip" Note.m
-call:azip "cacofonix.zip" NoteInit.m
-call:azip "cacofonix.zip" NoteInit_fr.m
-call:azip "cacofonix.zip" ForElise.m
+mkdir cacofonix
+
+copy cacofonix.m   cacofonix
+copy Note.m        cacofonix
+copy NoteInit.m    cacofonix
+copy NoteInit_fr.m cacofonix
+copy ForElise.m    cacofonix
 
 REM Doc
 
-call:azip doc_src.zip ../doc/cacofonix.tex
-call:azip doc_src.zip ../doc/make.bat
-call:azip doc_src.zip ../doc/make
-call:azip "cacofonix.zip" doc_src.zip
-erase /F doc_src.zip
+mkdir doc_src
+copy ..\doc\cacofonix.tex doc_src
+copy ..\doc\make.bat      doc_src
+copy ..\doc\make          doc_src
+move doc_src cacofonix
 
-ps2pdf ../doc/cacofonix.ps ./cacofonix.pdf || pause
-call:azip "cacofonix.zip" cacofonix.pdf
-erase /F "cacofonix.pdf"
+ps2pdf ..\doc\cacofonix.ps .\cacofonix\cacofonix.pdf || pause
 
 REM Démos
 
-call:azip "GO AWAY!.zip" BadRomance.m
-call:azip "GO AWAY!.zip" DarkWorld.m
-call:azip "GO AWAY!.zip" DragonRoostIsland.m
-call:azip "GO AWAY!.zip" FarewellHyruleKing.m
-call:azip "GO AWAY!.zip" GerudoValley.m
-call:azip "GO AWAY!.zip" LApresMidi.m
-call:azip "GO AWAY!.zip" LegendaryHero.m
-call:azip "GO AWAY!.zip" MyFreezeRay.m
-call:azip "GO AWAY!.zip" MysteryTrain.m
-call:azip "GO AWAY!.zip" OnTheRise.m
-call:azip "GO AWAY!.zip" SongOfStorms.m
-call:azip "GO AWAY!.zip" TheEntertainer.m
-call:azip "GO AWAY!.zip" ThePianoDuet.m
-call:azip "GO AWAY!.zip" VictorsPianoSolo.m
-call:azip "GO AWAY!.zip" WilliamTell.m
-call:azip "GO AWAY!.zip" Zelda.m
+mkdir "GO AWAY!"
+copy BadRomance.m         "GO AWAY!"
+copy DarkWorld.m          "GO AWAY!"
+copy DragonRoostIsland.m  "GO AWAY!"
+copy FarewellHyruleKing.m "GO AWAY!"
+copy GerudoValley.m       "GO AWAY!"
+copy LApresMidi.m         "GO AWAY!"
+copy LegendaryHero.m      "GO AWAY!"
+copy MyFreezeRay.m        "GO AWAY!"
+copy MysteryTrain.m       "GO AWAY!"
+copy OnTheRise.m          "GO AWAY!"
+copy SongOfStorms.m       "GO AWAY!"
+copy TheEntertainer.m     "GO AWAY!"
+copy ThePianoDuet.m       "GO AWAY!"
+copy VictorsPianoSolo.m   "GO AWAY!"
+copy WilliamTell.m        "GO AWAY!"
+copy Zelda.m              "GO AWAY!"
 
-call:azip "YOU DON'T SEE ME.zip" "GO AWAY!.zip"
-call:azip "DON'T OPEN.zip" "YOU DON'T SEE ME.zip"
+mkdir "cacofonix\DON'T OPEN\YOU DON'T SEE ME"
+move "GO AWAY!" "cacofonix\DON'T OPEN\YOU DON'T SEE ME"
 
-call:azip "cacofonix.zip" "DON'T OPEN.zip"
+7z a cacofonix.zip cacofonix
 
-erase /F "GO AWAY!.zip"
-erase /F "YOU DON'T SEE ME.zip"
-erase /F "DON'T OPEN.zip"
-
-goto:eof
-
-:azip
-7z a "%~1" "%~2" || pause
-goto:eof
+erase /Q .\cacofonix
 
