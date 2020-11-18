@@ -1,0 +1,6 @@
+
+doc/out/
+doc/*.ps
+
+*.mid
+

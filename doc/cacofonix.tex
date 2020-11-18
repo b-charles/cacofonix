@@ -136,11 +136,11 @@ real pitchTransQuad( real t ) { return (p1-p0)*((t-t0)^2)/((t1-t0)^2) + p0; }
 real pitchTransQuad2( real t ) { return (p0-p1)*((t-t1)^2)/((t0-t1)^2) + p1; }
 
 void displayPitchTransition( real transi(real) ){
-	size(5cm,3cm,false);
-	draw( graph( transi, t0, t1 )--(t1,p1) );
-	draw( (tstart,p0)--(t0,p0)^^(t1,p1)--(tend,p1), gray+dashed );
-	xaxis( "time" );
-	yaxis( "pitch" );
+  size(5cm,3cm,false);
+  draw( graph( transi, t0, t1 )--(t1,p1) );
+  draw( (tstart,p0)--(t0,p0)^^(t1,p1)--(tend,p1), gray+dashed );
+  xaxis( "time" );
+  yaxis( "pitch" );
 }
 
 \end{asydef}
@@ -178,7 +178,7 @@ To read this document, you need know some music theory and \matlab bases: at lea
 
 To see how \cacofonix works, we will try to transcode this sheet (\frerejaques, a famous French nursery melody):\\
 \begin{lilypond}
-	\relative c'' { \new Staff { \key g \major \time 2/4 g4 a b g b c d2 d8. e16 d8 c b4 g g d g2 } }
+  \relative c'' { \new Staff { \key g \major \time 2/4 g4 a b g b c d2 d8. e16 d8 c b4 g g d g2 } }
 \end{lilypond}
 
 \subsection{Dummy code}
@@ -191,29 +191,29 @@ This instruction creates a G quarter note (\lstinline!Note(4)! for a whole note)
 
 To have a G note (or any other note\dots) of an another octave, you have to use the unary operators \lstinline!-! and \lstinline!+!. \\
 \begin{lilypond}
-	\relative c' { \new Staff { b1 c a' c c'} }
+  \relative c' { \new Staff { b1 c a' c c'} }
 \end{lilypond}
 \begin{lstlisting}
 sheet = [ ...
-	-Note('B'):Note(4) ...
-	Note('C'):Note(4) ...
-	Note('A'):Note(4) ...
-	+Note('C'):Note(4) ...
-	++Note('C'):Note(4) ];
+  -Note('B'):Note(4) ...
+  Note('C'):Note(4) ...
+  Note('A'):Note(4) ...
+  +Note('C'):Note(4) ...
+  ++Note('C'):Note(4) ];
 \end{lstlisting}
 
 A complete sheet is just an array of \note objects. So, this is a first (and very dummy) version of \frerejaques:
 \begin{lstlisting}
 sheet = [ ...
-	Note('G'):Note(1) Note('A'):Note(1) ...
-	Note('B'):Note(1) Note('G'):Note(1) ...
-	Note('B'):Note(1) +Note('C'):Note(1) ...
-	+Note('D'):Note(2) ...
-	+Note('D'):Note(3/4) +Note('E'):Note(1/4) ...
-	+Note('D'):Note(1/2) +Note('C'):Note(1/2) ...
-	Note('B'):Note(1) Note('G'):Note(1) ...
-	Note('G'):Note(1) Note('D'):Note(1) ...
-	Note('G'):Note(2) ];
+  Note('G'):Note(1) Note('A'):Note(1) ...
+  Note('B'):Note(1) Note('G'):Note(1) ...
+  Note('B'):Note(1) +Note('C'):Note(1) ...
+  +Note('D'):Note(2) ...
+  +Note('D'):Note(3/4) +Note('E'):Note(1/4) ...
+  +Note('D'):Note(1/2) +Note('C'):Note(1/2) ...
+  Note('B'):Note(1) Note('G'):Note(1) ...
+  Note('G'):Note(1) Note('D'):Note(1) ...
+  Note('G'):Note(2) ];
 \end{lstlisting}
 
 The final step, to create the midi files, is call the \lstinline!cacofonix! function, with setting the name of the file and the tempo:
@@ -251,14 +251,14 @@ NoteInit
 N8dotted = Note( 3/4 );
 
 sheet = [ ...
-	G:N4 A:N4 ...
-	B:N4 G:N4 ...
-	B:N4 +C:N4 ...
-	+D:N2 ...
-	+D:N8dotted +E:N16 +D:N8 +C:N8 ...
-	B:N4 G:N4 ...
-	G:N4 D:N4 ...
-	G:N2 ];
+  G:N4 A:N4 ...
+  B:N4 G:N4 ...
+  B:N4 +C:N4 ...
+  +D:N2 ...
+  +D:N8dotted +E:N16 +D:N8 +C:N8 ...
+  B:N4 G:N4 ...
+  G:N4 D:N4 ...
+  G:N2 ];
 \end{lstlisting}
 
 \me{Nice. Why each measure is on a line? Again a whim?}
@@ -276,14 +276,14 @@ NoteInit
 N8dotted = Note( 3/4 );
 
 sheet = [ ...
-	G:N4 A:N4 bar ...
-	B:N4 G:N4 bar ...
-	B:N4 +C:N4 bar ...
-	+D:N2 bar ...
-	+D:N8dotted +E:N16 +D:N8 +C:N8 bar ...
-	B:N4 G:N4 bar ...
-	G:N4 D:N4 bar ...
-	G:N2 bar ];
+  G:N4 A:N4 bar ...
+  B:N4 G:N4 bar ...
+  B:N4 +C:N4 bar ...
+  +D:N2 bar ...
+  +D:N8dotted +E:N16 +D:N8 +C:N8 bar ...
+  B:N4 G:N4 bar ...
+  G:N4 D:N4 bar ...
+  G:N2 bar ];
 \end{lstlisting}
 
 \me{Always adding \lstinline!bar! at each measure, it's a little boring, isn't it?}
@@ -294,16 +294,16 @@ sheet = [ ...
 
 In the last version of \frerejaques, a special \note object has been created to represent a dotted eighth note: \lstinline!N8dotted = Note(3/4);!, but the operator \lstinline!ctranspose! (\lstinline!'!) can be used to add the half duration of the note. For example: \\
 \begin{lilypond}
-	\relative c'' { \new Staff { \time 2/4 g4. g8 g8. g16 g8. g16 g4.. g16 } }
+  \relative c'' { \new Staff { \time 2/4 g4. g8 g8. g16 g8. g16 g4.. g16 } }
 \end{lilypond}
 
 \begin{lstlisting}
 NoteInit
 
 sheet = [ ...
-	G:N4' G:N8 bar ...
-	G:N8' G:N16 G:N8' G:N16 bar ...
-	G:N4'' G:N16 bar ];
+  G:N4' G:N8 bar ...
+  G:N8' G:N16 G:N8' G:N16 bar ...
+  G:N4'' G:N16 bar ];
 \end{lstlisting}
 
 \subsection{Ties and slurs}
@@ -312,26 +312,26 @@ Ties and slurs are written with the same operator: \lstinline!not! (\lstinline!~
 
 \me{There are an another way to create a note with an exotic duration.}
 \begin{myselfenv}%
-	Yes, but the good way is always use the operators \lstinline!'! and \lstinline!~!.%
+  Yes, but the good way is always use the operators \lstinline!'! and \lstinline!~!.%
 \end{myselfenv}
 \begin{meenv}%
-	And the convenient way is use an array for the duration with the operator \lstinline!:!, like that: \lstinline!G:[N4 N16]!.%
+  And the convenient way is use an array for the duration with the operator \lstinline!:!, like that: \lstinline!G:[N4 N16]!.%
 \end{meenv}
 
 \subsection{Chord}
 
 A chord is a note with several tonalities and one duration. There are two ways to create a chord: a good one, the operator \lstinline!plus! (\lstinline!+!), and a bad-but-sometimes-convenient one, using an array with the operator \lstinline!colon! (you know, \lstinline!:!). \\
 \begin{lilypond}
-	\relative c' { \new Staff { \time 2/4 <c e g c>2 <g' b d g> <c, e g c> <g' b d g>4 ~ <g b d g>8 ~ <g b d g> } }
+  \relative c' { \new Staff { \time 2/4 <c e g c>2 <g' b d g> <c, e g c> <g' b d g>4 ~ <g b d g>8 ~ <g b d g> } }
 \end{lilypond}
 
 \begin{lstlisting}
 NoteInit
 sheet = [ ...
-	C+E+G++C:N2 bar ...
-	G+B++D++G:N2 bar ...
-	[C E G +C]:N2 bar ...
-	[G B +D +G]:[N4 N8 N8] bar ];
+  C+E+G++C:N2 bar ...
+  G+B++D++G:N2 bar ...
+  [C E G +C]:N2 bar ...
+  [G B +D +G]:[N4 N8 N8] bar ];
 \end{lstlisting}
 
 \myself{Something to say?}
@@ -344,18 +344,18 @@ sheet = [ ...
 A polyphonic section is a set of sheets with the same duration and played at the same time. To create a polyphonic sheet, the \emph{monophonic} sheets have to be combined with the operator \lstinline!mrdivide! (\lstinline!/!). \\
 \begin{lilypond}
 \new GrandStaff <<
-	\new Staff { \time 3/4 \relative c'' <<
-		{ c2. <c, e g c>2. } \\
-		{ c4( e g) s2. }
-		>> }
-	\new Staff { \clef bass \relative c { c2. ~ c } }
+  \new Staff { \time 3/4 \relative c'' <<
+    { c2. <c, e g c>2. } \\
+    { c4( e g) s2. }
+    >> }
+  \new Staff { \clef bass \relative c { c2. ~ c } }
 >>
 \end{lilypond}
 \begin{lstlisting}
 NoteInit
 sheet = [ ( +C:N2' ) / ~[ C:N4 E:N4 G:N4 ] bar ...
-	[ C E G +C ]:N2' bar ] / ...
-	[ -C:N2' bar ~-C:N2' bar ];
+  [ C E G +C ]:N2' bar ] / ...
+  [ -C:N2' bar ~-C:N2' bar ];
 \end{lstlisting}
 
 \begin{meenv}%
@@ -367,17 +367,17 @@ Yes, but it's nice in a canon:
 \begin{lstlisting}
 >> NoteInit
 >> sheet = [ ...
-	G:N4 A:N4 bar ...
-	B:N4 G:N4 bar ...
-	B:N4 +C:N4 bar ...
-	+D:N2 bar ...
-	+D:N8' +E:N16 +D:N8 +C:N8 bar ...
-	B:N4 G:N4 bar ...
-	G:N4 D:N4 bar ...
-	G:N2 bar ];
+  G:N4 A:N4 bar ...
+  B:N4 G:N4 bar ...
+  B:N4 +C:N4 bar ...
+  +D:N2 bar ...
+  +D:N8' +E:N16 +D:N8 +C:N8 bar ...
+  B:N4 G:N4 bar ...
+  G:N4 D:N4 bar ...
+  G:N2 bar ];
 >> delay = [ N2 bar N2 bar ];
 >> cacofonix( 'FrereJacques', 'Tempo', 100, ...
-	[ sheet delay ] / [ delay sheet ] );
+  [ sheet delay ] / [ delay sheet ] );
 \end{lstlisting}%
 \end{myselfenv}
 
@@ -387,14 +387,14 @@ A good way for checking errors is display the sheet: the function \lstinline!dis
 \begin{lstlisting}
 >> NoteInit
 >> sheet = [ ...
-	G:N4 A:N4 bar ...
-	B:N4 G:N4 bar ...
-	B:N4 +C:N4 bar ...
-	+D:N2 bar ...
-	+D:N8' +E:N16 +D:N8 +C:N8 bar ...
-	B:N4 G:N4 bar ...
-	G:N4 D:N4 bar ...
-	G:N2 bar ];
+  G:N4 A:N4 bar ...
+  B:N4 G:N4 bar ...
+  B:N4 +C:N4 bar ...
+  +D:N2 bar ...
+  +D:N8' +E:N16 +D:N8 +C:N8 bar ...
+  B:N4 G:N4 bar ...
+  G:N4 D:N4 bar ...
+  G:N2 bar ];
 >> sheet
 $1///////////////////////////////////////////////$
 $|-----------G-----------|-----------A-----------$
@@ -423,8 +423,8 @@ To set the number of characters per quarter note, you have to use the class func
 As you know, the \lstinline!cacofonix! function writes the final file. It is possible to give several sheets: to do that, you have to precise the wanted instrument before the sheet. Suppose you have two sheets, \lstinline!sheet_violin! and \lstinline!sheet_trumpet!:
 \begin{lstlisting}
 cacofonix( 'myFile.mid', 'Tempo', 100, ...
-	'Violin', sheet_violin, ...
-	'Trumpet', sheet_trumpet )
+  'Violin', sheet_violin, ...
+  'Trumpet', sheet_trumpet )
 \end{lstlisting}
 
 To know the list of available instruments, type \lstinline!cacofonix -instruments!. You can't play more than fifteen instruments, but with possibilities to set several sheets for one instrument (the operator \lstinline!/! is one of them).
@@ -437,14 +437,14 @@ Well, we have a nice version of \frerejaques:
 \begin{lstlisting}
 NoteInit
 sheet = [ ...
-	G:N4 A:N4 bar ...
-	B:N4 G:N4 bar ...
-	B:N4 +C:N4 bar ...
-	+D:N2 bar ...
-	+D:N8' +E:N16 +D:N8 +C:N8 bar ...
-	B:N4 G:N4 bar ...
-	G:N4 D:N4 bar ...
-	G:N2 bar ];
+  G:N4 A:N4 bar ...
+  B:N4 G:N4 bar ...
+  B:N4 +C:N4 bar ...
+  +D:N2 bar ...
+  +D:N8' +E:N16 +D:N8 +C:N8 bar ...
+  B:N4 G:N4 bar ...
+  G:N4 D:N4 bar ...
+  G:N2 bar ];
 cacofonix( 'FrereJacques', 'Tempo', 100, sheet );
 \end{lstlisting}
 
@@ -472,67 +472,67 @@ The first introductive sections will be about important and general key concepts
 To search of a particular point, three tables can help: all features concerning a special use of the \note constructor are in the table \ref{tab:NoteAPI}, member functions and operators are listed in the table \ref{tab:NoteFunctions} and the \lstinline!cacofonix! function API is in the table \ref{tab:CacofonixAPI}. Theses tables have a column Scope (explained at the section \ref{sec:scope}): N means note, M means monophonic, C means channel and G means global.
 
 \begin{table}
-	\centering
-	\begin{tabular}{llcl}
-		Contructor syntax & Description & Scope & Section \\
-		\hline
-		\lstinline!Note( tonality )! & tonality & N & \ref{sec:Tonalities} \\
-		\lstinline!Note( duration )! & duration & N & \ref{sec:Duration} \\
-		\lstinline!Note( '+X'|'-X' )! & octave & M & \ref{sec:OctaveNote} \\
-		\lstinline!Note( 'bar' )! & bars & M & \ref{sec:MetersAndBars} \\
-		\lstinline!Note( [upper lower] )! & meters & G & \ref{sec:MetersAndBars} \\
-		\lstinline!Note( 'dynamics', dyn, [ d ] )! & dynamics & M & \ref{sec:Dynamics} \\
-		\lstinline!Note( 'dynamics*', dyn, [ d ] )! & channel dynamics & C & \ref{sec:ChannelDynamics} \\
-		\lstinline!Note( 'cresc', dur, dyn, [ d ] )! & crescendo & M & \ref{sec:Crescendo} \\
-		\lstinline!Note( 'cresc*', dur, dyn, [ d ] )! & channel crescendo & C & \ref{sec:ChannelDynamics} \\
-		\lstinline!Note( 'tempo', tempo )! & tempo & G & \ref{sec:Tempo} \\
-		\lstinline!Note( 'accel', dur, tempo )! & accelerando & G & \ref{sec:AccelerandoRallentando} \\
-		\lstinline!Note( 'fermata', dur, play )! & fermata & G & \ref{sec:Fermata} \\
-		\lstinline!Note( 'sustain', 'on'|'off' )! & sustain & C & \ref{sec:Sustain} \\
-		\lstinline!Note( 'marker', mark )! & marker & G & \ref{sec:Markers} \\
-		\lstinline!Note( 'marker*', mark )! & goto marker & M & \ref{sec:Goto} \\
-		\lstinline!Note( 'pitch', [ t ], val, [ d ] )! & pitch wheel & C & \ref{sec:Pitch} \\
-		\lstinline!Note( 'void' )! & void note & N & \ref{sec:VoidNote} \\
-	\end{tabular}
-	\caption[\note constructor API]{\note constructor API.}
-	\label{tab:NoteAPI}
+  \centering
+  \begin{tabular}{llcl}
+    Contructor syntax & Description & Scope & Section \\
+    \hline
+    \lstinline!Note( tonality )! & tonality & N & \ref{sec:Tonalities} \\
+    \lstinline!Note( duration )! & duration & N & \ref{sec:Duration} \\
+    \lstinline!Note( '+X'|'-X' )! & octave & M & \ref{sec:OctaveNote} \\
+    \lstinline!Note( 'bar' )! & bars & M & \ref{sec:MetersAndBars} \\
+    \lstinline!Note( [upper lower] )! & meters & G & \ref{sec:MetersAndBars} \\
+    \lstinline!Note( 'dynamics', dyn, [ d ] )! & dynamics & M & \ref{sec:Dynamics} \\
+    \lstinline!Note( 'dynamics*', dyn, [ d ] )! & channel dynamics & C & \ref{sec:ChannelDynamics} \\
+    \lstinline!Note( 'cresc', dur, dyn, [ d ] )! & crescendo & M & \ref{sec:Crescendo} \\
+    \lstinline!Note( 'cresc*', dur, dyn, [ d ] )! & channel crescendo & C & \ref{sec:ChannelDynamics} \\
+    \lstinline!Note( 'tempo', tempo )! & tempo & G & \ref{sec:Tempo} \\
+    \lstinline!Note( 'accel', dur, tempo )! & accelerando & G & \ref{sec:AccelerandoRallentando} \\
+    \lstinline!Note( 'fermata', dur, play )! & fermata & G & \ref{sec:Fermata} \\
+    \lstinline!Note( 'sustain', 'on'|'off' )! & sustain & C & \ref{sec:Sustain} \\
+    \lstinline!Note( 'marker', mark )! & marker & G & \ref{sec:Markers} \\
+    \lstinline!Note( 'marker*', mark )! & goto marker & M & \ref{sec:Goto} \\
+    \lstinline!Note( 'pitch', [ t ], val, [ d ] )! & pitch wheel & C & \ref{sec:Pitch} \\
+    \lstinline!Note( 'void' )! & void note & N & \ref{sec:VoidNote} \\
+  \end{tabular}
+  \caption[\note constructor API]{\note constructor API.}
+  \label{tab:NoteAPI}
 \end{table}
 
 \begin{table}
-	\centering
-	\begin{tabular}{lllcl}
-		Member function & Operator & Description & Scope & Section \\
-		\hline
-		\lstinline!plus! & \lstinline!+! & chord & N & \ref{sec:Chord} \\
-		\lstinline!uplus!, \lstinline!uminus! & \lstinline!+!, \lstinline!-! & octave & N & \ref{sec:OctaveOperators} \\
-		\lstinline!colon! & \lstinline!:! & set duration & N & \ref{sec:SetDuration} \\
-		\lstinline!ctranspose! & \lstinline!'! & dot & N & \ref{sec:DottedNotes} \\
-		\lstinline!not! & \lstinline!~! & tie & N & \ref{sec:TiesAndSlurs} \\
-		\lstinline!mrdivide! & \lstinline!/! & polyphonic section & N & \ref{sec:Polyphony} \\
-		\lstinline!or! & \lstinline!|! & extraction & C & \ref{sec:Extraction} \\
-		\lstinline!mpower! & \lstinline!^! & transposition & N & \ref{sec:Transpose} \\
-		\lstinline!mtimes! & \lstinline!.*! & riff & N & \ref{sec:RepeatRiff} \\
-		\lstinline!display!& & display & C & \ref{sec:Display} \\
-		\lstinline!times! & \lstinline!*! & expand & N & \ref{sec:Expand} \\
-		\lstinline!minus! & \lstinline!-! & index & N & \ref{sec:Index} \\
-	\end{tabular}
-	\caption[\note member functions]{\note member functions.}
-	\label{tab:NoteFunctions}
+  \centering
+  \begin{tabular}{lllcl}
+    Member function & Operator & Description & Scope & Section \\
+    \hline
+    \lstinline!plus! & \lstinline!+! & chord & N & \ref{sec:Chord} \\
+    \lstinline!uplus!, \lstinline!uminus! & \lstinline!+!, \lstinline!-! & octave & N & \ref{sec:OctaveOperators} \\
+    \lstinline!colon! & \lstinline!:! & set duration & N & \ref{sec:SetDuration} \\
+    \lstinline!ctranspose! & \lstinline!'! & dot & N & \ref{sec:DottedNotes} \\
+    \lstinline!not! & \lstinline!~! & tie & N & \ref{sec:TiesAndSlurs} \\
+    \lstinline!mrdivide! & \lstinline!/! & polyphonic section & N & \ref{sec:Polyphony} \\
+    \lstinline!or! & \lstinline!|! & extraction & C & \ref{sec:Extraction} \\
+    \lstinline!mpower! & \lstinline!^! & transposition & N & \ref{sec:Transpose} \\
+    \lstinline!mtimes! & \lstinline!.*! & riff & N & \ref{sec:RepeatRiff} \\
+    \lstinline!display!& & display & C & \ref{sec:Display} \\
+    \lstinline!times! & \lstinline!*! & expand & N & \ref{sec:Expand} \\
+    \lstinline!minus! & \lstinline!-! & index & N & \ref{sec:Index} \\
+  \end{tabular}
+  \caption[\note member functions]{\note member functions.}
+  \label{tab:NoteFunctions}
 \end{table}
 
 \begin{table}
-	\centering
-	\begin{tabular}{llcl}
-		\lstinline!cacofonix! function syntax & Description & Scope & Section \\
-		\hline
-		\lstinline!cacofonix( file, ... )! & output file & & \ref{sec:CacofonixFunction} \\
-		\lstinline!cacofonix( ..., instrument, sheet, ... )! & add sheets & C & \ref{sec:CacofonixFunction} \\
-		\lstinline!cacofonix( ..., 'Tempo', tempo, ... )! & default tempo & G & \ref{sec:Tempo} \\
-		\lstinline!cacofonix( ..., 'Velocity', velocity, ... )! & velocity & G & \ref{sec:Velocity} \\
-		\lstinline!cacofonix( ..., 'DrumKit', drumkit, ... )! & drum kit & G & \ref{sec:CacofonixFunction} \\
-	\end{tabular}
-	\caption[\lstinline!cacofonix! function API]{\lstinline!cacofonix! function API.}
-	\label{tab:CacofonixAPI}
+  \centering
+  \begin{tabular}{llcl}
+    \lstinline!cacofonix! function syntax & Description & Scope & Section \\
+    \hline
+    \lstinline!cacofonix( file, ... )! & output file & & \ref{sec:CacofonixFunction} \\
+    \lstinline!cacofonix( ..., instrument, sheet, ... )! & add sheets & C & \ref{sec:CacofonixFunction} \\
+    \lstinline!cacofonix( ..., 'Tempo', tempo, ... )! & default tempo & G & \ref{sec:Tempo} \\
+    \lstinline!cacofonix( ..., 'Velocity', velocity, ... )! & velocity & G & \ref{sec:Velocity} \\
+    \lstinline!cacofonix( ..., 'DrumKit', drumkit, ... )! & drum kit & G & \ref{sec:CacofonixFunction} \\
+  \end{tabular}
+  \caption[\lstinline!cacofonix! function API]{\lstinline!cacofonix! function API.}
+  \label{tab:CacofonixAPI}
 \end{table}
 
 \subsection{Sheets, instruments, tracks and channels}
@@ -561,30 +561,30 @@ The reciprocal is not true: \emph{one} instrument can have \emph{several} sheets
 
 For each features of \cacofonix, there is four possible scopes: note, monophonic, channel or global.
 \begin{itemize}
-	\item A feature with a note scope will modify only one note (or sometimes, an array of notes), and the next notes are not influenced.
-	\item A feature with a monophonic scope is a little more complicated. This kind of features modify the next notes of the monophonic part\footnote{It's a sad misuse of language: a polyphonic section is said composed of \emph{monophonic} parts, even if a monophonic part can contains polyphonic sections itself.}. If the feature is placed in a monophonic section, the other monophonic parts (which are played in parallel) are not modified, influenced or perturbed, in any way. If, in the monophonic part and after the modification, a new polyphonic section starts, the feature will be apply in every new monophonic parts. Last point: after the polyphonic section, the last modification of the last written monophonic part will be active. This is a good example (see section \ref{sec:PlainDynamics} for explications about dynamics):
+  \item A feature with a note scope will modify only one note (or sometimes, an array of notes), and the next notes are not influenced.
+  \item A feature with a monophonic scope is a little more complicated. This kind of features modify the next notes of the monophonic part\footnote{It's a sad misuse of language: a polyphonic section is said composed of \emph{monophonic} parts, even if a monophonic part can contains polyphonic sections itself.}. If the feature is placed in a monophonic section, the other monophonic parts (which are played in parallel) are not modified, influenced or perturbed, in any way. If, in the monophonic part and after the modification, a new polyphonic section starts, the feature will be apply in every new monophonic parts. Last point: after the polyphonic section, the last modification of the last written monophonic part will be active. This is a good example (see section \ref{sec:PlainDynamics} for explications about dynamics):
 \begin{lstlisting}
 NoteInit
 sheet = [ C:N bar ...      % dyn: mf (default)
-	DynF D:N bar ...       % dyn: f  (setted)
-	[ ...                  % start a mono. section
-		E:N bar ...        % dyn: f
-		DynMP F:N bar ...  % dyn: mp (setted)
-		G:N bar ...        % dyn: mp (not modified)
-		A:N bar ...        % dyn: mp (not modified)
-	] ...                  % end of the mono. section
-	/ ...                  % polyphony
-	[ ...                  % new mono. section
-		+E:N bar ...       % dyn: f
-		+F:N bar ...       % dyn: f  (not modified)
-		DynPP +G:N bar ... % dyn: pp (setted)
-		+A:N bar ...       % dyn: pp (not modified)
-	] ...                  % end of the poly. section
-	+C:N bar ...           % dyn: pp
-	];
+  DynF D:N bar ...       % dyn: f  (setted)
+  [ ...                  % start a mono. section
+    E:N bar ...        % dyn: f
+    DynMP F:N bar ...  % dyn: mp (setted)
+    G:N bar ...        % dyn: mp (not modified)
+    A:N bar ...        % dyn: mp (not modified)
+  ] ...                  % end of the mono. section
+  / ...                  % polyphony
+  [ ...                  % new mono. section
+    +E:N bar ...       % dyn: f
+    +F:N bar ...       % dyn: f  (not modified)
+    DynPP +G:N bar ... % dyn: pp (setted)
+    +A:N bar ...       % dyn: pp (not modified)
+  ] ...                  % end of the poly. section
+  +C:N bar ...           % dyn: pp
+  ];
 \end{lstlisting}
-	\item A feature with a channel scope modify\dots the channel, and so all played sheets of the modified instrument at the same time. Be careful: remember that percussions share the same channel!
-	\item Finally, a feature with a global scope modify all sheets given to the \lstinline!cacofonix! function. For more readability, theses features can be grouped in a main sheet, see the section \ref{sec:CacofonixFunction}.
+  \item A feature with a channel scope modify\dots the channel, and so all played sheets of the modified instrument at the same time. Be careful: remember that percussions share the same channel!
+  \item Finally, a feature with a global scope modify all sheets given to the \lstinline!cacofonix! function. For more readability, theses features can be grouped in a main sheet, see the section \ref{sec:CacofonixFunction}.
 \end{itemize}
 
 \me{I not sure to understand\dots}
@@ -636,11 +636,11 @@ The simplest way to modify the octave of a note is the unary operators \lstinlin
 \begin{lstlisting}
 NoteInit
 sheet = [ ...
-	-G:N2 C:N2 bar ...
-	E:N2 G:N2 bar ...
-	A:N2 B:N2 bar ...
-	+C:N2 ++C:N2 bar ...
-	-E+-G+C+++C:N bar ];
+  -G:N2 C:N2 bar ...
+  E:N2 G:N2 bar ...
+  A:N2 B:N2 bar ...
+  +C:N2 ++C:N2 bar ...
+  -E+-G+C+++C:N bar ];
 \end{lstlisting}
 
 \begin{meenv}%
@@ -668,10 +668,10 @@ Sometimes, a sheet or a section of a sheet is naturally high or low pitched. So,
 \begin{lstlisting}
 NoteInit
 sheet = [ ...
-	          -G:N4 -A:N4  D:N4 -F:N4 bar ...
-	Note('-1') G:N4  A:N4 +D:N4  F:N4 bar ...
-	Note('+1') G:N4 F:N4 A:N4 G:N4 bar ...
-	Note('+0') G:N4 F:N4 A:N4 G:N4 bar ];
+            -G:N4 -A:N4  D:N4 -F:N4 bar ...
+  Note('-1') G:N4  A:N4 +D:N4  F:N4 bar ...
+  Note('+1') G:N4 F:N4 A:N4 G:N4 bar ...
+  Note('+0') G:N4 F:N4 A:N4 G:N4 bar ];
 \end{lstlisting}
 
 \myself{I guess you would talk about the other way to create this kind of \note?}
@@ -688,7 +688,7 @@ Officially, the operator \lstinline!colon! (\lstinline!:!) associates a tonality
 In fact, the operator \lstinline!:! is like the operator \lstinline!+!: it merges two array of notes in the same way. The difference is the optional argument, a string which is composed with the characters of the table \ref{table:charsOfColon}: only one accent can be specify (\lstinline!'>'!, \lstinline!'.'!, \lstinline!'^'! or \lstinline!'-'!), the characters \lstinline!'|'!, for a detached note, and \lstinline!'$'!, for an arpeggiated chord, can be added after or before (for more information about detached notes, see the section \ref{sec:TiesAndSlurs}). If the note is tied (and not detached), the arpeggio is ignored.
 
 \begin{table}
-	\center
+  \center
 \begin{tabular}{ccp{7cm}}
 \lstinline!'>'! & accent & raise the dynamics of the note \\
 \lstinline!'.'! & staccato & the note is played only during the half of its duration \\
@@ -703,14 +703,14 @@ In fact, the operator \lstinline!:! is like the operator \lstinline!+!: it merge
 
 Some examples: \\
 \begin{lilypond}
-	\new Staff { \time 4/4 \relative c'' { c4\accent b\staccato a\marcato g\tenuto c,4( ~ c8 g'8 g2\accent ) } }
+  \new Staff { \time 4/4 \relative c'' { c4\accent b\staccato a\marcato g\tenuto c,4( ~ c8 g'8 g2\accent ) } }
 \end{lilypond}
 
 \begin{lstlisting}
 NoteInit
 sheet = [ ...
-	+C:'>':N4 B:'.':N4 A:'^':N4 G:'-':N4 bar ...
-	~[ C:N4 C:N8 G:N8 G:'|>':N2 ] bar ];
+  +C:'>':N4 B:'.':N4 A:'^':N4 G:'-':N4 bar ...
+  ~[ C:N4 C:N8 G:N8 G:'|>':N2 ] bar ];
 \end{lstlisting}
 
 \subsection{Dotted notes \lstinline!'!}
@@ -718,16 +718,16 @@ sheet = [ ...
 
 The operator \lstinline!ctranspose! (\lstinline!'!) raises the duration of the note, as a dot: one \lstinline!'! increases the duration of the note by half of its original value, $n$ \lstinline!'! serve to lengthen the note by $1 - \frac{1}{2^n}$ of its original duration. For example: \\
 \begin{lilypond}
-	\relative c'' { \new Staff { \time 2/4 g4. g8 g8. g16 g8. g16 g4.. g16 } }
+  \relative c'' { \new Staff { \time 2/4 g4. g8 g8. g16 g8. g16 g4.. g16 } }
 \end{lilypond}
 
 \begin{lstlisting}
 NoteInit
 
 sheet = [ ...
-	G:N4' G:N8 bar ...
-	G:N8' G:N16 G:N8' G:N16 bar ...
-	G:N4'' G:N16 bar ];
+  G:N4' G:N8 bar ...
+  G:N8' G:N16 G:N8' G:N16 bar ...
+  G:N4'' G:N16 bar ];
 \end{lstlisting}
 
 \me{It's exactly the same example as the section \ref{sec:TutoDottedNotes}!}
@@ -740,17 +740,17 @@ The operator \lstinline!not! (\lstinline!~!) is used to defined ties and slurs. 
 
 If the operator \lstinline!not! is applied on an array of \note, all \note objects in the array will be tied. In this case, the array can contain not playable \note objects (like bars, meters, crescendo\dots): the operator will ignore them. This is some examples: \\
 \begin{lilypond}
-	\relative c'' { \new Staff { \time 4/4 g4( g) f( a) g( g) f( a) g\( ^( g) f a \) g\( g f a g1 \) } }
+  \relative c'' { \new Staff { \time 4/4 g4( g) f( a) g( g) f( a) g\( ^( g) f a \) g\( g f a g1 \) } }
 \end{lilypond}
 
 \begin{lstlisting}
 NoteInit
 sheet = [ ...
-	G:N4 ~G:N4 F:N4 ~A:N4 bar ...
-	~[ G:N4 G:N4 ] ~[ F:N4 A:N4 ] bar ...
-	G:N4 ~G:N4 ~F:N4 ~A:N4 bar ...
-	~[ G:N4 G:'|':N4 F:N4 A:N4 bar ...
-	G:N ] bar ];
+  G:N4 ~G:N4 F:N4 ~A:N4 bar ...
+  ~[ G:N4 G:N4 ] ~[ F:N4 A:N4 ] bar ...
+  G:N4 ~G:N4 ~F:N4 ~A:N4 bar ...
+  ~[ G:N4 G:'|':N4 F:N4 A:N4 bar ...
+  G:N ] bar ];
 \end{lstlisting}
 
 \begin{meenv}%
@@ -780,20 +780,20 @@ meter68 = Note( [6 8] );
 meter34 = Note( [3 4] );
 
 longmeasure = [ ...
-	C+E+G:N8 C+E+G:N8 C+E+G:N8 ...
-	E+G++C:N8 E+G++C:N8 E+G++C:N8 ];
+  C+E+G:N8 C+E+G:N8 C+E+G:N8 ...
+  E+G++C:N8 E+G++C:N8 E+G++C:N8 ];
 
 sheet = [ meter68 R:N8 -G+E:N8 bar ...
-	longmeasure bar ...
-	meter34 C+F+A:N4 -A+C+F:N4 -F+-A+C:N4 bar ...
-	meter68 longmeasure bar ...
-	meter34 G+B++D:N4 D+G+B:N4 -B+D+G:N4 bar ...
-	] / [ ...
-	Note('--') C:N8 R:N8 bar ...
-	C:N8 R:N8 R:N8 -G:N8 R:N8 R:N8 bar ...
-	C:N8 G:N8 -G:N8 G:N8 C:N8 G:N8 bar ...
-	C:N8 R:N8 R:N8 -G:N8 R:N8 R:N8 bar ...
-	C:N8 G:N8 -G:N8 G:N8 C:N8 G:N8 bar ];
+  longmeasure bar ...
+  meter34 C+F+A:N4 -A+C+F:N4 -F+-A+C:N4 bar ...
+  meter68 longmeasure bar ...
+  meter34 G+B++D:N4 D+G+B:N4 -B+D+G:N4 bar ...
+  ] / [ ...
+  Note('--') C:N8 R:N8 bar ...
+  C:N8 R:N8 R:N8 -G:N8 R:N8 R:N8 bar ...
+  C:N8 G:N8 -G:N8 G:N8 C:N8 G:N8 bar ...
+  C:N8 R:N8 R:N8 -G:N8 R:N8 R:N8 bar ...
+  C:N8 G:N8 -G:N8 G:N8 C:N8 G:N8 bar ];
 
 cacofonix( 'America', 'Tempo', 140, sheet );
 \end{lstlisting}
@@ -802,7 +802,7 @@ cacofonix( 'America', 'Tempo', 140, sheet );
 \myself{Here we go\dots}
 \me{It's true: any midi files \cacofonix can produce, you can make the same results with or without.}
 \begin{myselfenv}%
-	OK, yes, you're right. Adding bars is boring: you spend time for something which don't appear in the final midi file. But, sometimes, you have thinking about something else, and you have get the wrong duration on several notes. Then, you spend \emph{a lot} of time to find where is the mistake on the sheet, correct the code, re-launch \cacofonix and replay the midi files until the next error. Well, with bars, you can still get the wrong tonality of course, but get the wrong duration makes nicely crash \cacofonix, and the error message gives you what is the problematic measure. Look at that:
+  OK, yes, you're right. Adding bars is boring: you spend time for something which don't appear in the final midi file. But, sometimes, you have thinking about something else, and you have get the wrong duration on several notes. Then, you spend \emph{a lot} of time to find where is the mistake on the sheet, correct the code, re-launch \cacofonix and replay the midi files until the next error. Well, with bars, you can still get the wrong tonality of course, but get the wrong duration makes nicely crash \cacofonix, and the error message gives you what is the problematic measure. Look at that:
 \begin{lstlisting}
 >> NoteInit
 >> cacofonix('dumass', [ Note([4 4]) C:N4 bar E:N4 bar G:N bar ])
@@ -822,21 +822,21 @@ Dynamics are really important: they add all the expressiveness.
 \label{sec:PlainDynamics}
 
 \begin{table}
-	\centering
-	\begin{tabular}{rll}
-		\lstinline!'inf'! & & loudest possible \\
-		\lstinline!'fff'! & forteissimo possibile & very \emph{very} loud \\
-		\lstinline!'ff'! & fortissimo & very loud \\
-		\lstinline!'f'! & forte & loud \\
-		\lstinline!'mf'! & mezzo-forte & moderately loud (default) \\
-		\lstinline!'mp'! & mezzo-piano & moderately soft \\
-		\lstinline!'p'! & piano & soft \\
-		\lstinline!'pp'! & pianissimo & very soft \\
-		\lstinline!'ppp'! & pianissimo possibile & softest possible \\
-		\lstinline!'0'! & & silence \\
-	\end{tabular}
-	\caption{Strings for dynamics}
-	\label{tab:dynamics}
+  \centering
+  \begin{tabular}{rll}
+    \lstinline!'inf'! & & loudest possible \\
+    \lstinline!'fff'! & forteissimo possibile & very \emph{very} loud \\
+    \lstinline!'ff'! & fortissimo & very loud \\
+    \lstinline!'f'! & forte & loud \\
+    \lstinline!'mf'! & mezzo-forte & moderately loud (default) \\
+    \lstinline!'mp'! & mezzo-piano & moderately soft \\
+    \lstinline!'p'! & piano & soft \\
+    \lstinline!'pp'! & pianissimo & very soft \\
+    \lstinline!'ppp'! & pianissimo possibile & softest possible \\
+    \lstinline!'0'! & & silence \\
+  \end{tabular}
+  \caption{Strings for dynamics}
+  \label{tab:dynamics}
 \end{table}
 
 To start a section with a precise dynamic, you just have to add a special note: \lstinline!Note('dynamics',dyn)!, where \lstinline!dyn! is a string found in the table \ref{tab:dynamics}. You can also create a dynamic note with a delay: \lstinline!Note('dynamics',dyn,delay)!. The delay is a double or a duration \note and the new dynamic will be effective only after this duration.
@@ -853,11 +853,11 @@ Plain dynamics, from \lstinline!'fff'! to \lstinline!'ppp'! are defined in \lsti
 
 To play a crescendo, you have to add a note created by \lstinline!Note( keyword, duration, dynamics )! or \lstinline!Note( keyword, duration, dynamics, delay )!:
 \begin{itemize}
-	\item \lstinline!keyword! can be \lstinline!'crescendo'!, \lstinline!'cresc'!, \lstinline!'decrescendo'! or \lstinline!'decresc'!.
-		\me{Fun story: you can use indifferently these key words!}
-	\item \lstinline!duration! can be a double or a duration \note which indicates the duration of the crescendo (or the decrescendo).
-	\item \lstinline!dynamics! is a string from the table \ref{tab:dynamics}: it gives the final dynamic.
-	\item \lstinline!delay! is an optional double or a duration \note. Like for the dynamic \note, the crescendo starts only after this duration (and ends at \lstinline!delay+duration!).
+  \item \lstinline!keyword! can be \lstinline!'crescendo'!, \lstinline!'cresc'!, \lstinline!'decrescendo'! or \lstinline!'decresc'!.
+    \me{Fun story: you can use indifferently these key words!}
+  \item \lstinline!duration! can be a double or a duration \note which indicates the duration of the crescendo (or the decrescendo).
+  \item \lstinline!dynamics! is a string from the table \ref{tab:dynamics}: it gives the final dynamic.
+  \item \lstinline!delay! is an optional double or a duration \note. Like for the dynamic \note, the crescendo starts only after this duration (and ends at \lstinline!delay+duration!).
 \end{itemize}
 
 Like plain dynamics, \cacofonix looks at the current dynamic at the start of the note, and apply this dynamic only for the attack of the note. So you can't play crescendo or decrescendo on one note.
@@ -888,14 +888,14 @@ This is a famous example using dynamics: \\
 \begin{lstlisting}
 NoteInit
 sheet = [ Note([4 4]) Note('+') DynFF ...
-	Fs:'>':N2 ...
-	DynMP Note('cresc', N2, 'FF' ) ...
-	-B:N8 Cs:N8 D:N8 E:N8 bar ...
-	Fs:'>':N4' D:N8 Fs:'>':N4' D:N8 bar ...
-	Fs:'>':N4' DynMF ...
-	Note('dynamics*', 'FF' ) ...
-	-B:N8 D:N8 -B:N8 -G:N8 D:N8 bar ...
-	Note('decresc*', N, '0' ) -B:N bar ];
+  Fs:'>':N2 ...
+  DynMP Note('cresc', N2, 'FF' ) ...
+  -B:N8 Cs:N8 D:N8 E:N8 bar ...
+  Fs:'>':N4' D:N8 Fs:'>':N4' D:N8 bar ...
+  Fs:'>':N4' DynMF ...
+  Note('dynamics*', 'FF' ) ...
+  -B:N8 D:N8 -B:N8 -G:N8 D:N8 bar ...
+  Note('decresc*', N, '0' ) -B:N bar ];
 
 cacofonix( 'SwanLake', 'Tempo', 80, 'Flute', sheet );
 \end{lstlisting}
@@ -907,11 +907,11 @@ Look at the switch plain/channel dynamic: the plain dynamic is reset (line 7) an
 
 Two ways to set the tempo:
 \begin{itemize}
-	\item the tempo is constant: in this case, you can just add two input parameters at the calling of the \cacofonix function:
+  \item the tempo is constant: in this case, you can just add two input parameters at the calling of the \cacofonix function:
 \begin{lstlisting}
 cacofonix( filename, ..., 'Tempo', tempo, ... )
 \end{lstlisting}
-	\item the tempo is not constant: to set a new tempo, add in the sheet a note created with \lstinline!Note('tempo',tempo)!.
+  \item the tempo is not constant: to set a new tempo, add in the sheet a note created with \lstinline!Note('tempo',tempo)!.
 \end{itemize}
 
 The tempo is independent of the meters: the double \lstinline!tempo! is always the number of quarter notes (\lstinline!Note(1)!) per minutes.
@@ -937,7 +937,7 @@ You can indicate a fermata with \lstinline!Note( 'fermata', duration, playedDura
 This is an example of the tempo features: \\
 \begin{lilypond}
 \new Staff { \tempo 4=80 \clef bass \key g \major \time 4/4 \relative c {
-g''16 b, d, b' g' b, g' b, g' b, d, b' g' b, g' b, 
+g''16 b, d, b' g' b, g' b, g' b, d, b' g' b, g' b,
 g' a, d, a' g' a, g' a, g' a, d, a' g' a, g' a,
 fis' c d, c'_\markup{ \italic rall... } fis c fis c fis c d, c' fis c fis c
 <g, b' g'>1\fermata } }
@@ -946,20 +946,20 @@ fis' c d, c'_\markup{ \italic rall... } fis c fis c fis c d, c' fis c fis c
 \begin{lstlisting}
 NoteInit
 sheet = [ Note('-') Note('Tempo', 80) ...
-	+G:N16 B:N16 D:N16 B:N16 ...
-		+G:N16 B:N16 +G:N16 B:N16 ...
-		+G:N16 B:N16 D:N16 B:N16 ...
-		+G:N16 B:N16 +G:N16 B:N16 bar ...
-	+G:N16 A:N16 D:N16 A:N16 ...
-		+G:N16 A:N16 +G:N16 A:N16 ...
-		+G:N16 A:N16 D:N16 A:N16 ...
-		+G:N16 A:N16 +G:N16 A:N16 bar ...
-	+Fs:N16 +C:N16 D:N16 +C:N16 ...
-		Note( 'rall', N2', 60 ) ...
-		+Fs:N16 +C:N16 +Fs:N16 +C:N16 ...
-		+Fs:N16 +C:N16 D:N16 +C:N16 ...
-		+Fs:N16 +C:N16 +Fs:N16 +C:N16 bar ...
-	Note( 'fermata', N, N') -G+B++G:N bar ];
+  +G:N16 B:N16 D:N16 B:N16 ...
+    +G:N16 B:N16 +G:N16 B:N16 ...
+    +G:N16 B:N16 D:N16 B:N16 ...
+    +G:N16 B:N16 +G:N16 B:N16 bar ...
+  +G:N16 A:N16 D:N16 A:N16 ...
+    +G:N16 A:N16 +G:N16 A:N16 ...
+    +G:N16 A:N16 D:N16 A:N16 ...
+    +G:N16 A:N16 +G:N16 A:N16 bar ...
+  +Fs:N16 +C:N16 D:N16 +C:N16 ...
+    Note( 'rall', N2', 60 ) ...
+    +Fs:N16 +C:N16 +Fs:N16 +C:N16 ...
+    +Fs:N16 +C:N16 D:N16 +C:N16 ...
+    +Fs:N16 +C:N16 +Fs:N16 +C:N16 bar ...
+  Note( 'fermata', N, N') -G+B++G:N bar ];
 
 cacofonix( 'CelloSuite_Prelude', 'Cello', sheet );
 \end{lstlisting}
@@ -1009,7 +1009,7 @@ Where come from the $3$ extra notes?%
 \begin{meenv}%
 No reason. I guess I was boring. But, wait\dots If sometimes notes are added, it's pretty hazardous to use indexation like \lstinline!mysheet(5:25)!. How to get safely an extract of a sheet?%
 \end{meenv}
-\myself{It's the first time I hear you speak about safety, but, well, get a look at the section \ref{sec:Extraction}.} 
+\myself{It's the first time I hear you speak about safety, but, well, get a look at the section \ref{sec:Extraction}.}
 
 \subsection{Sustain}
 \label{sec:Sustain}
@@ -1033,15 +1033,15 @@ SusOn = Note( 'Sustain', 'on' );
 SusOff = Note( 'Sustain', 'off' );
 
 sheet = [ Note([2 4]) ...
-	SusOn Cs:N4' ~Fs:N8 bar ...
-	SusOn A:N4' ~Fs:N8 bar ...
-	SusOn Es:N4' ~Fs:N16 Gs:N16 bar ...
-	SusOn Fs:N2 SusOff bar ...
-	] / [ Note('--') ...
-	Fs:N8 ~A++Cs++A:'$.':N8 Cs:'.':N8 +Cs++A:'.':N8 bar ...
-	Fs:N8 ~A++Cs++A:'$.':N8 Cs:'.':N8 +Cs++A:'.':N8 bar ...
-	Fs:N8 ~B++D++Gs:'$.':N8 -B:'.':N8 +D++Gs:'.':N8 bar ...
-	Fs:N8 ~A++Cs++A:'$.':N8 Cs:'.':N8 +Cs++A:'.':N8 bar ];
+  SusOn Cs:N4' ~Fs:N8 bar ...
+  SusOn A:N4' ~Fs:N8 bar ...
+  SusOn Es:N4' ~Fs:N16 Gs:N16 bar ...
+  SusOn Fs:N2 SusOff bar ...
+  ] / [ Note('--') ...
+  Fs:N8 ~A++Cs++A:'$.':N8 Cs:'.':N8 +Cs++A:'.':N8 bar ...
+  Fs:N8 ~A++Cs++A:'$.':N8 Cs:'.':N8 +Cs++A:'.':N8 bar ...
+  Fs:N8 ~B++D++Gs:'$.':N8 -B:'.':N8 +D++Gs:'.':N8 bar ...
+  Fs:N8 ~A++Cs++A:'$.':N8 Cs:'.':N8 +Cs++A:'.':N8 bar ];
 
 cacofonix( 'HungarianDanceN5', 'Tempo', 100, sheet );
 \end{lstlisting}
@@ -1067,18 +1067,18 @@ Marker can be used everywhere in the sheet, but it's common to place it at the s
 >> markA = Note( 'Marker', 'A' );
 >> markB = Note( 'Marker', 'B' );
 >> sheet1 = [ ...
-	markA C:N4 C:N4 G:N4 G:N4 bar ...
-	A:N4 A:N4 G:N2 bar ...
-	markB F:N4 F:N4 E:N4 E:N4 bar ...
-	D:N4 D:N4 C:N2 bar ];
+  markA C:N4 C:N4 G:N4 G:N4 bar ...
+  A:N4 A:N4 G:N2 bar ...
+  markB F:N4 F:N4 E:N4 E:N4 bar ...
+  D:N4 D:N4 C:N2 bar ];
 >> sheet2 = [ Note('-') ...
-	C:N4 E+G:N4 C:N4 E+G:N4 bar ...
-	F:N4 A++C:N4 E:N4 G++C:N4 bar ...
-	markB F:N4 A++C:N4 E:N4 G++C:N4 bar ...
-	D:N4 G+B:N4 C+E+G:N2 bar ];
+  C:N4 E+G:N4 C:N4 E+G:N4 bar ...
+  F:N4 A++C:N4 E:N4 G++C:N4 bar ...
+  markB F:N4 A++C:N4 E:N4 G++C:N4 bar ...
+  D:N4 G+B:N4 C+E+G:N2 bar ];
 >> cacofonix( 'TinkleTinkleLittleStar', 'Tempo', 120, ...
-	'Piccolo', sheet1, ...
-	'Acoustic Bass', sheet2 );
+  'Piccolo', sheet1, ...
+  'Acoustic Bass', sheet2 );
 \end{lstlisting}
 
 Markers are very useful when \cacofonix crashes: the error message gives the problematic measure in function of the last marker read.
@@ -1086,7 +1086,7 @@ Markers are very useful when \cacofonix crashes: the error message gives the pro
 \subsubsection{Go to a marker}
 \label{sec:Goto}
 
-Sometimes, a sheet contains a long pause of several measures. Of course, you can fill theses measures with rests, but it can be more convenient to use a special note with the meaning ``From now and to this marker, don't play anything''. This kind of note is called a \emph{goto} marker\footnote{The name comes from of the famous instruction of BASIC.} and can be created by two ways: 
+Sometimes, a sheet contains a long pause of several measures. Of course, you can fill theses measures with rests, but it can be more convenient to use a special note with the meaning ``From now and to this marker, don't play anything''. This kind of note is called a \emph{goto} marker\footnote{The name comes from of the famous instruction of BASIC.} and can be created by two ways:
 \begin{lstlisting}
 >> gotomarker = Note( 'Marker*', 'mymarker' );
 \end{lstlisting}
@@ -1111,15 +1111,15 @@ A goto marker is first a marker: it can be use for an extraction (see the next s
 >> markC = Note( 'Marker', 'C' );
 >> markD = Note( 'Marker', 'D' );
 >> sheet1 = [ ...
-	markA C:N4 C:N4 G:N4 G:N4 bar ...
-	markB A:N4 A:N4 G:N2 bar ...
-	markC F:N4 F:N4 E:N4 E:N4 bar ...
-	markD D:N4 D:N4 C:N2 bar ];
+  markA C:N4 C:N4 G:N4 G:N4 bar ...
+  markB A:N4 A:N4 G:N2 bar ...
+  markC F:N4 F:N4 E:N4 E:N4 bar ...
+  markD D:N4 D:N4 C:N2 bar ];
 >> sheet2 = [ ~markD Note('-') ...
-	R:N2 C+E+G:N2 bar ];
+  R:N2 C+E+G:N2 bar ];
 >> cacofonix( 'TinkleTinkleLittleStar', 'Tempo', 120, ...
-	'Piccolo', sheet1, ...
-	'Acoustic Bass', sheet2 );
+  'Piccolo', sheet1, ...
+  'Acoustic Bass', sheet2 );
 \end{lstlisting}
 
 \subsubsection{Extraction \lstinline!|!}
@@ -1162,15 +1162,15 @@ So, this is how to extract a piece from a marker to an other: \\
 >> markC = Note( 'Marker', 'C' );
 >> markD = Note( 'Marker', 'D' );
 >> sheet1 = [ ...
-	markA C:N4 C:N4 G:N4 G:N4 bar ...
-	markB A:N4 A:N4 G:N2 bar ...
-	markC F:N4 F:N4 E:N4 E:N4 bar ...
-	markD D:N4 D:N4 C:N2 bar ];
+  markA C:N4 C:N4 G:N4 G:N4 bar ...
+  markB A:N4 A:N4 G:N2 bar ...
+  markC F:N4 F:N4 E:N4 E:N4 bar ...
+  markD D:N4 D:N4 C:N2 bar ];
 >> sheet2 = [ Note('-') ...
-	markA C:N4 E+G:N4 C:N4 E+G:N4 bar ...
-	markB F:N4 A++C:N4 E:N4 G++C:N4 bar ...
-	markC F:N4 A++C:N4 E:N4 G++C:N4 bar ...
-	markD D:N4 G+B:N4 C+E+G:N2 bar ];
+  markA C:N4 E+G:N4 C:N4 E+G:N4 bar ...
+  markB F:N4 A++C:N4 E:N4 G++C:N4 bar ...
+  markC F:N4 A++C:N4 E:N4 G++C:N4 bar ...
+  markD D:N4 G+B:N4 C+E+G:N2 bar ];
 >> sheet = markB | (sheet1/sheet2) | markD;
 \end{lstlisting}
 
@@ -1184,16 +1184,16 @@ So, this is how to extract a piece from a marker to an other: \\
 To do a trill or a portamento, you can modify the pitch of the channel with a \lstinline!Note( 'pitch', value )!. The value is a string corresponding to the number of half steps to add (or to subtract) to the notes. The acceptable characters and their effects on the value are listed on the table \ref{tab:pitchValue}.
 
 \begin{table}
-	\centering
-	\begin{tabular}{cl}
-		\lstinline!'#'! & Add a half step \\
-		\lstinline!'+'! & Add a quarter step \\
-		\lstinline!'0'! & Add nothing (reset) \\
-		\lstinline!'-'! & Subtract a quarter step \\
-		\lstinline!'b'! & Subtract a half step \\
-	\end{tabular}
-	\caption{Characters for the pitch value}
-	\label{tab:pitchValue}
+  \centering
+  \begin{tabular}{cl}
+    \lstinline!'#'! & Add a half step \\
+    \lstinline!'+'! & Add a quarter step \\
+    \lstinline!'0'! & Add nothing (reset) \\
+    \lstinline!'-'! & Subtract a quarter step \\
+    \lstinline!'b'! & Subtract a half step \\
+  \end{tabular}
+  \caption{Characters for the pitch value}
+  \label{tab:pitchValue}
 \end{table}
 
 Two optional parameters can be given. The first is the transition between the \emph{last} pitch value and the new one.
@@ -1203,30 +1203,30 @@ Two optional parameters can be given. The first is the transition between the \e
 To add a transition, just specify the name of the transition (see the figure \ref{fig:pitchTransitions}) between the string \lstinline!'pitch'! and the new value: \lstinline!Note( 'pitch', transition, value )!.
 
 \begin{figure}
-	\begin{center}
-		\begin{subfloatenv}{Transition \lstinline!'none'! (default)}
-			\begin{asy}
-				displayPitchTransition( pitchTransNone );
-			\end{asy}
-		\end{subfloatenv} %
-		\begin{subfloatenv}{Transition \lstinline!'linear'!}
-			\begin{asy}
-				displayPitchTransition( pitchTransLinear );
-			\end{asy}
-		\end{subfloatenv}
-		\begin{subfloatenv}{Transition \lstinline!'quad'!}
-			\begin{asy}
-				displayPitchTransition( pitchTransQuad );
-			\end{asy}
-		\end{subfloatenv}%
-		\begin{subfloatenv}{Transition \lstinline!'quad2'!}
-			\begin{asy}
-				displayPitchTransition( pitchTransQuad2 );
-			\end{asy}
-		\end{subfloatenv}
-	\end{center}
-	\caption{Pitch transitions}
-	\label{fig:pitchTransitions}
+  \begin{center}
+    \begin{subfloatenv}{Transition \lstinline!'none'! (default)}
+      \begin{asy}
+        displayPitchTransition( pitchTransNone );
+      \end{asy}
+    \end{subfloatenv} %
+    \begin{subfloatenv}{Transition \lstinline!'linear'!}
+      \begin{asy}
+        displayPitchTransition( pitchTransLinear );
+      \end{asy}
+    \end{subfloatenv}
+    \begin{subfloatenv}{Transition \lstinline!'quad'!}
+      \begin{asy}
+        displayPitchTransition( pitchTransQuad );
+      \end{asy}
+    \end{subfloatenv}%
+    \begin{subfloatenv}{Transition \lstinline!'quad2'!}
+      \begin{asy}
+        displayPitchTransition( pitchTransQuad2 );
+      \end{asy}
+    \end{subfloatenv}
+  \end{center}
+  \caption{Pitch transitions}
+  \label{fig:pitchTransitions}
 \end{figure}
 
 The second optional argument is the delay: like dynamics, if a delay is given (a number or a duration note), the note will be effective only after this duration. The delay is placed after the value: \lstinline!Note( 'pitch', value, delay )!.
@@ -1250,32 +1250,32 @@ N48 = Note(1/12);
 delay = N8; val = { 'b', '#' };
 trill = Note( 'pitch', val{1}, delay);
 for t = 1:20
-	delay = delay+N32;
-	trill = [ trill ...
-		Note( 'pitch', 'quad', val{1+mod(t,2)}, delay) ];
+  delay = delay+N32;
+  trill = [ trill ...
+    Note( 'pitch', 'quad', val{1+mod(t,2)}, delay) ];
 end
 
 portamento = [ ...
-	Note( 'pitch', 'quad', repmat('#',1,29) ) ...
-	Note( 'pitch', '0' ) ];
+  Note( 'pitch', 'quad', repmat('#',1,29) ) ...
+  Note( 'pitch', '0' ) ];
 
 sheet = [ ...
-	Note('fermata', N2, N2') trill -F:N2' ...
-		Note( 'pitch', '0' ) -F:N4 portamento bar ...
-	+Bf:'>':N2 ~[ +Af:N48 +Bf:N48 +Af:'.':N24 ] ...
-		+Gf:'.':N12 +Af:'.':N12 ...
-		+Gf:'.':N12 +Af:'.':N12 +Gf:'.':N12 bar ...
-	+F:'-':N8 +Ef:'-':N8 +D:'-':N8 +Df:'-':N4 ...
-		+Ef:'-':N8 +E:'-':N8 +F:'-':N8 bar ...
-	Note('cresc',B,'f') ~+F:N8 +D:N8 ...
-		~[Bf:N32 +C:N32 Bf:N32 A:N32] ...
-		Note('cresc',B,'mf') Af:'>':N8 ...
-		~Af:N8 Gf:N8 F:N8 F:'>':N8 bar ...
-	~F:N bar ];
+  Note('fermata', N2, N2') trill -F:N2' ...
+    Note( 'pitch', '0' ) -F:N4 portamento bar ...
+  +Bf:'>':N2 ~[ +Af:N48 +Bf:N48 +Af:'.':N24 ] ...
+    +Gf:'.':N12 +Af:'.':N12 ...
+    +Gf:'.':N12 +Af:'.':N12 +Gf:'.':N12 bar ...
+  +F:'-':N8 +Ef:'-':N8 +D:'-':N8 +Df:'-':N4 ...
+    +Ef:'-':N8 +E:'-':N8 +F:'-':N8 bar ...
+  Note('cresc',B,'f') ~+F:N8 +D:N8 ...
+    ~[Bf:N32 +C:N32 Bf:N32 A:N32] ...
+    Note('cresc',B,'mf') Af:'>':N8 ...
+    ~Af:N8 Gf:N8 F:N8 F:'>':N8 bar ...
+  ~F:N bar ];
 
 cacofonix( 'RhapsodyInBlue', ...
-	'Tempo', 80, ...
-	'Clarinet', sheet );
+  'Tempo', 80, ...
+  'Clarinet', sheet );
 \end{lstlisting}
 
 \subsection{Display}
@@ -1296,14 +1296,14 @@ bes8\( c bes8. aes16 aes2\) } }
 >> markB = Note( 'Marker', 'B' );
 >> Note.setNbCharByQuater( 16 );
 >> sheet = [ Note('+') DynP ...
-	markA ~[ C:N8' Ef:N16 Ef:'|':N4 bar ...
-	C:N8' -Bf:N16 -Af:N4 ] bar ...
-	~[ -Bf:N8' C:N16 Ef:N8' C:N16 bar ...
-	-Bf:N2 ] bar ...
-	markB ~[ C:N8' Ef:N16 Ef:'|':N4 bar ...
-	C:N8' -Bf:N16 -Af:N4 ] bar ...
-	~[ -Bf:N8 C:N8 -Bf:N8' -Af:N16 bar ...
-	-Af:'|':N2 ] bar ]
+  markA ~[ C:N8' Ef:N16 Ef:'|':N4 bar ...
+  C:N8' -Bf:N16 -Af:N4 ] bar ...
+  ~[ -Bf:N8' C:N16 Ef:N8' C:N16 bar ...
+  -Bf:N2 ] bar ...
+  markB ~[ C:N8' Ef:N16 Ef:'|':N4 bar ...
+  C:N8' -Bf:N16 -Af:N4 ] bar ...
+  ~[ -Bf:N8 C:N8 -Bf:N8' -Af:N16 bar ...
+  -Af:'|':N2 ] bar ]
 $A (1)///////////////////////////$
 $p                               $
 $|-----C-----~Eb-|------Eb-------$
@@ -1329,8 +1329,8 @@ $3 (8)///////////////////////////$
 $                                $
 $|--------------Ab---------------$
 >> cacofonix( 'NewWorldSymphony_Largo', ...
-	'Tempo', 52, ...
-	'English Horn', sheet );
+  'Tempo', 52, ...
+  'English Horn', sheet );
 \end{lstlisting}
 
 The output is pretty intuitive: the display show the name of the notes which are contained in the sheet, with a \lstinline!b! for a flat and a \lstinline!#! for a sharp. The display can show every features of \cacofonix: meters, dynamics, tempo, polyphony\dots Only the octave and the pitch are not displayed. The measures are numbered from the last marker and from the start of the sheet (in brackets). The class function \lstinline!setNbCharByQuater! defines the number of characters per quarter notes.
@@ -1357,14 +1357,14 @@ And sometimes, something weird appears even if the sheet is correctly build! If 
 \begin{lstlisting}
 >> Note.setNbCharByQuater( 18 );
 >> sheet = [ Note('+') ...
-	~[ C:N8' Ef:N16 Ef:'|':N4 bar ...
-	C:N8' -Bf:N16 -Af:N4 ] bar ...
-	~[ -Bf:N8' C:N16 Ef:N8' C:N16 bar ...
-	-Bf:N2 ] bar ...
-	~[ C:N8' Ef:N16 Ef:'|':N4 bar ...
-	C:N8' -Bf:N16 -Af:N4 ] bar ...
-	~[ -Bf:N8 C:N8 -Bf:N8' -Af:N16 bar ...
-	-Af:'|':N2 ] bar ]
+  ~[ C:N8' Ef:N16 Ef:'|':N4 bar ...
+  C:N8' -Bf:N16 -Af:N4 ] bar ...
+  ~[ -Bf:N8' C:N16 Ef:N8' C:N16 bar ...
+  -Bf:N2 ] bar ...
+  ~[ C:N8' Ef:N16 Ef:'|':N4 bar ...
+  C:N8' -Bf:N16 -Af:N4 ] bar ...
+  ~[ -Bf:N8 C:N8 -Bf:N8' -Af:N16 bar ...
+  -Af:'|':N2 ] bar ]
 $1////////////////////////////////////$
 $|------C------~-Eb-|-------Eb--------$
 $2////////////////////////////////////$
@@ -1397,54 +1397,54 @@ $|  Bb  |  C   |  D   |  Eb  |  F   |  G   |  A   $
 \end{lstlisting}
 And we want transpose this scale in G major. To do that, each note have to be reduced of $3$ half steps (or raised of $9$ half steps). Remember the scale steps (see figure \ref{fig:scalesteps})!
 \begin{figure}
-	\begin{center}
-	\begin{asy}
-		size( 5cm );
-		import labelpath;
+  \begin{center}
+  \begin{asy}
+    size( 5cm );
+    import labelpath;
 
-		pen circlepen = black;
-		pen degpen = black;
-		pen notepen = blue;
-		pen steppen = red;
+    pen circlepen = black;
+    pen degpen = black;
+    pen notepen = blue;
+    pen steppen = red;
 
-		path c = reverse( rotate(90)*unitcircle );
-		int clen = length( c );
+    path c = reverse( rotate(90)*unitcircle );
+    int clen = length( c );
 
-		draw( c, circlepen );
+    draw( c, circlepen );
 
-		real getPos( real h ){ return clen*h/12; }
-		pair getPair( real h ){ return point( c, getPos(h) ); }
-		path getSub( real a, real b ){ return subpath( c, getPos(a), getPos(b) ); }
+    real getPos( real h ){ return clen*h/12; }
+    pair getPair( real h ){ return point( c, getPos(h) ); }
+    path getSub( real a, real b ){ return subpath( c, getPos(a), getPos(b) ); }
 
-		void addDeg( real pos, string deg, string note ){
-			dot( getPair( pos ), degpen );
-			label( deg, getPair( pos ), getPair( pos ), degpen );
-			label( note, getPair( pos ), getPair( pos+6 ), notepen );
-		}
+    void addDeg( real pos, string deg, string note ){
+      dot( getPair( pos ), degpen );
+      label( deg, getPair( pos ), getPair( pos ), degpen );
+      label( note, getPair( pos ), getPair( pos+6 ), notepen );
+    }
 
-		void addStep( real a, real b, string step ){
-			labelpath( shift(0,1)*Label(step), getSub( a, b ), steppen );
-		}
+    void addStep( real a, real b, string step ){
+      labelpath( shift(0,1)*Label(step), getSub( a, b ), steppen );
+    }
 
-		addDeg( 0, "I", "C" );
-		addDeg( 2, "II", "D" );
-		addDeg( 4, "III", "E" );
-		addDeg( 5, "IV", "F" );
-		addDeg( 7, "V", "G" );
-		addDeg( 9, "VI", "A" );
-		addDeg( 11, "VII", "B" );
+    addDeg( 0, "I", "C" );
+    addDeg( 2, "II", "D" );
+    addDeg( 4, "III", "E" );
+    addDeg( 5, "IV", "F" );
+    addDeg( 7, "V", "G" );
+    addDeg( 9, "VI", "A" );
+    addDeg( 11, "VII", "B" );
 
-		addStep(  0,  2, "2" );
-		addStep(  2,  4, "2" );
-		addStep(  4,  5, "1" );
-		addStep(  5,  7, "2" );
-		addStep(  7,  9, "2" );
-		addStep(  9, 11, "2" );
-		addStep( 11, 12, "1" );
-	\end{asy}
-	\end{center}
-	\caption[The scale steps]{The scale steps apply to the C major scale: the degree in black, the number of half step in red and the corresponding name of the note in blue.}
-	\label{fig:scalesteps}
+    addStep(  0,  2, "2" );
+    addStep(  2,  4, "2" );
+    addStep(  4,  5, "1" );
+    addStep(  5,  7, "2" );
+    addStep(  7,  9, "2" );
+    addStep(  9, 11, "2" );
+    addStep( 11, 12, "1" );
+  \end{asy}
+  \end{center}
+  \caption[The scale steps]{The scale steps apply to the C major scale: the degree in black, the number of half step in red and the corresponding name of the note in blue.}
+  \label{fig:scalesteps}
 \end{figure}
 
 \begin{lstlisting}
@@ -1505,37 +1505,37 @@ $|-------C-------|-------G-------$
 
 When you use \lstinline!.*! on two sheets, the algorithm is a little more complicated:
 \begin{algo}{T}{Operator \lstinline!.*!}{Given two arrays \lstinline!A! and \lstinline!B!, we compute \lstinline!C = A.*B! with this algorithm:}
-	\step{Initialize.}{Initialize \lstinline!C = Note.empty()!. Set \lstinline!i = 1! and \lstinline!j = 1!.}
-	\step[checki]{Check \lstinline!i!.}{If \lstinline!i > length(A)!, stop the algortihm and return \lstinline!C!.}
-	\step[addAi]{Add \lstinline!A(i)!.}{If the \lstinline!i!th element of \lstinline!A! is not a playable note (neither a duration nor a tonality, so a bar, a crescendo\dots) add this element at the end of \lstinline!C!: \lstinline!C(end+1)=A(i)! and go to step \stepref{inci}.}
-	\step[checkj]{Check \lstinline!j!.}{If \lstinline!j > length(B)!, set \lstinline!j = 1! and go to the step \stepref{inci}.}
-	\step[addBj]{Add \lstinline!B(j)!.}{If the \lstinline!j!th element of \lstinline!B! is not a playable note (see step \stepref{addAi}), add this element at the end of \lstinline!C! and go to \stepref{incj}.}
-	\step[addAiBj]{Add \lstinline!A(i):B(j)!.}{Merge and add the new note: \lstinline!C(end+1) = A(i):B(j)!.}
-	\step[incj]{Increase \lstinline!j!.}{Set \lstinline!j = j + 1!. Go to \stepref{checkj}.}
-	\step[inci]{Increase \lstinline!i!.}{Set \lstinline!i = i + 1!. Go to \stepref{checki}.}
+  \step{Initialize.}{Initialize \lstinline!C = Note.empty()!. Set \lstinline!i = 1! and \lstinline!j = 1!.}
+  \step[checki]{Check \lstinline!i!.}{If \lstinline!i > length(A)!, stop the algortihm and return \lstinline!C!.}
+  \step[addAi]{Add \lstinline!A(i)!.}{If the \lstinline!i!th element of \lstinline!A! is not a playable note (neither a duration nor a tonality, so a bar, a crescendo\dots) add this element at the end of \lstinline!C!: \lstinline!C(end+1)=A(i)! and go to step \stepref{inci}.}
+  \step[checkj]{Check \lstinline!j!.}{If \lstinline!j > length(B)!, set \lstinline!j = 1! and go to the step \stepref{inci}.}
+  \step[addBj]{Add \lstinline!B(j)!.}{If the \lstinline!j!th element of \lstinline!B! is not a playable note (see step \stepref{addAi}), add this element at the end of \lstinline!C! and go to \stepref{incj}.}
+  \step[addAiBj]{Add \lstinline!A(i):B(j)!.}{Merge and add the new note: \lstinline!C(end+1) = A(i):B(j)!.}
+  \step[incj]{Increase \lstinline!j!.}{Set \lstinline!j = j + 1!. Go to \stepref{checkj}.}
+  \step[inci]{Increase \lstinline!i!.}{Set \lstinline!i = i + 1!. Go to \stepref{checki}.}
 \end{algo}
 
 The algorithm isn't as complicated as it seems. In fact, the steps \stepref[T]{checki} and \stepref[T]{inci} and the steps \stepref[T]{checkj} and \stepref[T]{incj} define two imbricated \lstinline!for! loops: each note of \lstinline!A! is merged with each note of \lstinline!B! (step \stepref[T]{addAiBj}), unless a note can't be merged (steps \stepref[T]{addAi} and \stepref[T]{addBj}). This is a pseudo \matlab code of this algorithm:
 \begin{lstlisting}
 function C = times( A, B )
-	C = Note.empty();
+  C = Note.empty();
 
-	for i = 1:length( A )
-		if ~A(i).isNote
-			C(end+1) = A(i);
+  for i = 1:length( A )
+    if ~A(i).isNote
+      C(end+1) = A(i);
 
-		else
-			for j = 1:length( B )
-				if ~B(j).isNote
-					C(end+1) = B(j);
+    else
+      for j = 1:length( B )
+        if ~B(j).isNote
+          C(end+1) = B(j);
 
-				else
-					C(end+1) = A(i):B(j);
+        else
+          C(end+1) = A(i):B(j);
 
-				end
-			end
-		end
-	end
+        end
+      end
+    end
+  end
 end
 \end{lstlisting}
 
@@ -1558,16 +1558,16 @@ c8 c d( c) dis( c) f( e)
 NoteInit
 
 TROMBONE = [ [ R:N bar ].*2 ...
-	-Bf:N2' ~-Bf:N8 -G:'>':N8 bar ...
-	R:N bar ...
-	-Bf:N bar ...
-	-G+G:'>':N8 Ds:N8 R:N4 R:N2 bar ];
+  -Bf:N2' ~-Bf:N8 -G:'>':N8 bar ...
+  R:N bar ...
+  -Bf:N bar ...
+  -G+G:'>':N8 Ds:N8 R:N4 R:N2 bar ];
 
 BASS = [ Note('--') 6.*[ C C D ~C Ds ~C F ~E bar ].*N8 ];
 
 cacofonix( 'PeterGunn', 'Tempo', 120, ...
-	'Trombone', TROMBONE, ...
-	'Acoustic Bass', BASS );	
+  'Trombone', TROMBONE, ...
+  'Acoustic Bass', BASS );
 \end{lstlisting}
 
 \me{This explanation needs two remarks.}
@@ -1578,14 +1578,14 @@ cacofonix( 'PeterGunn', 'Tempo', 120, ...
 \myself{Do you really expect a \matlab code with this operator to prove that something isn't possible to do with that operator precisely? Sorry, I need a little more time\dots}
 \me{Too bad. Be focus on the next. And search harder, please. The other point: when you want to set an attack, you can use a rest with the operator \lstinline!:!. Examples: \dots}
 \begin{myselfenv}
-	Hum\dots Well, I have one setting the accent on duration notes:
+  Hum\dots Well, I have one setting the accent on duration notes:
 
 \begin{lilypond}
-	\new DrumStaff \with{
-	drumStyleTable = #percussion-style
-	\override StaffSymbol #'line-count = #1 } {
-	\override Staff.BarLine #'bar-extent = #'(-2 . 2)
-	\drummode { \time 3/4 sn8-> \times 2/3 { sn16 sn sn } sn8-> \times 2/3 { sn16 sn sn } sn8-> sn sn-> \times 2/3 { sn16 sn sn } sn8-> \times 2/3 { sn16 sn sn } \times 2/3 { sn16 sn sn } \times 2/3 { sn16 sn sn } } }
+  \new DrumStaff \with{
+  drumStyleTable = #percussion-style
+  \override StaffSymbol #'line-count = #1 } {
+  \override Staff.BarLine #'bar-extent = #'(-2 . 2)
+  \drummode { \time 3/4 sn8-> \times 2/3 { sn16 sn sn } sn8-> \times 2/3 { sn16 sn sn } sn8-> sn sn-> \times 2/3 { sn16 sn sn } sn8-> \times 2/3 { sn16 sn sn } \times 2/3 { sn16 sn sn } \times 2/3 { sn16 sn sn } } }
 \end{lilypond}
 
 \begin{lstlisting}
@@ -1593,14 +1593,14 @@ NoteInit
 
 T = Note(1/6).*3;
 sheet = [ Note([3 4]) V.*[ ...
-	R:'>':N8 T R:'>':N8 T R:'>':N8 N8 bar ...
-	R:'>':N8 T R:'>':N8 T T T bar ] ];
+  R:'>':N8 T R:'>':N8 T R:'>':N8 N8 bar ...
+  R:'>':N8 T R:'>':N8 T T T bar ] ];
 
 cacofonix( 'Bolero', 'Tempo', 72, ...
-	'Acoustic Snare', 179.*sheet );
+  'Acoustic Snare', 179.*sheet );
 \end{lstlisting}
 
-	And I have another one, where the accents are setted on the tonality notes:
+  And I have another one, where the accents are setted on the tonality notes:
 
 \begin{lilypond}
 \new GrandStaff <<
@@ -1615,15 +1615,15 @@ fis8-> cis e fis-> e cis b cis
 NoteInit
 
 SYNTH = [ Note([4 4]) ...
-	[ -A+Cs+Fs R R -B+Ds+Gs ].*N8 R:N2 bar ...
-	[ Cs+E+A R R -B+Ds+Gs ].*N8 R:N2 bar ];
+  [ -A+Cs+Fs R R -B+Ds+Gs ].*N8 R:N2 bar ...
+  [ Cs+E+A R R -B+Ds+Gs ].*N8 R:N2 bar ];
 
 BASS = [ Note('--') ...
-	2.*[ Fs:'>':R Cs E Fs:'>':R E Cs -B Cs bar ].*N8 ];
+  2.*[ Fs:'>':R Cs E Fs:'>':R E Cs -B Cs bar ].*N8 ];
 
 cacofonix( 'BillieJean', 'Tempo', 115, ...
-	'Electric Grand Piano', SYNTH, ...
-	'Acoustic Bass', BASS );
+  'Electric Grand Piano', SYNTH, ...
+  'Acoustic Bass', BASS );
 \end{lstlisting}
 \end{myselfenv}
 \me{Good boy.}
@@ -1641,17 +1641,17 @@ cacofonix( 'BillieJean', 'Tempo', 115, ...
 \paper { line-width = 106\mm }
 \layout { indent = 2.0\cm }
 \header{
-	title = "Symphony No. 5"
-	composer = "Beethoven"
+  title = "Symphony No. 5"
+  composer = "Beethoven"
 }
 \score { <<
-\new Staff { 
-	\set Staff.instrumentName = \markup \center-column { Violin, \line { Clarinet } }
-	\clef treble \key es \major \time 2/4 \relative c'' {r8 g\ff[ g g] es2\fermata r8 f[ f f] d2 ~ d2\fermata}
+\new Staff {
+  \set Staff.instrumentName = \markup \center-column { Violin, \line { Clarinet } }
+  \clef treble \key es \major \time 2/4 \relative c'' {r8 g\ff[ g g] es2\fermata r8 f[ f f] d2 ~ d2\fermata}
 }
 \new Staff {
-	\set Staff.instrumentName = \markup \center-column { Viol, \line { Cello, } \line { \concat{ Bass } } }
-	\clef bass \key es \major \partcombine { \relative c' { r8 g[ g g] es2\fermata r8 f[ f f] d2 ~ d2\fermata } } { \relative c { r8 g[ g g] es2 r8 f[ f f] d2 ~ d2 } }
+  \set Staff.instrumentName = \markup \center-column { Viol, \line { Cello, } \line { \concat{ Bass } } }
+  \clef bass \key es \major \partcombine { \relative c' { r8 g[ g g] es2\fermata r8 f[ f f] d2 ~ d2\fermata } } { \relative c { r8 g[ g g] es2 r8 f[ f f] d2 ~ d2 } }
 }
 >> }
 \end{lilypond}
@@ -1680,21 +1680,21 @@ $|-------G-------|-------G-------$
 
 But the real purpose of this operator is set the tonality of a void note. The general algorithm is:
 \begin{algo}{M}{Operator \lstinline!*!}{Given a \note \lstinline!n! and a sheet \lstinline!A! (which contains void notes), we compute \lstinline!n*A! with this algorithm:}
-	\step{Initialize.}{Set \lstinline!i = 1!.}
-	\step[checki]{Check \lstinline!i!.}{If \lstinline!i > length(A)!, stop the algorithm and return the new \lstinline!A!.}
-	\step{Set the tonality.}{If the \lstinline!i!th element of \lstinline!A! is a void note, set the tonality of \lstinline!A(i)! with the tonality of \lstinline!n!.}
-	\step{Increase \lstinline!i!.}{Set \lstinline!i = i + 1!. Go to \stepref{checki}.}
+  \step{Initialize.}{Set \lstinline!i = 1!.}
+  \step[checki]{Check \lstinline!i!.}{If \lstinline!i > length(A)!, stop the algorithm and return the new \lstinline!A!.}
+  \step{Set the tonality.}{If the \lstinline!i!th element of \lstinline!A! is a void note, set the tonality of \lstinline!A(i)! with the tonality of \lstinline!n!.}
+  \step{Increase \lstinline!i!.}{Set \lstinline!i = i + 1!. Go to \stepref{checki}.}
 \end{algo}
 
 The algorithm is much simpler than the operator \lstinline!.*!: it's just a for loop and every note of \lstinline!A! get the tonality of \lstinline!n!. For the fun, this is a pseudo \matlab code:
 \begin{lstlisting}
 function A = mtimes( n, A )
-	ton = n.getTonality();
-	for i = 1:length( A )
-		if A(i).isVoid
-			A(i).setTonality( ton );
-		end
-	end
+  ton = n.getTonality();
+  for i = 1:length( A )
+    if A(i).isVoid
+      A(i).setTonality( ton );
+    end
+  end
 end
 \end{lstlisting}
 
@@ -1721,8 +1721,8 @@ A void note can be transposed: the transpositions are applied after the affectat
 >> NoteInit
 >> Note.setNbCharByQuater( 6 )
 >> majorScale = [ V^[0 0] V^[1 0] V^[2 0] V^[3 0] ...
-	V^[4 0] V^[5 0] V^[6 0] ];
->> C*majorScale               
+  V^[4 0] V^[5 0] V^[6 0] ];
+>> C*majorScale
 $|  C  |  D  |  E  |  F  |  G  |  A  |  B  $
 >> Ef*majorScale
 $| Eb  |  F  |  G  | Ab  | Bb  |  C  |  D  $
@@ -1732,8 +1732,8 @@ You can also combine transpositions to get relative minor scales:
 >> NoteInit
 >> Note.setNbCharByQuater( 6 )
 >> minorScale = [ V^[0 0] V^[1 0] V^[2 -1] V^[3 0] ...
-	V^[4 0] V^[5 -1] V^[6 0] ]; 
->> A*minorScale                                                               
+  V^[4 0] V^[5 -1] V^[6 0] ];
+>> A*minorScale
 $|  A  |  B  |  C  |  D  |  E  |  F  | G#  $
 >> relativeMinorScale = ( V^[-2 0] )*minorScale;
 >> C*relativeMinorScale
@@ -1750,7 +1750,7 @@ Theses examples are very theorical, but the creation of virtual chords is a dire
 >> ChordMinor = [ V^[0 0] V^[2 -1] V^[4 0] ];
 >> G*ChordMajor
 $|  G  |  B  |  D  $
->> F*ChordMinor 
+>> F*ChordMinor
 $|  F  | Ab  |  C  $
 \end{lstlisting}
 The files \noteInitFile and \noteInitFrFile contain the common chords and can be excessively used in sheets for piano, guitar, bass\dots Good demonstrations of how use that need the explanation of the operator \lstinline!-! and are grouped at the section \ref{sec:voidExamples}.
@@ -1774,11 +1774,11 @@ $|-C-|-E-|-G-$
 The two following examples show how use the void notes. The first use the void note with the index \lstinline!0!. It is a demonstration of how use the virtual chords seen at the section \ref{sec:VirtualArrays}.
 
 \begin{lilypond}
-	\score{ <<
-	\chords{ g1 c s d2 e1 }
-	\relative c' { \time 4/4 r4 e4 d8 c8 b4 b4 c8 b8 ~ b8 a8 g8 a8 b4 c8 b8 ~ b8 a8 g8 a8 \time 2/4 b4 c4 \time 4/4 b1 }
-	\addlyrics { My ba -- by don't mess a -- round be -- cause she loves me so and this I know for sho'. }
-	>> }
+  \score{ <<
+  \chords{ g1 c s d2 e1 }
+  \relative c' { \time 4/4 r4 e4 d8 c8 b4 b4 c8 b8 ~ b8 a8 g8 a8 b4 c8 b8 ~ b8 a8 g8 a8 \time 2/4 b4 c4 \time 4/4 b1 }
+  \addlyrics { My ba -- by don't mess a -- round be -- cause she loves me so and this I know for sho'. }
+  >> }
 \end{lilypond}
 
 \begin{lstlisting}
@@ -1788,61 +1788,61 @@ M44 = Note([4 4]);
 M24 = Note([2 4]);
 
 MELODY = [ Note('-') M44 ...
-	R:N4 +E:N4 +D:N8 +C:N8 B:N4 bar ...
-	B:N4 +C:N8 B:[N8 N8] A:N8 G:N8 A:N8 bar ...
-	B:N4 +C:N8 B:[N8 N8] A:N8 G:N8 A:N8 bar ...
-	M24 B:N4 +C:N4 bar ...
-	M44 B:N bar ];
+  R:N4 +E:N4 +D:N8 +C:N8 B:N4 bar ...
+  B:N4 +C:N8 B:[N8 N8] A:N8 G:N8 A:N8 bar ...
+  B:N4 +C:N8 B:[N8 N8] A:N8 G:N8 A:N8 bar ...
+  M24 B:N4 +C:N4 bar ...
+  M44 B:N bar ];
 
 V0 = V-0; RIFF = [ V0:N4 V0:N8 V0:N4 (V0:N8)*3 bar ];
 GUITAR = [ DynMP ...
-	G*CM*RIFF ...
-	C*CM*RIFF ...
-	C*CM*RIFF ...
-	D*CM*[ V0:N4 V0:N8 V0:N8 bar ] ...
-	E*CM*RIFF ];
+  G*CM*RIFF ...
+  C*CM*RIFF ...
+  C*CM*RIFF ...
+  D*CM*[ V0:N4 V0:N8 V0:N8 bar ] ...
+  E*CM*RIFF ];
 
 cacofonix( 'HeyYa', 'Tempo', 160, ...
-	'Oboe', MELODY, ...
-	'Nylon-String Guitar', GUITAR );
+  'Oboe', MELODY, ...
+  'Nylon-String Guitar', GUITAR );
 \end{lstlisting}
 
 The second example is a little more complicated: the chords are arpeggiated and one note is raised to the upper octave with the unary operator \lstinline!+!. For the strings, you can see the use of the operator \lstinline!:! directly on the arrays of tonality notes. Of course, the use of a riff \lstinline!V-0:N2! should be possible.
 
 \begin{lilypond}
-	\score{ <<
-	\chords{ s4 f2 a:m bes a:m g:m f a d:m }
-	\relative c' { \key f \major \partial 4 c8 e f4. a8 c2 r8 d d d c2 r8 bes bes bes a2 r8 g g g f2 }
-	\addlyrics { I see trees of green, red ros -- es too, I see them bloom, for me and you. }
-	>> }
+  \score{ <<
+  \chords{ s4 f2 a:m bes a:m g:m f a d:m }
+  \relative c' { \key f \major \partial 4 c8 e f4. a8 c2 r8 d d d c2 r8 bes bes bes a2 r8 g g g f2 }
+  \addlyrics { I see trees of green, red ros -- es too, I see them bloom, for me and you. }
+  >> }
 \end{lilypond}
 
 \begin{lstlisting}
 NoteInit
 
 VOICE = [ Note('-') C:N8 E:N8 bar ...
-	F:N4' A:N8 +C:N2 bar ...
-	R:N8 (+D:N8)*3 +C:N2 bar ...
-	R:N8 (Bf:N8)*3 A:N2 bar ...
-	R:N8 (G:N8)*3 F:N2 bar ];
+  F:N4' A:N8 +C:N2 bar ...
+  R:N8 (+D:N8)*3 +C:N2 bar ...
+  R:N8 (Bf:N8)*3 A:N2 bar ...
+  R:N8 (G:N8)*3 F:N2 bar ];
 
 RIFF = [ V-1 V-2 V-3 +V-1 +V-4 V-6 V-5 V-4 bar ].*N8;
 GUITAR = [ Note('-') R:N4 bar ...
-	[ F*CM  A*Cm ]*RIFF ...
-	[ Bf*CM A*Cm ]*RIFF ...
-	[ G*Cm  F*CM ]*RIFF ...
-	[ A*CM  D*Cm ]*RIFF ];
+  [ F*CM  A*Cm ]*RIFF ...
+  [ Bf*CM A*Cm ]*RIFF ...
+  [ G*Cm  F*CM ]*RIFF ...
+  [ A*CM  D*Cm ]*RIFF ];
 
 VIOLIN = [ DynPP R:N4 bar ...
-	F*CM:N2 A*Cm:N2 bar ...
-	Bf*CM:N2 A*Cm:N2 bar ...
-	G*Cm:N2 F*CM:N2 bar ...
-	A*CM:N2 D*Cm:N2 bar ];
+  F*CM:N2 A*Cm:N2 bar ...
+  Bf*CM:N2 A*Cm:N2 bar ...
+  G*Cm:N2 F*CM:N2 bar ...
+  A*CM:N2 D*Cm:N2 bar ];
 
 cacofonix( 'WhatAWonderfulWorld', 'Tempo', 80, ...
-	'Bassoon', VOICE, ...
-	'Nylon-String Guitar', GUITAR, ...
-	'Slow String Ensemble', VIOLIN );
+  'Bassoon', VOICE, ...
+  'Nylon-String Guitar', GUITAR, ...
+  'Slow String Ensemble', VIOLIN );
 \end{lstlisting}
 
 \subsection{Function \lstinline!cacofonix!}
@@ -1853,32 +1853,32 @@ So, it remains one big last question: how get the midi files from the sheets. Of
 The API of \lstinline!cacofonix! to write a midi file can be write like that:
 \begin{lstlisting}
 cacofonix( midiFilePath, ...
-	[ 'Tempo', tempo, ] ...
-	[ 'Velocity', velocity, ] ...
-	[ 'DrumKit', drumkit, ] ...
-	[ mainSheet, ] ...
-	[ pianoSheet1, pianoSheet2, ... ] ...
-	[ instrument1, sheet1, sheet2, ... ] ...
-	[ instrument2, ... ] ... )
+  [ 'Tempo', tempo, ] ...
+  [ 'Velocity', velocity, ] ...
+  [ 'DrumKit', drumkit, ] ...
+  [ mainSheet, ] ...
+  [ pianoSheet1, pianoSheet2, ... ] ...
+  [ instrument1, sheet1, sheet2, ... ] ...
+  [ instrument2, ... ] ... )
 \end{lstlisting}
 \begin{itemize}
-	\item The parameter \lstinline!midiFilePath! is the path to midi file. It is automatically completed by the extension \lstinline!'.mid'!.
-	\item The optional parameter \lstinline!tempo! following the string \lstinline!'Tempo'! defines the general tempo. See the section \ref{sec:Tempo} for more informations.
-	\item The optional parameter \lstinline!velocity! following the string \lstinline!'Velocity'! defines the velocities to apply to the dynamics. See the section \ref{sec:Velocity} for more informations.
-	\item The optional parameter \lstinline!drumkit! following the string \lstinline!'DrumKit'! defines the drum kit to use. Use it at your own risk.
-		\myself{What? That's all you have to tell about the drum kits? ``Use it at you own risk''?}
-		\me{Well, if you want more clues about the risks, you can see the appendix \ref{sec:AvailDrumKits}.}
-	\item The parameter \lstinline!mainSheet! is an optional sheet without any playable note: it's the perfect place to define meters, tempos, fermatas and markers when the project contains several instruments.
-	\item The meaning of the next parameters is strongly related to the explanations of the section \ref{sec:SITandC}. The first sheets with playable notes (but without being preceded by the name of an instrument) are associated with an unique channel with the timbre of a piano. When a string containing the name of an instrument or a percussion is given, \lstinline!cacofonix! creates a new channel (with the right timbre) and associates the next sheets to that instrument.
+  \item The parameter \lstinline!midiFilePath! is the path to midi file. It is automatically completed by the extension \lstinline!'.mid'!.
+  \item The optional parameter \lstinline!tempo! following the string \lstinline!'Tempo'! defines the general tempo. See the section \ref{sec:Tempo} for more informations.
+  \item The optional parameter \lstinline!velocity! following the string \lstinline!'Velocity'! defines the velocities to apply to the dynamics. See the section \ref{sec:Velocity} for more informations.
+  \item The optional parameter \lstinline!drumkit! following the string \lstinline!'DrumKit'! defines the drum kit to use. Use it at your own risk.
+    \myself{What? That's all you have to tell about the drum kits? ``Use it at you own risk''?}
+    \me{Well, if you want more clues about the risks, you can see the appendix \ref{sec:AvailDrumKits}.}
+  \item The parameter \lstinline!mainSheet! is an optional sheet without any playable note: it's the perfect place to define meters, tempos, fermatas and markers when the project contains several instruments.
+  \item The meaning of the next parameters is strongly related to the explanations of the section \ref{sec:SITandC}. The first sheets with playable notes (but without being preceded by the name of an instrument) are associated with an unique channel with the timbre of a piano. When a string containing the name of an instrument or a percussion is given, \lstinline!cacofonix! creates a new channel (with the right timbre) and associates the next sheets to that instrument.
 \end{itemize}
 
-The names of the instruments and percussions can be found in the sections \ref{sec:AvailInstruments} and \ref{sec:AvailPercussion}. \lstinline!cacofonix! can manage the instruments of the midi specification level 1 and 2, but not necessarily your midi player: the level 2 is not always supported. You have been warned. 
+The names of the instruments and percussions can be found in the sections \ref{sec:AvailInstruments} and \ref{sec:AvailPercussion}. \lstinline!cacofonix! can manage the instruments of the midi specification level 1 and 2, but not necessarily your midi player: the level 2 is not always supported. You have been warned.
 
 \begin{meenv}%
-	Why in the appendix \ref{sec:AvailPercussion}, there are columns \lstinline!V-2! and \lstinline!V-3!?%
+  Why in the appendix \ref{sec:AvailPercussion}, there are columns \lstinline!V-2! and \lstinline!V-3!?%
 \end{meenv}
 \begin{myselfenv}%
-	As you have to know, a sheet of an instrument can't contain a void note and a sheet of a percussion has to contain only void notes. But, moreover, for some percussions, the indexed void notes \lstinline!V-2! and \lstinline!V-3! have special meanings and can be used to play an other (but very related) percussion.%
+  As you have to know, a sheet of an instrument can't contain a void note and a sheet of a percussion has to contain only void notes. But, moreover, for some percussions, the indexed void notes \lstinline!V-2! and \lstinline!V-3! have special meanings and can be used to play an other (but very related) percussion.%
 \end{myselfenv}
 
 \paragraph{}
@@ -1886,10 +1886,10 @@ The names of the instruments and percussions can be found in the sections \ref{s
 We will finish that guide by a last demonstration with percussions:
 
 \begin{lilypond}
-	\score{ <<
-	\relative c'' { \key g \major \time 4/4 d16 e e d e8 e16 d e8 e d16 e e d e8 e16 d e d e8 a g g16 d e8 e16 e8 d16 e8 r16 e, e'8 e e r d16 d d8 d8 a16( b) a g e e ~ e8 b'16 d g4 fis e d e8 e r4 r2 }
-	\addlyrics { Bud -- dy, you're a boy, make a big noise play -- in' in the street. Gon -- na be a big man some -- day. You got mud on yo' face, you big dis -- grace, kick -- in' your can all o -- ver the place, sing -- in' WE WILL, WE WILL ROCK YOU! }
-	>> }
+  \score{ <<
+  \relative c'' { \key g \major \time 4/4 d16 e e d e8 e16 d e8 e d16 e e d e8 e16 d e d e8 a g g16 d e8 e16 e8 d16 e8 r16 e, e'8 e e r d16 d d8 d8 a16( b) a g e e ~ e8 b'16 d g4 fis e d e8 e r4 r2 }
+  \addlyrics { Bud -- dy, you're a boy, make a big noise play -- in' in the street. Gon -- na be a big man some -- day. You got mud on yo' face, you big dis -- grace, kick -- in' your can all o -- ver the place, sing -- in' WE WILL, WE WILL ROCK YOU! }
+  >> }
 \end{lilypond}
 
 \begin{lstlisting}
@@ -1900,27 +1900,27 @@ MChorus = Note( 'Marker', 'Chorus' );
 
 P = [ R:N bar ];
 MAIN = [ Note([4 4]) Note( 'Tempo', 80 ) ...
-	P*2 MVerse P*4 MChorus P*2 ];
+  P*2 MVerse P*4 MChorus P*2 ];
 
 VOICE = [ Note('+') ~MVerse ...
-	D:N16 E:N16 E:N16 D:N16 E:N8 E:N16 D:N16 ...
-		E:N8 E:N8 D:N16 E:N16 E:N16 D:N16 bar ...
-	E:N8 E:N16 D:N16 E:N16 D:N16 E:N8 ...
-		A:N8 G:N8 G:N16 D:N16 E:N8 bar ...
-	E:N8 E:N16 D:N16 E:N8 R:N16 -A:N16 ...
-		E:N8 E:N8 E:N8 R:N8 bar ...
-	D:N16 D:N16 D:N8 D:N8 -A:N16 ~-B:N16 ...
-		-A:N16 -G:N16 -E:N16 -E:N8' -B:N16 D:N16 bar ...
-	MChorus G:N4 Fs:N4 E:N4 D:N4 bar ...
-	E:N8 E:N8 R:N2' bar ];
+  D:N16 E:N16 E:N16 D:N16 E:N8 E:N16 D:N16 ...
+    E:N8 E:N8 D:N16 E:N16 E:N16 D:N16 bar ...
+  E:N8 E:N16 D:N16 E:N16 D:N16 E:N8 ...
+    A:N8 G:N8 G:N16 D:N16 E:N8 bar ...
+  E:N8 E:N16 D:N16 E:N8 R:N16 -A:N16 ...
+    E:N8 E:N8 E:N8 R:N8 bar ...
+  D:N16 D:N16 D:N8 D:N8 -A:N16 ~-B:N16 ...
+    -A:N16 -G:N16 -E:N16 -E:N8' -B:N16 D:N16 bar ...
+  MChorus G:N4 Fs:N4 E:N4 D:N4 bar ...
+  E:N8 E:N8 R:N2' bar ];
 
 BASS = [ V:N8 V:N8 R:N4     V:N8 V:N8 R:N4     bar ]*8;
 CLAP = [ R:N8 R:N8 V:'>':N4 R:N8 R:N8 V:'>':N4 bar ]*8;
 
 cacofonix( 'WeWillRockYou', MAIN, ...
-	'Soprano Sax', VOICE, ...
-	'Acoustic Bass Drum', BASS, ...
-	'Hand Clap', CLAP );
+  'Soprano Sax', VOICE, ...
+  'Acoustic Bass Drum', BASS, ...
+  'Hand Clap', CLAP );
 \end{lstlisting}
 
 \paragraph{}
@@ -2107,9 +2107,9 @@ The names of the available percussions are listed here. A star (\lvlt) before a 
 
 \begin{center}
 \begin{longtable}{llll}
-	& \multicolumn{1}{c}{Name (\lstinline!V-1!)} & \multicolumn{1}{c}{\lstinline!V-2!} & \multicolumn{1}{c}{\lstinline!V-3!} \\
+  & \multicolumn{1}{c}{Name (\lstinline!V-1!)} & \multicolumn{1}{c}{\lstinline!V-2!} & \multicolumn{1}{c}{\lstinline!V-3!} \\
 \endfirsthead
-	& \multicolumn{1}{c}{Name (\lstinline!V-1!)} & \multicolumn{1}{c}{\lstinline!V-2!} & \multicolumn{1}{c}{\lstinline!V-3!} \\
+  & \multicolumn{1}{c}{Name (\lstinline!V-1!)} & \multicolumn{1}{c}{\lstinline!V-2!} & \multicolumn{1}{c}{\lstinline!V-3!} \\
 \endhead
  \lvlt & \lstinline!'High Q'! & & \\
  \lvlt & \lstinline!'Slap'! & & \\
